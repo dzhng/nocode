@@ -99,6 +99,12 @@ To handle user events, use `@testing-library/user-event`. The default `fireEvent
 
 ## Package Management
 
+Keep all dev packages in root. Module packages should be specific to the package. Do NOT run npm install in the module's directory, there should only be one `node_modules` and that's the one in root.
+
+To install a new package in a module, run:
+
+    $ npm i somepackage --workspace=submodule0
+
 Make sure to keep all dependencies updated. Read release notes whenever there is a major update to access compatibility / learn about new features.
 
 To see a list of all oudated packages
