@@ -1,0 +1,19 @@
+{
+  "rules": {
+    "calls": {
+      ".read": true,
+      ".write": "auth != null",
+
+      "$call_id": {
+        "chats": {
+          "all": {
+            ".indexOn": ["createdAt"]
+          }
+        },
+        "reactions": {
+          ".indexOn": ["createdAt"]
+        }
+      }
+    }
+  }
+}

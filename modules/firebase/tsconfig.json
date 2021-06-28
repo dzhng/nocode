@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown"],
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
+    "noEmit": false,
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

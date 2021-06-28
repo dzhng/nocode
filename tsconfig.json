@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2019",
+      "es2020.bigint",
+      "es2020.string",
+      "es2020.symbol.wellknown"
+    ],
+    "allowJs": true,
+    "alwaysStrict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true
+  },
+  "exclude": ["node_modules"]
+}

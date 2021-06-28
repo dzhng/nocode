@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "plugins": ["prettier"],
+  "extends": [
+    "react-app",
+    "prettier",
+    "prettier/prettier",
+    "prettier/@typescript-eslint",
+    "prettier/babel",
+    "prettier/react"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/alt-text": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "react/require-default-props": "off",
+    "no-param-reassign": "off",
+    "import/no-anonymous-default-export": "off"
+  }
+}
