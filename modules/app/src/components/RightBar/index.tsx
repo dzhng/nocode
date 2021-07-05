@@ -12,7 +12,7 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-export default function LeftBar() {
+export default function RightBar() {
   const classes = useStyles();
 
   return <div className={classes.container} />;
