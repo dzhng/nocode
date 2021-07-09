@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-export default function Home() {
+export default function Sheet() {
   const classes = useStyles();
 
   const columns: ColumnType[] = [

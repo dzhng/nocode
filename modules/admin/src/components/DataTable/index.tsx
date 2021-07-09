@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) =>
     columnItem: {
       width: 100,
     },
+    rowContainer: {},
     row: {
       height: 40,
     },
@@ -38,12 +39,14 @@ export default function DataTable({ columns, data }: PropTypes) {
         ))}
       </div>
 
-      <div className={classes.row}>
-        {data.map((dataRow) =>
-          columns.map((column) => (
-            <div className={classes.rowItem}>{dataRow[column.columnID]}</div>
-          )),
-        )}
+      <div className={classes.rowContainer}>
+        {data.map((dataRow) => (
+          <div className={classes.row}>
+            {columns.map((column) => (
+              <div className={classes.rowItem}>{JSON.stringify(dataRow[column.columnID])}</div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
