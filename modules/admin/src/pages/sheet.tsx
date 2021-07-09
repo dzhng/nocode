@@ -1,7 +1,6 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-
-import LeftBar from '~/components/LeftBar';
-import RightBar from '~/components/RightBar';
+import { DataTypes, ColumnType, RowType } from '~/types';
+import DataTable from '~/components/DataTable';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -22,21 +21,31 @@ const useStyles = makeStyles((theme) =>
       height: `calc(100% - ${theme.headerBarHeight}px)`,
       display: 'flex',
     },
-    center: {
-      height: '100%',
-      flexGrow: 1,
-    },
-    right: {
-      flexGrow: 0,
-      flexShrink: 0,
-      width: 200,
-      backgroundColor: '#CCC',
-    },
   }),
 );
 
 export default function Home() {
   const classes = useStyles();
+
+  const columns: ColumnType[] = [
+    {
+      columnID: '1',
+      name: 'Name',
+      type: DataTypes.Text,
+    },
+    {
+      columnID: '2',
+      name: 'Peak Chart Position',
+      type: DataTypes.Number,
+    },
+    {
+      columnID: '3',
+      name: 'Release Date',
+      type: DataTypes.Date,
+    },
+  ];
+
+  const data: RowType[] = [{ '1': 'Jay-Z', '2': 1, '3': new Date() }];
 
   return (
     <div className={classes.container}>
@@ -44,9 +53,7 @@ export default function Home() {
         <img className={classes.logo} src="/logo.png" />
       </div>
       <div className={classes.content}>
-        <LeftBar />
-        <div className={classes.center}></div>
-        <RightBar />
+        <DataTable columns={columns} data={data} />
       </div>
     </div>
   );

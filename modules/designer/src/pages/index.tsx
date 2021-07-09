@@ -3,8 +3,6 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import LeftBar from '~/components/LeftBar';
 import RightBar from '~/components/RightBar';
 
-const NavBarHeight = 40;
-
 const useStyles = makeStyles((theme) =>
   createStyles({
     container: {
@@ -14,14 +12,14 @@ const useStyles = makeStyles((theme) =>
     navBar: {
       width: '100%',
       borderBottom: theme.dividerBorder,
-      height: NavBarHeight,
+      height: theme.headerBarHeight,
     },
     logo: {
-      height: NavBarHeight - 10,
+      height: theme.headerBarHeight - 10,
       margin: 5,
     },
     content: {
-      height: `calc(100% - ${NavBarHeight}px)`,
+      height: `calc(100% - ${theme.headerBarHeight}px)`,
       display: 'flex',
     },
     center: {
