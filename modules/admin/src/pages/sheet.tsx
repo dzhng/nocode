@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { DataTypes, ColumnType, RowType } from '~/types';
 import DataTable from '~/components/DataTable';
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) =>
 export default function Sheet() {
   const classes = useStyles();
 
-  const columns: ColumnType[] = [
+  const [columns, setColumns] = useState<ColumnType[]>([
     {
       columnID: '1',
       name: 'Name',
@@ -43,9 +44,13 @@ export default function Sheet() {
       name: 'Release Date',
       type: DataTypes.Date,
     },
-  ];
+  ]);
 
   const data: RowType[] = [{ '1': 'Jay-Z', '2': 1, '3': new Date() }];
+
+  const addColumn = (type: ColumnType) => {
+    setColumns([...columns, type]);
+  };
 
   return (
     <div className={classes.container}>
@@ -53,7 +58,7 @@ export default function Sheet() {
         <img className={classes.logo} src="/logo.png" />
       </div>
       <div className={classes.content}>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} addColumn={addColumn} />
       </div>
     </div>
   );

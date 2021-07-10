@@ -115,7 +115,7 @@ export default createMuiTheme({
   },
 
   // custom
-  headerBarHeight: 65,
+  headerBarHeight: 40,
   transitionTime: '0.3s',
   dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
   callControlHeightXs: 48,

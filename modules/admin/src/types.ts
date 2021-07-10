@@ -45,12 +45,14 @@ export interface TableMeta {
 
 export interface ColumnType {
   columnID: string;
-  name: String;
+  name: string;
   type: DataTypes;
   typeMetadata?: SelectionMeta | ListMeta | RelationMeta;
   tableMetadata?: TableMeta;
 }
 
+export type CellType = string | number | Date | object | string[] | number[];
+
 export interface RowType {
-  [columnID: string]: any;
+  [columnID: string]: CellType;
 }

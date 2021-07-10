@@ -119,6 +119,8 @@ To upgrade a specific package to latest major version (make sure to research com
 
     $ npm install <package_name>@latest
 
+NOTE: There is a shared module under `modules/shared` that contains all shared code. Whenever an npm module want to use the shared module, make sure to modify `next.config.js` with the `transpile-modules` plugin. This will ensure that the shared module's typescript files also gets compiled as part of next.js's compilation process.
+
 ## Style Guides
 
 Style will be automatically enforced via prettier and eslint. An autoformatter will be run on every git commit via lint-staged, and a linting script is available if you want to manually run it.

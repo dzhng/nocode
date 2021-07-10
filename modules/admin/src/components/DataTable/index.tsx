@@ -1,9 +1,11 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import type { ColumnType, RowType } from '~/types';
+import { DataTypes, ColumnType, RowType } from '~/types';
+import Cell from './Cell';
 
 interface PropTypes {
   columns: ColumnType[];
   data: RowType[];
+  addColumn(type: ColumnType): void;
 }
 
 const useStyles = makeStyles((theme) =>
@@ -20,7 +22,7 @@ const useStyles = makeStyles((theme) =>
     row: {
       height: 40,
     },
-    cell: {
+    cellContainer: {
       display: 'inline-block',
       width: 100,
       height: '100%',
@@ -30,28 +32,43 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-function AddNewColumnHeader() {
+function AddNewColumnHeader({ onClick }: { onClick(): void }) {
   const classes = useStyles();
-  return <div className={classes.cell}>+</div>;
+  return (
+    <div className={classes.cell} onClick={onClick}>
+      +
+    </div>
+  );
 }
 
-export default function DataTable({ columns, data }: PropTypes) {
+export default function DataTable({ columns, data, addColumn }: PropTypes) {
   const classes = useStyles();
+
+  const add = () =>
+    addColumn({
+      columnID: String(Math.floor(Math.random() * 1000)),
+      name: 'test',
+      type: DataTypes.Text,
+    });
 
   return (
     <div className={classes.container}>
       <div className={classes.columnHeader}>
         {columns.map((column) => (
-          <div className={classes.cell}>{column.name}</div>
+          <div className={classes.cellContainer}>
+            <Cell column={column} isHeader />
+          </div>
         ))}
-        <AddNewColumnHeader />
+        <AddNewColumnHeader onClick={add} />
       </div>
 
       <div className={classes.rowContainer}>
         {data.map((dataRow) => (
           <div className={classes.row}>
             {columns.map((column) => (
-              <div className={classes.cell}>{JSON.stringify(dataRow[column.columnID])}</div>
+              <div className={classes.cellContainer}>
+                <Cell column={column} data={dataRow[column.columnID]} />
+              </div>
             ))}
           </div>
         ))}
