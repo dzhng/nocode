@@ -53,6 +53,8 @@ export interface ColumnType {
 
 export type CellType = string | number | Date | object | string[] | number[];
 
+// each row is a record, hence the _id is required to track recordID
 export interface RowType {
+  _id: string;
   [columnID: string]: CellType;
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { DataTypes, ColumnType, RowType } from '~/types';
+import { cloneDeep } from 'lodash';
+import { DataTypes, ColumnType, RowType, CellType } from '~/types';
 import DataTable from '~/components/DataTable';
 
 const useStyles = makeStyles((theme) =>
@@ -46,10 +47,21 @@ export default function Sheet() {
     },
   ]);
 
-  const data: RowType[] = [{ '1': 'Jay-Z', '2': 1, '3': new Date() }];
+  const [data, setData] = useState<RowType[]>([
+    { _id: '1', '1': 'Jay-Z', '2': 1, '3': new Date() },
+  ]);
 
   const addColumn = (type: ColumnType) => {
     setColumns([...columns, type]);
+  };
+
+  const changeCell = (location: { columnID: string; rowID?: string }, value: CellType) => {
+    const newData = cloneDeep(data);
+    const row = newData.find((aRow) => aRow._id === location.rowID);
+    if (row) {
+      row[location.columnID] = value;
+      setData(newData); // TODO: need to make immutable value here
+    }
   };
 
   return (
@@ -58,7 +70,7 @@ export default function Sheet() {
         <img className={classes.logo} src="/logo.png" />
       </div>
       <div className={classes.content}>
-        <DataTable columns={columns} data={data} addColumn={addColumn} />
+        <DataTable columns={columns} data={data} addColumn={addColumn} changeCell={changeCell} />
       </div>
     </div>
   );

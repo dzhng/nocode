@@ -1,11 +1,12 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { DataTypes, ColumnType, RowType } from '~/types';
+import { DataTypes, ColumnType, RowType, CellType } from '~/types';
 import Cell from './Cell';
 
 interface PropTypes {
   columns: ColumnType[];
   data: RowType[];
   addColumn(type: ColumnType): void;
+  changeCell(location: { columnID: string; rowID?: string }, value: CellType): void;
 }
 
 const useStyles = makeStyles((theme) =>
@@ -35,13 +36,13 @@ const useStyles = makeStyles((theme) =>
 function AddNewColumnHeader({ onClick }: { onClick(): void }) {
   const classes = useStyles();
   return (
-    <div className={classes.cell} onClick={onClick}>
+    <div className={classes.cellContainer} onClick={onClick}>
       +
     </div>
   );
 }
 
-export default function DataTable({ columns, data, addColumn }: PropTypes) {
+export default function DataTable({ columns, data, addColumn, changeCell }: PropTypes) {
   const classes = useStyles();
 
   const add = () =>
@@ -56,7 +57,11 @@ export default function DataTable({ columns, data, addColumn }: PropTypes) {
       <div className={classes.columnHeader}>
         {columns.map((column) => (
           <div className={classes.cellContainer}>
-            <Cell column={column} isHeader />
+            <Cell
+              isHeader
+              column={column}
+              onChange={(newData) => changeCell({ columnID: column.columnID }, newData)}
+            />
           </div>
         ))}
         <AddNewColumnHeader onClick={add} />
@@ -67,7 +72,13 @@ export default function DataTable({ columns, data, addColumn }: PropTypes) {
           <div className={classes.row}>
             {columns.map((column) => (
               <div className={classes.cellContainer}>
-                <Cell column={column} data={dataRow[column.columnID]} />
+                <Cell
+                  column={column}
+                  data={dataRow[column.columnID]}
+                  onChange={(newData) =>
+                    changeCell({ columnID: column.columnID, rowID: dataRow._id }, newData)
+                  }
+                />
               </div>
             ))}
           </div>

@@ -1,14 +1,17 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { formatRelativeDate } from 'nocode-shared/utils';
-import { DataTypes, CellType, ColumnType, RowType } from '~/types';
+import { DataTypes, CellType, ColumnType } from '~/types';
+
+import { TextCellInput, NumberCellInput } from './CellInput';
 
 interface PropTypes {
   column: ColumnType;
   data?: CellType;
   isHeader?: boolean;
+  onChange(data: CellType): void;
 }
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     container: {
       width: '100%',
@@ -17,7 +20,7 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-export default function Cell({ column, data, isHeader }: PropTypes) {
+export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
   const classes = useStyles();
 
   const getCellComponent = (): JSX.Element => {
@@ -26,17 +29,17 @@ export default function Cell({ column, data, isHeader }: PropTypes) {
     }
 
     if (column.type === DataTypes.Text) {
-      return <span>String(data)</span>;
+      return <TextCellInput value={String(data)} onChange={onChange} />;
     } else if (column.type === DataTypes.Image) {
       return <span>Image</span>; // TODO
     } else if (column.type === DataTypes.Number) {
-      return <span>String(data)</span>;
+      return <NumberCellInput value={Number(data)} onChange={onChange} />;
     } else if (column.type === DataTypes.File) {
       return <span>File</span>; // TODO
     } else if (column.type === DataTypes.Date) {
       return <span>{data instanceof Date ? formatRelativeDate(data) : ''}</span>;
     } else if (column.type === DataTypes.Location) {
-      return <span>String(data)</span>; // TODO
+      return <TextCellInput value={String(data)} onChange={onChange} />;
     } else if (
       column.type === DataTypes.SingleSelection ||
       column.type === DataTypes.MultipleSelection
@@ -61,7 +64,7 @@ export default function Cell({ column, data, isHeader }: PropTypes) {
     }
   };
 
-  const displayComponent = isHeader ? <span>column.name</span> : getCellComponent();
+  const displayComponent = isHeader ? <span>{column.name}</span> : getCellComponent();
 
   return <div className={classes.container}>{displayComponent}</div>;
 }
