@@ -13,7 +13,7 @@ export function TextCellInput({
   value,
   onChange,
 }: {
-  value: string;
+  value?: string;
   onChange(input: string): void;
 }) {
   const classes = useStyles();
@@ -32,8 +32,8 @@ export function NumberCellInput({
   value,
   onChange,
 }: {
-  value: number;
-  onChange(input: number): void;
+  value?: number;
+  onChange(input?: number): void;
 }) {
   const classes = useStyles();
 
@@ -41,8 +41,15 @@ export function NumberCellInput({
     <input
       className={classes.input}
       type="number"
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
+      value={value === undefined ? '' : value}
+      onChange={(e) => {
+        const inputVal = e.target.value;
+        if (inputVal === '') {
+          onChange(undefined);
+        } else {
+          onChange(Number(inputVal));
+        }
+      }}
     />
   );
 }

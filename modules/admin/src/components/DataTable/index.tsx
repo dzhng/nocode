@@ -6,7 +6,7 @@ interface PropTypes {
   columns: ColumnType[];
   data: RowType[];
   addColumn(type: ColumnType): void;
-  changeCell(location: { columnID: string; rowID?: string }, value: CellType): void;
+  changeCell(location: { columnID: string; rowID?: string }, value?: CellType): void;
 }
 
 const useStyles = makeStyles((theme) =>

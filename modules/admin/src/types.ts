@@ -47,6 +47,7 @@ export interface ColumnType {
   columnID: string;
   name: string;
   type: DataTypes;
+  defaultValue?: CellType;
   typeMetadata?: SelectionMeta | ListMeta | RelationMeta;
   tableMetadata?: TableMeta;
 }
@@ -56,5 +57,5 @@ export type CellType = string | number | Date | object | string[] | number[];
 // each row is a record, hence the _id is required to track recordID
 export interface RowType {
   _id: string;
-  [columnID: string]: CellType;
+  [columnID: string]: CellType | undefined;
 }

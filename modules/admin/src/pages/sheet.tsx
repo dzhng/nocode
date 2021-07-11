@@ -55,7 +55,7 @@ export default function Sheet() {
     setColumns([...columns, type]);
   };
 
-  const changeCell = (location: { columnID: string; rowID?: string }, value: CellType) => {
+  const changeCell = (location: { columnID: string; rowID?: string }, value?: CellType) => {
     const newData = cloneDeep(data);
     const row = newData.find((aRow) => aRow._id === location.rowID);
     if (row) {

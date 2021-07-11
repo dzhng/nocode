@@ -8,7 +8,7 @@ interface PropTypes {
   column: ColumnType;
   data?: CellType;
   isHeader?: boolean;
-  onChange(data: CellType): void;
+  onChange(data?: CellType): void;
 }
 
 const useStyles = makeStyles(() =>
@@ -24,16 +24,19 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
   const classes = useStyles();
 
   const getCellComponent = (): JSX.Element => {
-    if (!data) {
-      return <span></span>;
-    }
-
     if (column.type === DataTypes.Text) {
-      return <TextCellInput value={String(data)} onChange={onChange} />;
+      return (
+        <TextCellInput value={data === undefined ? undefined : String(data)} onChange={onChange} />
+      );
     } else if (column.type === DataTypes.Image) {
       return <span>Image</span>; // TODO
     } else if (column.type === DataTypes.Number) {
-      return <NumberCellInput value={Number(data)} onChange={onChange} />;
+      return (
+        <NumberCellInput
+          value={data === undefined ? undefined : Number(data)}
+          onChange={onChange}
+        />
+      );
     } else if (column.type === DataTypes.File) {
       return <span>File</span>; // TODO
     } else if (column.type === DataTypes.Date) {
