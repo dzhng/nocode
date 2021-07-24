@@ -6,6 +6,7 @@ interface PropTypes {
   columns: ColumnType[];
   data: RowType[];
   addColumn(type: ColumnType): void;
+  addRow(index: number): void;
   changeCell(location: { columnID: string; rowID?: string }, value?: CellType): void;
 }
 
@@ -42,15 +43,26 @@ function AddNewColumnHeader({ onClick }: { onClick(): void }) {
   );
 }
 
-export default function DataTable({ columns, data, addColumn, changeCell }: PropTypes) {
+function AddNewRow({ onClick }: { onClick(): void }) {
+  const classes = useStyles();
+  return (
+    <div className={classes.row} onClick={onClick}>
+      +
+    </div>
+  );
+}
+
+export default function DataTable({ columns, data, addColumn, addRow, changeCell }: PropTypes) {
   const classes = useStyles();
 
-  const add = () =>
+  const onAddColumn = () =>
     addColumn({
       columnID: String(Math.floor(Math.random() * 1000)),
       name: 'test',
       type: DataTypes.Text,
     });
+
+  const onAddRow = () => addRow(0);
 
   return (
     <div className={classes.container}>
@@ -64,7 +76,7 @@ export default function DataTable({ columns, data, addColumn, changeCell }: Prop
             />
           </div>
         ))}
-        <AddNewColumnHeader onClick={add} />
+        <AddNewColumnHeader onClick={onAddColumn} />
       </div>
 
       <div className={classes.rowContainer}>
@@ -83,6 +95,10 @@ export default function DataTable({ columns, data, addColumn, changeCell }: Prop
             ))}
           </div>
         ))}
+      </div>
+
+      <div className={classes.rowContainer}>
+        <AddNewRow onClick={onAddRow} />
       </div>
     </div>
   );

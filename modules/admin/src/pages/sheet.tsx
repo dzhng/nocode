@@ -55,6 +55,10 @@ export default function Sheet() {
     setColumns([...columns, type]);
   };
 
+  const addRow = (index: number) => {
+    setData([...data, { _id: '2' }]);
+  };
+
   const changeCell = (location: { columnID: string; rowID?: string }, value?: CellType) => {
     const newData = cloneDeep(data);
     const row = newData.find((aRow) => aRow._id === location.rowID);
@@ -70,7 +74,13 @@ export default function Sheet() {
         <img className={classes.logo} src="/logo.png" />
       </div>
       <div className={classes.content}>
-        <DataTable columns={columns} data={data} addColumn={addColumn} changeCell={changeCell} />
+        <DataTable
+          columns={columns}
+          data={data}
+          addColumn={addColumn}
+          addRow={addRow}
+          changeCell={changeCell}
+        />
       </div>
     </div>
   );
