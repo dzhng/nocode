@@ -8,6 +8,7 @@ interface PropTypes {
   addColumn(type: ColumnType): void;
   addRow(index: number): void;
   changeCell(location: { columnID: string; rowID?: string }, value?: CellType): void;
+  changeColumn(columnID: string, newData: { name: string; type: DataTypes }): void;
 }
 
 const useStyles = makeStyles((theme) =>
@@ -52,7 +53,14 @@ function AddNewRow({ onClick }: { onClick(): void }) {
   );
 }
 
-export default function DataTable({ columns, data, addColumn, addRow, changeCell }: PropTypes) {
+export default function DataTable({
+  columns,
+  data,
+  addColumn,
+  addRow,
+  changeCell,
+  changeColumn,
+}: PropTypes) {
   const classes = useStyles();
 
   const onAddColumn = () =>
@@ -72,7 +80,9 @@ export default function DataTable({ columns, data, addColumn, addRow, changeCell
             <Cell
               isHeader
               column={column}
-              onChange={(newData) => changeCell({ columnID: column.columnID }, newData)}
+              onChange={(newData) =>
+                changeColumn(column.columnID, { name: String(newData), type: column.type })
+              }
             />
           </div>
         ))}

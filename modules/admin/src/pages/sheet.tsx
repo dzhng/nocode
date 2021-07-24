@@ -66,8 +66,18 @@ export default function Sheet() {
     const row = newData.find((aRow) => aRow._id === location.rowID);
     if (row) {
       row[location.columnID] = value;
-      setData(newData); // TODO: need to make immutable value here
+      setData(newData);
     }
+  };
+
+  const changeColumn = (columnID: string, newData: { name: string; type: DataTypes }) => {
+    const cloned = clone(columns);
+    const column = cloned.find((c) => c.columnID === columnID);
+    if (column) {
+      column.name = newData.name;
+      column.type = newData.type;
+    }
+    setColumns(cloned);
   };
 
   return (
@@ -82,6 +92,7 @@ export default function Sheet() {
           addColumn={addColumn}
           addRow={addRow}
           changeCell={changeCell}
+          changeColumn={changeColumn}
         />
       </div>
     </div>

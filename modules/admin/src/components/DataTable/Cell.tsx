@@ -66,7 +66,11 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
     }
   };
 
-  const displayComponent = isHeader ? <span>{column.name}</span> : getCellComponent();
+  const displayComponent = isHeader ? (
+    <TextCellInput value={column.name} onChange={onChange} />
+  ) : (
+    getCellComponent()
+  );
 
   return <div className={classes.container}>{displayComponent}</div>;
 }
