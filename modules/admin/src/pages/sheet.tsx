@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { cloneDeep } from 'lodash';
+import { clone } from 'lodash';
 import { DataTypes, ColumnType, RowType, CellType } from '~/types';
 import DataTable from '~/components/DataTable';
 
@@ -56,11 +56,13 @@ export default function Sheet() {
   };
 
   const addRow = (index: number) => {
-    setData([...data, { _id: '2' }]);
+    const cloned = clone(data);
+    cloned.splice(index, 0, { _id: String(Math.floor(Math.random() * 100000)) });
+    setData(cloned);
   };
 
   const changeCell = (location: { columnID: string; rowID?: string }, value?: CellType) => {
-    const newData = cloneDeep(data);
+    const newData = clone(data);
     const row = newData.find((aRow) => aRow._id === location.rowID);
     if (row) {
       row[location.columnID] = value;

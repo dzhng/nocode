@@ -25,9 +25,8 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
 
   const getCellComponent = (): JSX.Element => {
     if (column.type === DataTypes.Text) {
-      return (
-        <TextCellInput value={data === undefined ? undefined : String(data)} onChange={onChange} />
-      );
+      // should show empty string for empty text cell, or else React may recycle old values
+      return <TextCellInput value={data === undefined ? '' : String(data)} onChange={onChange} />;
     } else if (column.type === DataTypes.Image) {
       return <span>Image</span>; // TODO
     } else if (column.type === DataTypes.Number) {

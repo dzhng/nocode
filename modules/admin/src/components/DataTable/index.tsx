@@ -68,7 +68,7 @@ export default function DataTable({ columns, data, addColumn, addRow, changeCell
     <div className={classes.container}>
       <div className={classes.columnHeader}>
         {columns.map((column) => (
-          <div className={classes.cellContainer}>
+          <div key={column.columnID} className={classes.cellContainer}>
             <Cell
               isHeader
               column={column}
@@ -83,7 +83,7 @@ export default function DataTable({ columns, data, addColumn, addRow, changeCell
         {data.map((dataRow) => (
           <div className={classes.row}>
             {columns.map((column) => (
-              <div className={classes.cellContainer}>
+              <div key={column.columnID} className={classes.cellContainer}>
                 <Cell
                   column={column}
                   data={dataRow[column.columnID]}
