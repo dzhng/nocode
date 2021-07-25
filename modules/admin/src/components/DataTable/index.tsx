@@ -91,7 +91,7 @@ export default function DataTable({
 
       <div className={classes.rowContainer}>
         {data.map((dataRow) => (
-          <div className={classes.row}>
+          <div key={dataRow._id} className={classes.row}>
             {columns.map((column) => (
               <div key={column.columnID} className={classes.cellContainer}>
                 <Cell
