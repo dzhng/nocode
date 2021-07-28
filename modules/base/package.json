@@ -1,0 +1,44 @@
+{
+  "name": "nocode-admin",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@date-io/dayjs": "^2.10.8",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "clsx": "^1.1.1",
+    "dayjs": "^1.10.4",
+    "firebase": "^8.2.3",
+    "firebase-admin": "^9.4.2",
+    "firebase-functions": "^3.13.2",
+    "framer-motion": "^3.2.2-rc.1",
+    "lodash": "^4.17.21",
+    "next": "^11.0.1",
+    "notistack": "^1.0.3",
+    "nprogress": "^0.2.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "build": "next build && next export -o build",
+    "clean": "rm -rf .next build",
+    "start": "next start",
+    "test": "jest --passWithNoTests",
+    "test:dev": "jest --watch --runInBand --coverage --passWithNoTests",
+    "lint": "eslint src/**/*.{ts,tsx} --fix"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
