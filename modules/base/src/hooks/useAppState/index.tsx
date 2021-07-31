@@ -31,7 +31,7 @@ export interface StateContextType {
 
 export const StateContext = createContext<StateContextType>(null!);
 
-export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
+export function AppStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<Error | string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
 
