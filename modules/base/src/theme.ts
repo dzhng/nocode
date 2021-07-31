@@ -1,7 +1,7 @@
-import { createMuiTheme } from '@material-ui/core';
+import { createTheme } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
-declare module '@material-ui/core/styles/createMuiTheme' {
+declare module '@material-ui/core/styles/createTheme' {
   interface Theme {
     headerBarHeight: number;
     transitionTime: string;
@@ -20,7 +20,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
     };
   }
 
-  // allow configuration using `createMuiTheme`
+  // allow configuration using `createTheme`
   interface ThemeOptions {
     headerBarHeight?: number;
     transitionTime?: string;
@@ -41,7 +41,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
 // Primary is for main actions
 // Secondary is for host or moderation related actions
 
-export default createMuiTheme({
+export default createTheme({
   shape: {
     borderRadius: 6,
   },
