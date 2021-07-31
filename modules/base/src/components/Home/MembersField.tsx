@@ -6,8 +6,8 @@ import { Paper, InputBase, IconButton } from '@material-ui/core';
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { Add as AddIcon, HighlightOff as RemoveIcon } from '@material-ui/icons';
 import { createStyles, makeStyles, styled, Theme } from '@material-ui/core/styles';
-import { shortName } from '~/utils';
-import { LocalModel, User } from '~/firebase/schema-types';
+import { shortName } from 'shared/utils';
+import { LocalModel, User } from 'shared/schema';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

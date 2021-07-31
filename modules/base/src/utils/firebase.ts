@@ -5,7 +5,7 @@ import 'firebase/database';
 import 'firebase/storage';
 import 'firebase/analytics';
 
-import { isBrowser, isTestEnv } from './index';
+import { isBrowser, isTestEnv } from 'shared/utils';
 
 const config =
   process.env.NODE_ENV === 'test'

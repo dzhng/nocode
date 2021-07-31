@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { LocalModel, User } from '~/firebase/schema-types';
+import { LocalModel, User } from 'shared/schema';
 import MembersField from './MembersField';
 
 interface PropTypes {

@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Card, Button, Tooltip } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { VideoCall } from '@material-ui/icons';
-import { LocalModel, Template } from '~/firebase/schema-types';
+import { LocalModel, Template } from 'shared/schema';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
