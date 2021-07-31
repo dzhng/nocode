@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import { IconButton, Menu as MenuContainer, MenuItem, Tooltip } from '@material-ui/core';

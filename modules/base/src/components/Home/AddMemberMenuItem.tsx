@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState, useCallback } from 'react';
 import {
   MenuItem,
   Dialog,

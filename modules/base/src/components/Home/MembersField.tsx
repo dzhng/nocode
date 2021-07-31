@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { includes, trim, without } from 'lodash';
 import clsx from 'clsx';
 import * as Yup from 'yup';

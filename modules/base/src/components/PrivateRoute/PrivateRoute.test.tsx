@@ -1,11 +1,10 @@
-import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { useRouter } from 'next/router';
-import { useAppState } from '~/state';
+import { useAppState } from '~/hooks/useAppState';
 import PrivateRoute from './PrivateRoute';
 
 jest.mock('next/router');
-jest.mock('~/state');
+jest.mock('~/hooks/useAppState');
 
 const mockUseAppState = useAppState as jest.Mock<any>;
 const mockUseRouter = useRouter as jest.Mock<any>;

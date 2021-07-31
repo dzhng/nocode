@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAppState } from '~/state';
+import { useAppState } from '~/hooks/useAppState';
 
 export default function PrivateRoute(props: {
   children: React.ReactChild;

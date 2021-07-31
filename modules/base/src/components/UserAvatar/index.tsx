@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import clsx from 'clsx';
 import { Avatar } from '@material-ui/core';
 import makeStyles from '@material-ui/styles/makeStyles';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography, Card } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { AddCircleOutline as AddIcon } from '@material-ui/icons';

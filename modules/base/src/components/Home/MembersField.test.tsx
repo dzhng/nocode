@@ -1,4 +1,3 @@
-import React from 'react';
 import { screen, render, waitFor, within } from '@testing-library/react';
 import fireEvent from '@testing-library/user-event';
 import { LocalModel, User } from 'shared/schema';

@@ -1,23 +1,16 @@
-import React from 'react';
 import { screen, render, within } from '@testing-library/react';
 import fireEvent from '@testing-library/user-event';
-import { useAppState } from '~/state';
-import useVideoContext from '~/hooks/Video/useVideoContext/useVideoContext';
-import Menu from './Menu';
+import { useAppState } from '~/hooks/useAppState';
+import Menu from './index';
 
 jest.mock('~/state');
 jest.mock('~/hooks/Video/useVideoContext/useVideoContext');
 
 const mockUseAppState = useAppState as jest.Mock<any>;
-const mockUseVideoContext = useVideoContext as jest.Mock<any>;
 
 describe('the Menu component', () => {
   const mockDisconnect = jest.fn();
   const mockTrack = { stop: jest.fn() };
-  mockUseVideoContext.mockImplementation(() => ({
-    room: { disconnect: mockDisconnect },
-    localTracks: [mockTrack],
-  }));
 
   describe('when there is a user', () => {
     it('should render the UserAvatar component', () => {

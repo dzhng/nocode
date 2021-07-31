@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Collections, LocalModel, Template, Member, User, Invite } from 'shared/schema';
 
 import firebase, { db } from '~/utils/firebase';

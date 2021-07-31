@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Router from 'next/router';
 import { CssBaseline } from '@material-ui/core';

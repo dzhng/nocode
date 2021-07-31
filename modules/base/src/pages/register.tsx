@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 import {
@@ -13,7 +13,7 @@ import {
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { ErrorOutline as ErrorIcon } from '@material-ui/icons';
-import { useAppState } from '~/state';
+import { useAppState } from '~/hooks/useAppState';
 import { Logo } from '~/components/Icons';
 
 const FormSchema = Yup.object().shape({

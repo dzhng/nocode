@@ -1,6 +1,5 @@
-import React from 'react';
 import { screen, render, within } from '@testing-library/react';
-import UserAvatar, { getInitials } from './UserAvatar';
+import UserAvatar, { getInitials } from './index';
 
 describe('the UserAvatar component', () => {
   it('should display the users initials when there is a displayName property', () => {
