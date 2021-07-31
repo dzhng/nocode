@@ -4,9 +4,9 @@ import { useRouter } from 'next/router';
 import { IconButton, Menu as MenuContainer, MenuItem, Tooltip } from '@material-ui/core';
 import { MoreVert as MoreIcon } from '@material-ui/icons';
 
-import { useAppState } from '~/state';
-import UserAvatar from '~/components/UserAvatar/UserAvatar';
-import AboutDialog from '../AboutDialog/AboutDialog';
+import { useAppState } from '~/hooks/useAppState';
+import UserAvatar from '~/components/UserAvatar';
+import AboutDialog from '../AboutDialog';
 
 export default function Menu() {
   const router = useRouter();

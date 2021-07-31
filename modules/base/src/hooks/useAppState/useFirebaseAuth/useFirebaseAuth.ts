@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import fetch from 'isomorphic-unfetch';
+import { Collections, User } from 'shared/schema';
 import firebase, { db, auth } from '~/utils/firebase';
-import { Collections, User } from '~/firebase/schema-types';
-import { TWILIO_TOKEN_ENDPOINT } from '~/constants';
 
 export default function useFirebaseAuth() {
   const [user, setUser] = useState<firebase.User | null>(null);
@@ -16,30 +14,6 @@ export default function useFirebaseAuth() {
 
     return unsubscribe;
   }, []);
-
-  // fetch twilio token for call from internal endpoint (which talks to twilio admin API)
-  // TODO: move this to another file that's not firebase related
-  const getToken = useCallback(
-    async (roomName: string): Promise<string> => {
-      if (!user) {
-        return Promise.reject('User is not authenticated');
-      }
-
-      const idToken = await user.getIdToken();
-      const params = JSON.stringify({ idToken, roomName });
-
-      const res = await fetch(`${TWILIO_TOKEN_ENDPOINT}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: params,
-      });
-
-      return res.text();
-    },
-    [user],
-  );
 
   const signInWithEmailAndPassword = useCallback(
     async (email, password) => {
@@ -136,7 +110,6 @@ export default function useFirebaseAuth() {
     signInAnonymously,
     signOut,
     isAuthReady,
-    getToken,
     register,
   };
 }

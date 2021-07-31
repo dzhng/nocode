@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Collections, User, Workspace, Member, LocalModel } from 'shared/schema';
 import firebase, { db } from '~/utils/firebase';
-import { Collections, User, Workspace, Member, LocalModel } from '~/firebase/schema-types';
 import useFirebaseAuth from '../useFirebaseAuth/useFirebaseAuth';
 
 export default function useWorkspaces() {

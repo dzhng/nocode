@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import firebase from 'firebase';
-import { User, Workspace, LocalModel } from 'nocode-shared/schema';
+import { User, Workspace, LocalModel } from 'shared/schema';
 
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import useWorkspaces from './useWorkspaces/useWorkspaces';

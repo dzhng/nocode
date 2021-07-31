@@ -24,11 +24,10 @@ import {
   Button,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import { VideoCallIcon, CallHistoryIcon } from '~/components/Icons';
-import { isBrowser } from '~/utils';
-import { useAppState } from '~/state';
-import { Logo } from '~/components/Icons';
-import Menu from './Menu/Menu';
+import { isBrowser } from 'shared/utils';
+import { Logo, VideoCallIcon, CallHistoryIcon } from '~/components/Icons';
+import { useAppState } from '~/hooks/useAppState';
+import Menu from './Menu';
 
 const NewWorkspaceValue = '__New_Workspace__';
 const sidebarWidth = 300;

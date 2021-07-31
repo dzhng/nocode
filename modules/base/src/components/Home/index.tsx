@@ -6,16 +6,16 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { MoreVert as MoreIcon, Menu as MenuIcon } from '@material-ui/icons';
 import { Skeleton } from '@material-ui/lab';
 import useDimensions from 'react-cool-dimensions';
+import { LocalModel, Template, Workspace, User } from 'shared/schema';
 
-import { LocalModel, Template, Workspace, User } from '~/firebase/schema-types';
-import UserAvatar from '~/components/UserAvatar/UserAvatar';
-import Nav from '~/components/Nav/Nav';
+import UserAvatar from '~/components/UserAvatar';
+import Nav from '~/components/Nav';
+import { useAppState } from '~/hooks/useAppState';
 import TemplateCard from './TemplateCard';
 import CreateCard from './CreateCard';
 import { AddMemberDialog } from './AddMemberMenuItem';
 import LeaveMenuItem from './LeaveMenuItem';
 import DeleteMenuItem from './DeleteMenuItem';
-import { useAppState } from '~/state';
 
 interface PropTypes {
   workspace?: LocalModel<Workspace>;
@@ -147,7 +147,7 @@ export default function Home({
   const { workspaces, isWorkspacesReady } = useAppState();
 
   // measure width of header bar to calculate how many avatars to show
-  const { ref, width } = useDimensions<HTMLDivElement>({ useBorderBoxSize: true });
+  const { observe, width } = useDimensions<HTMLDivElement>({ useBorderBoxSize: true });
 
   const handleMenuClick = useCallback(() => {
     setSettingsMenuOpen(false);
@@ -171,7 +171,7 @@ export default function Home({
         <Nav mobileOpen={mobileOpen} closeModal={() => setMobileOpen(false)} />
 
         <Grid container className={classes.grid} spacing={3}>
-          <Grid item xs={12} className={classes.titleBar} ref={ref}>
+          <Grid item xs={12} className={classes.titleBar} ref={observe}>
             <div className={classes.titleSection}>
               <Hidden smUp implementation="css">
                 <IconButton onClick={() => setMobileOpen(true)}>
@@ -308,7 +308,7 @@ export default function Home({
       <div className={classes.container}>
         <Nav mobileOpen={mobileOpen} closeModal={() => setMobileOpen(false)} />
         <Grid container className={classes.grid} spacing={3}>
-          <Grid item xs={12} className={classes.titleBar} ref={ref}>
+          <Grid item xs={12} className={classes.titleBar} ref={observe}>
             <div className={classes.titleSection}>
               <Hidden smUp implementation="css">
                 <IconButton onClick={() => setMobileOpen(true)}>
