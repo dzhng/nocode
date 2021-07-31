@@ -8,7 +8,7 @@ import { SnackbarProvider } from 'notistack';
 import '~/utils/progress-indicator';
 import theme from '~/theme';
 import Head from '~/components/App/Head';
-import ErrorDialog from '~/components/ErrorDialog/ErrorDialog';
+import ErrorDialog from '~/components/ErrorDialog';
 import { AppStateProvider } from '~/hooks/useAppState';
 
 import './styles.css';
