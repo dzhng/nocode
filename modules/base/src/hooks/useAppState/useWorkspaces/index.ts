@@ -1,148 +1,134 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Collections, User, Workspace, Member, LocalModel } from 'shared/schema';
-import firebase, { db } from '~/utils/firebase';
-import useFirebaseAuth from '../useFirebaseAuth/useFirebaseAuth';
+import { Collections, Workspace, Member } from 'shared/schema';
+import supabase from '~/utils/supabase';
+import useAuth from '../useAuth';
 
 export default function useWorkspaces() {
-  const { user, isAuthReady } = useFirebaseAuth();
-  const [workspaces, setWorkspaces] = useState<LocalModel<Workspace>[]>([]);
-  const [userRecord, setUserRecord] = useState<User | null>(null);
-  const [workspaceIds, setWorkspaceIds] = useState<string[] | null>(null);
+  const { user, userDetails, isAuthReady } = useAuth();
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<string | null>(null);
   const [isWorkspacesReady, setIsWorkspacesReady] = useState(false);
 
+  // make sure currentWorkspaceId is always up to date when user details changes
   useEffect(() => {
+    if (userDetails) {
+      _setCurrentWorkspaceId(userDetails?.defaultWorkspaceId ?? null);
+    }
+  }, [userDetails]);
+
+  const queryForWorkspaces = useCallback(async () => {
+    setWorkspaces([]);
+    setIsWorkspacesReady(false);
+
     if (!(isAuthReady && user)) {
       return;
     }
 
-    const unsubscribe = db
-      .collection(Collections.USERS)
-      .doc(user.uid)
-      .onSnapshot((snapshot) => {
-        const data = snapshot.data() as User;
-        setUserRecord(data);
-      });
+    const ret = await supabase
+      .from<Member & { workspace: Workspace }>(Collections.MEMBERS)
+      .select(
+        ` *,
+        workspace:${Collections.WORKSPACES}(*)
+      `,
+      )
+      .eq('memberId', user.id)
+      .neq('role', 'deleted');
 
-    return unsubscribe;
-  }, [isAuthReady, user]);
-
-  useEffect(() => {
-    if (!(isAuthReady && user)) {
-      return;
-    }
-
-    const unsubscribe = db
-      .collectionGroup(Collections.MEMBERS)
-      .where('memberId', '==', user.uid)
-      .where('role', '!=', 'deleted')
-      .onSnapshot((snapshot) => {
-        const ids = snapshot.docs.map((doc) => doc.ref.parent.parent!.id);
-        setWorkspaceIds(ids);
-      });
-
-    return unsubscribe;
-  }, [isAuthReady, user]);
-
-  useEffect(() => {
-    const queryWorkspaces = async () => {
-      if (workspaceIds && workspaceIds.length <= 0) {
-        setWorkspaces([]);
-        setIsWorkspacesReady(true);
-        return;
-      }
-
+    if (ret.error || !ret.data) {
       setIsWorkspacesReady(false);
-
-      const workspaceDocs = await db
-        .collection(Collections.WORKSPACES)
-        .where(firebase.firestore.FieldPath.documentId(), 'in', workspaceIds)
-        .get();
-      const records = workspaceDocs.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as LocalModel<Workspace>),
-      );
-
-      setWorkspaces(records);
-      setIsWorkspacesReady(true);
-    };
-
-    if (workspaceIds !== null) {
-      queryWorkspaces();
+      setWorkspaces([]);
+      return;
     }
-  }, [workspaceIds]);
+
+    setWorkspaces(ret.data.map((data) => data.workspace));
+    setIsWorkspacesReady(true);
+  }, [isAuthReady, user]);
 
   const setCurrentWorkspaceId = useCallback(
-    (workspaceId: string | null) => {
+    async (workspaceId: string | null) => {
       if (user) {
-        db.collection(Collections.USERS).doc(user.uid).update({
-          defaultWorkspaceId: workspaceId,
-        });
+        _setCurrentWorkspaceId(workspaceId);
+        await supabase
+          .from(Collections.USER_DETAILS)
+          .update(
+            {
+              defaultWorkspaceId: workspaceId,
+            },
+            { returning: 'minimal' },
+          )
+          .eq('id', user.id);
       }
     },
     [user],
   );
 
   const createWorkspace = useCallback(
-    async (name: string): Promise<LocalModel<Workspace>> => {
+    async (name: string): Promise<Workspace | undefined> => {
       if (!user) {
         return Promise.reject('User is not authenticated');
       }
 
       setIsWorkspacesReady(false);
-      const batch = db.batch();
 
-      const newWorkspaceRef = db.collection(Collections.WORKSPACES).doc();
       const workspaceData: Workspace = {
         name,
         isDeleted: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date(),
       };
-      batch.set(newWorkspaceRef, workspaceData);
+
+      const workspaceRet = await supabase
+        .from<Workspace>(Collections.WORKSPACES)
+        .insert(workspaceData);
+      if (workspaceRet.error || !workspaceRet.data || workspaceRet.data.length === 0) {
+        return;
+      }
+
+      const createdWorkspace = workspaceRet.data[0];
+      if (!createdWorkspace.id) {
+        return;
+      }
+
+      const memberData: Member = {
+        workspaceId: createdWorkspace.id,
+        memberId: user.id,
+        role: 'owner',
+        createdAt: new Date(),
+      };
+
+      // add new workspace to list of workspaces
+      await supabase.from(Collections.MEMBERS).insert(memberData);
+
+      // requery workspace list
+      await queryForWorkspaces();
 
       // set the new workspace as the new default
-      const userRef = db.collection(Collections.USERS).doc(user.uid);
-      const userData = {
-        defaultWorkspaceId: newWorkspaceRef.id,
-      };
-      batch.update(userRef, userData);
+      await setCurrentWorkspaceId(createdWorkspace.id);
 
-      const memberRef = newWorkspaceRef.collection(Collections.MEMBERS).doc(user.uid);
-      const memberData: Member = {
-        memberId: user.uid,
-        role: 'owner',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      };
-      batch.set(memberRef, memberData);
-
-      await batch.commit();
       setIsWorkspacesReady(true);
 
       return {
-        id: newWorkspaceRef.id,
+        id: createdWorkspace.id,
         name,
         createdAt: new Date(),
-      } as LocalModel<Workspace>;
+      } as Workspace;
     },
-    [user],
+    [user, queryForWorkspaces, setCurrentWorkspaceId],
   );
 
   // when exporting current workspace, make sure to always export one that is still in workspaces array
-  const currentWorkspaceId = workspaces.find(
-    (workspace) => workspace.id === userRecord?.defaultWorkspaceId,
+  const calculatedCurrentWorkspaceId = workspaces.find(
+    (workspace) => workspace.id === currentWorkspaceId,
   )
-    ? userRecord?.defaultWorkspaceId
+    ? currentWorkspaceId
     : workspaces.length > 0
     ? workspaces[0].id
     : undefined;
 
   return {
-    userRecord,
+    queryForWorkspaces,
     workspaces,
     isWorkspacesReady,
-    currentWorkspaceId,
+    currentWorkspaceId: calculatedCurrentWorkspaceId,
     setCurrentWorkspaceId,
     createWorkspace,
   };

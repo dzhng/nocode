@@ -5,12 +5,8 @@ export enum Collections {
   INVITES = 'invites',
 }
 
-// extends the type with properties that is needed for client operations (such as id)
-// becareful with this in components that deal with saving because it is very easy to get into a situation where you end up saving data that's extended for local, which would be rejected on server.
-export type LocalModel<T> = T & { id: string };
-
 export declare interface UserDetails {
-  id: string;
+  id?: string;
   displayName: string;
   email?: string | null;
   photoURL?: string | null;
@@ -19,6 +15,7 @@ export declare interface UserDetails {
 }
 
 export declare interface Workspace {
+  id?: string;
   name: string;
   logoURL?: string | null;
   primaryColor?: string | null;
@@ -30,12 +27,16 @@ export declare interface Workspace {
 export type MemberRoles = 'owner' | 'member' | 'deleted';
 
 export declare interface Member {
+  id?: string;
+  workspaceId: string;
   memberId: string;
   role: MemberRoles;
   createdAt: Date;
 }
 
 export declare interface Invite {
+  id?: string;
+  workspaceId: string;
   inviterId: string;
   email: string;
   createdAt: Date;
