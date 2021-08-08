@@ -18,7 +18,7 @@ export declare interface UserDetails {
 }
 
 export declare interface Workspace {
-  id?: string;
+  id?: number;
   name: string;
   isDeleted: boolean;
   createdAt: Date;
@@ -27,16 +27,16 @@ export declare interface Workspace {
 export type MemberRoles = 'owner' | 'member' | 'deleted';
 
 export declare interface Member {
-  id?: string;
-  workspaceId: string;
-  memberId: string;
+  id?: number;
+  workspaceId: number;
+  userId: string;
   role: MemberRoles;
   createdAt: Date;
 }
 
 export declare interface Invite {
-  id?: string;
-  workspaceId: string;
+  id?: number;
+  workspaceId: number;
   inviterId: string;
   email: string;
   createdAt: Date;
