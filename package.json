@@ -6,10 +6,10 @@
     "modules/*"
   ],
   "scripts": {
+    "dev": "npm run dev --workspaces",
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces",
     "start": "npm start --workspaces",
-    "dev": "npm run dev --workspaces",
     "test": "npm run test --workspaces",
     "test:dev": "npm run test:dev --workspaces",
     "lint": "npm run lint --workspaces"
