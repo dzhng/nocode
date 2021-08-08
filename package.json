@@ -12,15 +12,9 @@
     "dev": "npm run dev --workspaces",
     "test": "npm run test --workspaces",
     "test:dev": "npm run test:dev --workspaces",
-    "lint": "npm run lint --workspaces",
-    "deploy:all": "npm run build && firebase deploy --only firestore,storage,database,hosting,functions",
-    "deploy:store": "npm run build && firebase deploy --only firestore,storage,database,hosting",
-    "deploy:functions": "npm run build && firebase deploy --only functions",
-    "firebase:indexes": "firebase firestore:indexes",
-    "firebase:logs": "firebase functions:log"
+    "lint": "npm run lint --workspaces"
   },
   "devDependencies": {
-    "@firebase/rules-unit-testing": "^1.1.8",
     "@testing-library/dom": "^7.29.4",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",

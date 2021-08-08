@@ -11,8 +11,6 @@
     "@supabase/supabase-js": "^1.21.0",
     "clsx": "^1.1.1",
     "dayjs": "^1.10.4",
-    "firebase": "^8.2.3",
-    "firebase-functions": "^3.13.2",
     "formik": "^2.2.9",
     "formik-material-ui": "^3.0.1",
     "framer-motion": "^3.2.2-rc.1",
@@ -25,6 +23,9 @@
     "react-cool-dimensions": "^2.0.7",
     "react-dom": "^17.0.2",
     "yup": "^0.32.9"
+  },
+  "devDependencies": {
+    "next-transpile-modules": "^8.0.0"
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
