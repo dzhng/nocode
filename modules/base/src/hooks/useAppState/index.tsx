@@ -1,8 +1,6 @@
 import { createContext, useContext, useState } from 'react';
-import firebase from 'firebase';
 import { User, Workspace, LocalModel } from 'shared/schema';
 
-import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import useWorkspaces from './useWorkspaces/useWorkspaces';
 
 export interface StateContextType {
@@ -11,19 +9,18 @@ export interface StateContextType {
 
   // auth
   getToken(room: string): Promise<string>;
-  user?: firebase.User | null;
-  signInWithEmailAndPassword(name: string, password: string): Promise<firebase.User | null>;
-  signInWithGoogle(): Promise<firebase.User | null>;
-  signInAnonymously(displayName: string): Promise<firebase.User | null>;
+  user?: User | null;
+  signInWithEmailAndPassword(name: string, password: string): Promise<User | null>;
+  signInWithGoogle(): Promise<User | null>;
+  signInAnonymously(displayName: string): Promise<User | null>;
   signOut(): Promise<void>;
   isAuthReady?: boolean;
   isFetching: boolean;
-  register(email: string, password: string, name: string): Promise<firebase.User | null>;
+  register(email: string, password: string, name: string): Promise<User | null>;
 
   // workspaces
   currentWorkspaceId?: string | null;
   setCurrentWorkspaceId(workspaceId: string | null): void;
-  userRecord?: User | null;
   workspaces?: LocalModel<Workspace>[];
   isWorkspacesReady: boolean;
   createWorkspace(name: string): Promise<LocalModel<Workspace>>;
@@ -43,7 +40,6 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
 
   contextValue = {
     ...contextValue,
-    ...useFirebaseAuth(),
     ...useWorkspaces(),
   };
 
