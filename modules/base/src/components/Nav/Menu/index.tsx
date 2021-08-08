@@ -10,7 +10,7 @@ import AboutDialog from '../AboutDialog';
 
 export default function Menu() {
   const router = useRouter();
-  const { userRecord, signOut } = useAppState();
+  const { user, signOut } = useAppState();
 
   const [aboutOpen, setAboutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,8 +27,8 @@ export default function Menu() {
     <div ref={anchorRef}>
       <IconButton color="inherit" onClick={() => setMenuOpen((state) => !state)}>
         <Tooltip title="Settings" placement="bottom">
-          {userRecord ? (
-            <UserAvatar data-testid="avatar" user={userRecord} />
+          {user ? (
+            <UserAvatar data-testid="avatar" user={user} />
           ) : (
             <MoreIcon data-testid="more-icon" />
           )}
@@ -40,13 +40,13 @@ export default function Menu() {
         anchorEl={anchorRef.current}
         data-testid="menu"
       >
-        {userRecord?.displayName && (
+        {user?.displayName && (
           <MenuItem data-testid="name-item" disabled>
-            {userRecord.displayName}
+            {user.displayName}
           </MenuItem>
         )}
         <MenuItem onClick={() => setAboutOpen(true)}>About</MenuItem>
-        {userRecord && <MenuItem onClick={handleSignOut}>Logout</MenuItem>}
+        {user && <MenuItem onClick={handleSignOut}>Logout</MenuItem>}
       </MenuContainer>
       <AboutDialog
         open={aboutOpen}

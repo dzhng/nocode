@@ -40,7 +40,7 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
 
   contextValue = {
     ...contextValue,
-    ...useWorkspaces(),
+    //...useWorkspaces(),
   };
 
   const getToken: StateContextType['getToken'] = async (room) => {
