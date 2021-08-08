@@ -1,21 +1,20 @@
 import { createContext, useContext, useState } from 'react';
-import { User, Workspace, LocalModel } from 'shared/schema';
+import { UserDetails, Workspace, LocalModel } from 'shared/schema';
+import { User } from '@supabase/supabase-js';
 
-import useWorkspaces from './useWorkspaces/useWorkspaces';
+import useWorkspaces from './useWorkspaces';
+import useAuth from './useAuth';
 
 export interface StateContextType {
   error: Error | string | null;
   setError(error: Error | string | null): void;
 
   // auth
-  getToken(room: string): Promise<string>;
   user?: User | null;
+  userDetails?: UserDetails | null;
   signInWithEmailAndPassword(name: string, password: string): Promise<User | null>;
-  signInWithGoogle(): Promise<User | null>;
-  signInAnonymously(displayName: string): Promise<User | null>;
   signOut(): Promise<void>;
   isAuthReady?: boolean;
-  isFetching: boolean;
   register(email: string, password: string, name: string): Promise<User | null>;
 
   // workspaces
@@ -30,37 +29,15 @@ export const StateContext = createContext<StateContextType>(null!);
 
 export function AppStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<Error | string | null>(null);
-  const [isFetching, setIsFetching] = useState(false);
 
-  let contextValue = {
+  const contextValue: StateContextType = {
     error,
     setError,
-    isFetching,
-  } as StateContextType;
-
-  contextValue = {
-    ...contextValue,
-    //...useWorkspaces(),
+    ...useAuth(),
+    ...useWorkspaces(),
   };
 
-  const getToken: StateContextType['getToken'] = async (room) => {
-    setIsFetching(true);
-    try {
-      const res = await contextValue.getToken(room);
-      setIsFetching(false);
-      return res;
-    } catch (err) {
-      setError(err);
-      setIsFetching(false);
-      return Promise.reject(err);
-    }
-  };
-
-  return (
-    <StateContext.Provider value={{ ...contextValue, getToken }}>
-      {props.children}
-    </StateContext.Provider>
-  );
+  return <StateContext.Provider value={contextValue}>{props.children}</StateContext.Provider>;
 }
 
 export function useAppState() {
