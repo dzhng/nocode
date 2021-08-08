@@ -1,5 +1,5 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { formatRelativeDate } from 'nocode-shared/utils';
+import { formatRelativeDate } from 'shared/utils';
 import { DataTypes, CellType, ColumnType } from '~/types';
 
 import { TextCellInput, NumberCellInput } from './CellInput';
