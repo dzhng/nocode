@@ -1,9 +1,9 @@
 import { createContext, useContext, useState } from 'react';
-import { UserDetails, Workspace, LocalModel } from 'shared/schema';
+import { UserDetails, Workspace } from 'shared/schema';
 import { User } from '@supabase/supabase-js';
 
-import useWorkspaces from './useWorkspaces';
 import useAuth from './useAuth';
+import useWorkspaces from './useWorkspaces';
 
 export interface StateContextType {
   error: Error | string | null;
@@ -19,10 +19,11 @@ export interface StateContextType {
 
   // workspaces
   currentWorkspaceId?: string | null;
+  currentWorkspace?: Workspace;
   setCurrentWorkspaceId(workspaceId: string | null): void;
-  workspaces?: LocalModel<Workspace>[];
+  workspaces?: Workspace[];
   isWorkspacesReady: boolean;
-  createWorkspace(name: string): Promise<LocalModel<Workspace>>;
+  createWorkspace(name: string): Promise<Workspace | undefined>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);

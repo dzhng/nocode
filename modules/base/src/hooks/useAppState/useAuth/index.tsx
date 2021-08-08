@@ -12,7 +12,8 @@ export default function useAuth() {
   const upsertDefaultUserDetailsRecord = async (newUser: User, name?: string) => {
     const userData: UserDetails = {
       id: newUser.id,
-      displayName: name ?? 'Aomni Customer',
+      email: newUser.email,
+      displayName: name,
     };
 
     const ret = await supabase.from<UserDetails>(Collections.USER_DETAILS).upsert(userData);

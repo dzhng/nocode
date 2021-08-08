@@ -28,8 +28,8 @@ export default function useWorkspaces() {
       .from<Member & { workspace: Workspace }>(Collections.MEMBERS)
       .select(
         ` *,
-        workspace:${Collections.WORKSPACES}(*)
-      `,
+          workspace:${Collections.WORKSPACES}(*)
+        `,
       )
       .eq('memberId', user.id)
       .neq('role', 'deleted');
@@ -124,11 +124,14 @@ export default function useWorkspaces() {
     ? workspaces[0].id
     : undefined;
 
+  const currentWorkspace = workspaces?.find((model) => model.id === calculatedCurrentWorkspaceId);
+
   return {
     queryForWorkspaces,
     workspaces,
     isWorkspacesReady,
     currentWorkspaceId: calculatedCurrentWorkspaceId,
+    currentWorkspace,
     setCurrentWorkspaceId,
     createWorkspace,
   };
