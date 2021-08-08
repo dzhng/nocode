@@ -8,7 +8,7 @@ export default function PrivateRoute(props: {
   const router = useRouter();
   const { isAuthReady, user } = useAppState();
 
-  const isAuthenticated: boolean = !!isAuthReady && !!user && !user.isAnonymous;
+  const isAuthenticated: boolean = !!isAuthReady && !!user;
 
   useEffect(() => {
     // don't prematurely push to login if auth is not ready
