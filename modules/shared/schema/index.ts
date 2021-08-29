@@ -13,7 +13,7 @@ export declare interface UserDetails {
   email?: string | null;
   photoURL?: string | null;
   bio?: string | null;
-  defaultWorkspaceId?: string;
+  defaultWorkspaceId?: number;
   createdAt: Date;
 }
 

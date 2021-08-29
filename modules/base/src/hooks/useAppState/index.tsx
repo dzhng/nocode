@@ -18,12 +18,14 @@ export interface StateContextType {
   register(email: string, password: string, name: string): Promise<User | null>;
 
   // workspaces
-  currentWorkspaceId?: string | null;
+  currentWorkspaceId?: number;
   currentWorkspace?: Workspace;
-  setCurrentWorkspaceId(workspaceId: string | null): void;
+  setCurrentWorkspaceId(workspaceId?: number): void;
   workspaces?: Workspace[];
   isWorkspacesReady: boolean;
   createWorkspace(name: string): Promise<Workspace | undefined>;
+  leaveWorkspace(): Promise<void>;
+  deleteWorkspace(): Promise<void>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);
