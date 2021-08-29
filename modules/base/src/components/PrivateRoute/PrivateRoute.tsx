@@ -8,8 +8,6 @@ export default function PrivateRoute(props: {
   const router = useRouter();
   const { isAuthReady, user } = useAppState();
 
-  const isAuthenticated: boolean = !!isAuthReady && !!user;
-
   useEffect(() => {
     // don't prematurely push to login if auth is not ready
     // just hide component until we're sure
@@ -17,10 +15,10 @@ export default function PrivateRoute(props: {
       return;
     }
 
-    if (!isAuthenticated) {
+    if (!user) {
       router.push('/login');
     }
-  }, [isAuthReady]); // eslint-disable-line
+  }, [isAuthReady, user]); // eslint-disable-line
 
-  return isAuthenticated ? <>{props.children}</> : null;
+  return !!isAuthReady && !!user ? <>{props.children}</> : null;
 }

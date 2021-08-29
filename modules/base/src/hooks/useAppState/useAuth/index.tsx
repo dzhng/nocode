@@ -27,10 +27,15 @@ export default function useAuth() {
 
   useEffect(() => {
     const currentSession = supabase.auth.session();
-    setSession(currentSession);
-    setUser(currentSession?.user ?? null);
+    if (currentSession === null) {
+      setIsAuthReady(true);
+    } else {
+      setSession(currentSession);
+      setUser(currentSession.user);
+    }
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_, newSession) => {
+      console.log('Auth state changed...');
       setSession(newSession);
       setUser(newSession?.user ?? null);
     });
