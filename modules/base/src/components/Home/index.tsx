@@ -118,8 +118,8 @@ export default function Home() {
   const templates: any[] = []; // TODO: replace with actual data later
   const isLoadingTemplates = false;
 
-  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const classes = useStyles();
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
