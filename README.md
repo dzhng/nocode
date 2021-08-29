@@ -1,16 +1,14 @@
 # No-Code React App
 
-## Make sure you have the necessary dependencies
+## Vercel
 
-### Install firebase-tools globally
+This project is primarily hosted on Vercel. To start, make sure to first link the local codebase to the vercel project.
 
-`npm install -g firebase-tools`
+    $ vercel link
 
-### Install Java
+Before running the project via `npm run dev`, make sure to pull the latest env variables.
 
-Some versions of Linux may not have Java installed by default (required for Firebase emulators)
-
-`sudo apt update && sudo apt install openjdk-11-jdk`
+    $ vercel env pull
 
 ## Adding dependencies
 

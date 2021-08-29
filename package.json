@@ -12,7 +12,8 @@
     "start": "npm start --workspace=modules/base",
     "test": "npm run test --workspaces",
     "test:dev": "npm run test:dev --workspaces",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "vercel:env": "vercel env pull modules/base/.env.local"
   },
   "devDependencies": {
     "@testing-library/dom": "^7.29.4",
