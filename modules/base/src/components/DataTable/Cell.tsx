@@ -50,7 +50,7 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
         return (
           <span>
             {data.map((unit) => (
-              <span>{String(unit)}</span>
+              <span key={unit}>{String(unit)}</span>
             ))}
           </span>
         );

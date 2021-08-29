@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import * as Yup from 'yup';
+import * as yup from 'yup';
 import { useRouter } from 'next/router';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { ErrorOutline as ErrorIcon } from '@material-ui/icons';
@@ -12,9 +12,10 @@ import { useAppState } from '~/hooks/useAppState';
 import LoadingContainer from '~/components/LoadingContainer';
 import { Logo } from '~/components/Icons';
 
-const FormSchema = Yup.object().shape({
-  email: Yup.string().email().required(),
-  password: Yup.string()
+const FormSchema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup
+    .string()
     .min(6, 'Your password is too short, please enter a minimum of 6 characters.')
     .max(50, 'Your password is too long.')
     .required(),
@@ -25,6 +26,7 @@ const initialValues = {
   password: '',
 };
 
+// eslint-disable-next-line @next/next/no-img-element
 const GoogleLogo = <img src="/google-logo.svg" />;
 
 const useStyles = makeStyles((theme) =>
@@ -211,7 +213,7 @@ export default function LoginPage({ previousPage }: { previousPage?: string }) {
 
         <Divider />
 
-        <Link href="/register">
+        <Link href="/register" passHref>
           <Button fullWidth color="secondary">
             Register
           </Button>

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import assert from 'assert';
-import yup from 'yup';
+import * as yup from 'yup';
 import { Collections, Member } from 'shared/schema';
 import supabase from '~/utils/supabase';
 
