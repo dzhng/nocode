@@ -54,14 +54,8 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-export default function TemplateCard({
-  //template,
-  height,
-}: {
-  //template: Template;
-  height: number;
-}) {
-  const template: any = {}; // TODO: replace once actual data defined
+// TODO: replace once actual data defined
+export default function TemplateCard({ template, height }: { template: any; height: number }) {
   const classes = useStyles();
   const callLink = `/start/${template.id}?from=${encodeURIComponent('/')}`;
 
