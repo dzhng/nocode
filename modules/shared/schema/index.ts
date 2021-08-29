@@ -1,10 +1,10 @@
 // make sure this typescript schema aligns with schema.sql
 
 export enum Collections {
-  USER_DETAILS = 'public.users',
-  WORKSPACES = 'public.workspaces',
-  MEMBERS = 'public.members',
-  INVITES = 'public.invites',
+  USER_DETAILS = 'users',
+  WORKSPACES = 'workspaces',
+  MEMBERS = 'members',
+  INVITES = 'invites',
 }
 
 export declare interface UserDetails {

@@ -183,7 +183,7 @@ export default function Home() {
           spacing={0}
           direction="column"
           alignItems="center"
-          justify="center"
+          justifyContent="center"
           style={{ height: '100vh' }}
         >
           <Typography variant="h1">No Workspace Exists</Typography>

@@ -24,6 +24,7 @@ export interface StateContextType {
   setCurrentWorkspaceId(workspaceId?: number): void;
   workspaces?: Workspace[];
   isWorkspacesReady: boolean;
+  queryForWorkspaces(): Promise<void>;
   createWorkspace(name: string): Promise<Workspace | undefined>;
   leaveWorkspace(): Promise<void>;
   deleteWorkspace(): Promise<void>;

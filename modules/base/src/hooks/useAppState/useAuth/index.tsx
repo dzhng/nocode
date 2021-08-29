@@ -9,21 +9,34 @@ export default function useAuth() {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
-  const upsertDefaultUserDetailsRecord = async (newUser: User, name?: string) => {
-    const userData: UserDetails = {
-      id: newUser.id,
-      email: newUser.email,
-      displayName: name,
-      createdAt: new Date(),
-    };
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    setIsAuthReady(false);
+    setUserDetails(null);
+    setSession(null);
+    setUser(null);
+  }, []);
 
-    const ret = await supabase.from<UserDetails>(Collections.USER_DETAILS).upsert(userData);
-    if (ret.error) {
-      console.error('Error upserting user record', ret.error);
-    }
+  const upsertDefaultUserDetailsRecord = useCallback(
+    async (newUser: User, name?: string) => {
+      const userData: UserDetails = {
+        id: newUser.id,
+        email: newUser.email,
+        displayName: name,
+        createdAt: new Date(),
+      };
 
-    setUserDetails(userData);
-  };
+      const ret = await supabase.from<UserDetails>(Collections.USER_DETAILS).upsert(userData);
+      if (ret.error) {
+        console.error('Error upserting user record', ret.error);
+        await signOut();
+        return;
+      }
+
+      setUserDetails(userData);
+    },
+    [signOut],
+  );
 
   useEffect(() => {
     const currentSession = supabase.auth.session();
@@ -31,19 +44,31 @@ export default function useAuth() {
       setIsAuthReady(true);
     } else {
       setSession(currentSession);
-      setUser(currentSession.user);
+      if (currentSession.user) {
+        setUser(currentSession.user);
+        setIsAuthReady(true);
+      }
     }
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_, newSession) => {
-      console.log('Auth state changed...');
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
+      if (newSession && newSession.user) {
+        console.log('Auth state changed: update');
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        setIsAuthReady(true);
+      } else {
+        console.log('Auth state changed: sign out');
+        setIsAuthReady(false);
+        setSession(null);
+        setUserDetails(null);
+        setUser(null);
+      }
     });
 
     return () => {
       authListener?.unsubscribe();
     };
-  }, []);
+  }, [signOut]);
 
   useEffect(() => {
     if (user) {
@@ -56,21 +81,12 @@ export default function useAuth() {
           if (!res.data) {
             // if data doesn't exist, upsert a new record
             await upsertDefaultUserDetailsRecord(user);
-            setIsAuthReady(true);
           } else {
             setUserDetails(res.data);
-            setIsAuthReady(true);
           }
         });
     }
-  }, [user]);
-
-  const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setIsAuthReady(false);
-    setUserDetails(null);
-    setUser(null);
-  }, []);
+  }, [user, upsertDefaultUserDetailsRecord]);
 
   const signInWithEmailAndPassword = useCallback(
     async (email, password) => {
@@ -80,6 +96,10 @@ export default function useAuth() {
       }
 
       const data = await supabase.auth.signIn({ email, password });
+      if (data.error) {
+        throw data.error;
+      }
+
       setUser(data.user);
       setSession(data.session);
       return data.user;
@@ -103,6 +123,9 @@ export default function useAuth() {
       }
 
       const data = await supabase.auth.signUp({ email, password });
+      if (data.error) {
+        throw data.error;
+      }
 
       if (data.user) {
         await upsertDefaultUserDetailsRecord(data.user, name);
@@ -112,7 +135,7 @@ export default function useAuth() {
       setUser(data.user);
       return data.user;
     },
-    [user, signOut],
+    [user, signOut, upsertDefaultUserDetailsRecord],
   );
 
   return {

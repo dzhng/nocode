@@ -34,7 +34,7 @@ export default function useWorkspaces() {
       .eq('userId', user.id)
       .neq('role', 'deleted');
 
-    if (ret.error || !ret.data) {
+    if (ret.error) {
       setIsWorkspacesReady(false);
       setWorkspaces([]);
       return;
