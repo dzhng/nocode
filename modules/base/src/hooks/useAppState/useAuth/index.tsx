@@ -14,6 +14,7 @@ export default function useAuth() {
       id: newUser.id,
       email: newUser.email,
       displayName: name,
+      createdAt: new Date(),
     };
 
     const ret = await supabase.from<UserDetails>(Collections.USER_DETAILS).upsert(userData);

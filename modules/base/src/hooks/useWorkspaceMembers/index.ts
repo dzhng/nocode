@@ -1,7 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Collections, Workspace, Member, UserDetails } from 'shared/schema';
+import fetch from 'isomorphic-unfetch';
+import { Collections, Member, UserDetails } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import { useAppState } from '~/hooks/useAppState';
+
+const INVITE_ENDPOINT = '/api/inviteMembers';
 
 export default function useWorkspaceMembers(workspaceId?: string) {
   const { user } = useAppState();
@@ -42,55 +45,46 @@ export default function useWorkspaceMembers(workspaceId?: string) {
     loadMemberUsers();
   }, [workspaceId, user]);
 
-  const addMembers = useCallback(
+  const inviteMembers = useCallback(
     async (emails: string[]) => {
-      if (!currentWorkspaceId || !user || emails.length === 0) {
+      if (!workspaceId || !user || emails.length === 0) {
         return;
       }
 
-      // creating an invite model will trigger cloud functions to do the rest
-      const batch = db.batch();
-      emails.forEach((email) => {
-        const ref = db
-          .collection(Collections.WORKSPACES)
-          .doc(currentWorkspaceId)
-          .collection(Collections.INVITES)
-          .doc();
+      const params = JSON.stringify({ workspaceId, emails });
 
-        const inviteData: Invite = {
-          inviterId: user.uid,
-          email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        };
-        batch.set(ref, inviteData);
+      await fetch(INVITE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: params,
       });
 
-      await batch.commit();
+      return;
     },
-    [currentWorkspaceId, user],
+    [workspaceId, user],
   );
 
   const removeMembers = useCallback(
     async (ids: string[]) => {
-      if (!currentWorkspaceId || ids.length === 0) {
+      if (!workspaceId || ids.length === 0) {
         return;
       }
 
-      const batch = db.batch();
-      ids.forEach((id) => {
-        const ref = db
-          .collection(Collections.WORKSPACES)
-          .doc(currentWorkspaceId)
-          .collection(Collections.MEMBERS)
-          .doc(id);
-
-        batch.update(ref, {
-          role: 'deleted',
-        });
-      });
-
-      await batch.commit();
+      await supabase
+        .from<Member>(Collections.MEMBERS)
+        .update({ role: 'deleted' }, { returning: 'minimal' })
+        .in('userId', ids);
     },
-    [currentWorkspaceId],
+    [workspaceId],
   );
+
+  return {
+    members,
+    isAdmin,
+    isLoadingMembers,
+    inviteMembers,
+    removeMembers,
+  };
 }
