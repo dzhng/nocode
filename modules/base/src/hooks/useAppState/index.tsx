@@ -13,6 +13,7 @@ export interface StateContextType {
   user?: User | null;
   userDetails?: UserDetails | null;
   signInWithEmailAndPassword(name: string, password: string): Promise<User | null>;
+  signInWithGoogle(): Promise<User | null>;
   signOut(): Promise<void>;
   isAuthReady?: boolean;
   register(email: string, password: string, name: string): Promise<User | null>;

@@ -88,6 +88,7 @@ export default function useAuth() {
       await signOut();
     }
     // TODO
+    return null;
   }, [user, signOut]);
 
   const register = useCallback(

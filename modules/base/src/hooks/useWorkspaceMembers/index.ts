@@ -6,7 +6,7 @@ import { useAppState } from '~/hooks/useAppState';
 
 const INVITE_ENDPOINT = '/api/inviteMembers';
 
-export default function useWorkspaceMembers(workspaceId?: string) {
+export default function useWorkspaceMembers(workspaceId?: number) {
   const { user } = useAppState();
   const [members, setMembers] = useState<UserDetails[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);

@@ -1,3 +1,4 @@
+import React from 'react';
 import Document, { DocumentContext } from 'next/document';
 import { ServerStyleSheets } from '@material-ui/core/styles';
 

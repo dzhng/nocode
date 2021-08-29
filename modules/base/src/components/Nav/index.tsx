@@ -29,7 +29,7 @@ import { Logo, VideoCallIcon, CallHistoryIcon } from '~/components/Icons';
 import { useAppState } from '~/hooks/useAppState';
 import Menu from './Menu';
 
-const NewWorkspaceValue = '__New_Workspace__';
+const NewWorkspaceValue = -1;
 const sidebarWidth = 300;
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -125,7 +125,7 @@ export default function Nav({
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
 
   const {
-    user,
+    userDetails,
     workspaces,
     isWorkspacesReady,
     currentWorkspaceId,
@@ -142,7 +142,7 @@ export default function Nav({
 
   const handleWorkspaceChange = useCallback(
     (event: React.ChangeEvent<{ value: unknown }>) => {
-      const value = event.target.value as string;
+      const value = Number(event.target.value);
       if (value === NewWorkspaceValue) {
         setIsCreatingWorkspace(true);
       } else {
@@ -219,7 +219,7 @@ export default function Nav({
           <div className={classes.profileMenu}>
             <Menu />
             <Typography className={classes.displayName} variant="h2">
-              {user?.displayName}
+              {userDetails?.displayName ?? ''}
             </Typography>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function Nav({
       handleWorkspaceChange,
       isWorkspacesReady,
       workspaces,
-      user,
+      userDetails,
       closeModal,
     ],
   );
