@@ -8,7 +8,7 @@ This project is primarily hosted on Vercel. To start, make sure to first link th
 
 Before running the project via `npm run dev`, make sure to pull the latest env variables.
 
-    $ vercel env pull
+    $ npm run vercel:env
 
 ## Adding dependencies
 
