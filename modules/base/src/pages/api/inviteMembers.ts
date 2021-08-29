@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import assert from 'assert';
+import yup from 'yup';
 import { Collections, Member } from 'shared/schema';
 import supabase from '~/utils/supabase';
 
@@ -16,7 +17,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const body: RequestBody = req.body;
   assert(typeof body.workspaceId === 'number');
   assert(typeof body.emails === 'object');
-  assert(body.emails.length > 0);
+
+  const emails = body.emails.filter((email) => yup.string().email().isValidSync(email));
+  assert(emails.length > 0);
 
   const { user, error } = await supabase.auth.api.getUserByCookie(req);
   if (error || !user) {

@@ -1,15 +1,15 @@
 import { screen, render, waitFor, within } from '@testing-library/react';
 import fireEvent from '@testing-library/user-event';
-import { LocalModel, User } from 'shared/schema';
+import { UserDetails } from 'shared/schema';
 import MembersField from './MembersField';
 
 const mockOnChange = jest.fn();
 
 describe('the MembersField component', () => {
   it('should render correct values', () => {
-    const values: LocalModel<User>[] = [
-      { id: '1', displayName: 'hello world', email: '1' },
-      { id: '2', displayName: 'steve appleseed', email: '2' },
+    const values: UserDetails[] = [
+      { id: '1', displayName: 'hello world', email: '1', createdAt: new Date() },
+      { id: '2', displayName: 'steve appleseed', email: '2', createdAt: new Date() },
     ];
 
     render(<MembersField users={values} onChange={mockOnChange} />);
@@ -19,7 +19,7 @@ describe('the MembersField component', () => {
   });
 
   it('should submit with the correct name', async () => {
-    const values: LocalModel<User>[] = [
+    const values: UserDetails[] = [
       { id: '1', displayName: 'test1', email: '1' },
       { id: '2', displayName: 'test2', email: '2' },
     ];
@@ -38,7 +38,9 @@ describe('the MembersField component', () => {
   });
 
   it('should allow users to remove emails', async () => {
-    const values: LocalModel<User>[] = [{ id: '1', displayName: '', email: 'test@test.com' }];
+    const values: UserDetails[] = [
+      { id: '1', displayName: '', email: 'test@test.com', createdAt: new Date() },
+    ];
     render(<MembersField users={values} onChange={mockOnChange} />);
 
     expect(screen.queryByTestId('email-item')).toBeInTheDocument();
@@ -54,7 +56,7 @@ describe('the MembersField component', () => {
 
   describe('adding emails', () => {
     beforeEach(() => {
-      const values: LocalModel<User>[] = [];
+      const values: UserDetails[] = [];
       render(<MembersField users={values} onChange={mockOnChange} />);
     });
 

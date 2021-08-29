@@ -11,11 +11,11 @@ import {
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { LocalModel, User } from 'shared/schema';
+import { UserDetails } from 'shared/schema';
 import MembersField from './MembersField';
 
 interface PropTypes {
-  members: LocalModel<User>[];
+  members: UserDetails[];
   addMembers(emails: string[]): Promise<void>;
   removeMembers(ids: string[]): Promise<void>;
   className?: string;
@@ -42,11 +42,11 @@ export function AddMemberDialog({
 }: PropTypes & { open: boolean; setOpen(open: boolean): void; onFinished?(): void }) {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [removedUsers, setRemovedUsers] = useState<LocalModel<User>[]>([]);
+  const [removedUsers, setRemovedUsers] = useState<UserDetails[]>([]);
   const [addedEmails, setAddedEmails] = useState<string[]>([]);
 
   const handleMembersChange = useCallback(
-    (_addedEmails: string[], _removedUsers: LocalModel<User>[]) => {
+    (_addedEmails: string[], _removedUsers: UserDetails[]) => {
       setRemovedUsers(_removedUsers);
       setAddedEmails(_addedEmails);
     },
@@ -71,7 +71,7 @@ export function AddMemberDialog({
     setIsSubmitting(true);
 
     if (removedUsers.length > 0) {
-      await removeMembers(removedUsers.map((u) => u.id));
+      await removeMembers(removedUsers.map((u) => u.id ?? ''));
     }
 
     if (addedEmails.length > 0) {

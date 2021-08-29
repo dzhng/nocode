@@ -6,7 +6,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { MoreVert as MoreIcon, Menu as MenuIcon } from '@material-ui/icons';
 import { Skeleton } from '@material-ui/lab';
 import useDimensions from 'react-cool-dimensions';
-import { LocalModel, Template, Workspace, User } from 'shared/schema';
+import { Workspace, UserDetails } from 'shared/schema';
 
 import UserAvatar from '~/components/UserAvatar';
 import Nav from '~/components/Nav';
@@ -18,10 +18,9 @@ import LeaveMenuItem from './LeaveMenuItem';
 import DeleteMenuItem from './DeleteMenuItem';
 
 interface PropTypes {
-  workspace?: LocalModel<Workspace>;
-  members: LocalModel<User>[];
+  workspace?: Workspace;
+  members: UserDetails[];
   isLoadingMembers: boolean;
-  templates: LocalModel<Template>[];
   isLoadingTemplates: boolean;
   isAdmin: boolean;
   leaveWorkspace(): void;
@@ -131,7 +130,6 @@ export default function Home({
   workspace,
   members,
   isLoadingMembers,
-  templates,
   isLoadingTemplates,
   isAdmin,
   leaveWorkspace,
@@ -139,6 +137,7 @@ export default function Home({
   addMembers,
   removeMembers,
 }: PropTypes) {
+  const templates: any[] = []; // TODO: replace with actual data later
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const classes = useStyles();
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -187,7 +186,7 @@ export default function Home({
               {!workspace || isLoadingMembers
                 ? loadingMemberSkeletons
                 : members.slice(0, numberOfAvatars).map((member) => (
-                    <Tooltip key={member.id} title={member.displayName} placement="bottom">
+                    <Tooltip key={member.id} title={member.displayName ?? ''} placement="bottom">
                       <UserAvatar
                         className={classes.avatar}
                         user={member}

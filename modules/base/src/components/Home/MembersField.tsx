@@ -7,7 +7,7 @@ import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { Add as AddIcon, HighlightOff as RemoveIcon } from '@material-ui/icons';
 import { createStyles, makeStyles, styled, Theme } from '@material-ui/core/styles';
 import { shortName } from 'shared/utils';
-import { LocalModel, User } from 'shared/schema';
+import { UserDetails } from 'shared/schema';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -187,12 +187,12 @@ export default function MembersField({
   users,
   onChange,
 }: {
-  users: LocalModel<User>[];
-  onChange(addedEmails: string[], removedUsers: LocalModel<User>[]): void;
+  users: UserDetails[];
+  onChange(addedEmails: string[], removedUsers: UserDetails[]): void;
 }) {
-  const [removedUsers, setRemovedUsers] = useState<LocalModel<User>[]>([]);
+  const [removedUsers, setRemovedUsers] = useState<UserDetails[]>([]);
   const [addedEmails, setAddedEmails] = useState<string[]>([]);
-  const [currentUsers, setCurrentUsers] = useState<LocalModel<User>[]>(users);
+  const [currentUsers, setCurrentUsers] = useState<UserDetails[]>(users);
 
   const removeUser = useCallback(
     (userId: string) => {
@@ -232,7 +232,7 @@ export default function MembersField({
       {currentUsers.map((user) => (
         <MemberItem
           key={user.id}
-          title={`${shortName(user.displayName)} (${user.email})`}
+          title={`${shortName(user.displayName ?? '')} (${user.email})`}
           value={user.id}
           remove={removeUser}
         />

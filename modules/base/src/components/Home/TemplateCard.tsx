@@ -1,7 +1,7 @@
 import { Typography, Card, Button, Tooltip } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { VideoCall } from '@material-ui/icons';
-import { LocalModel, Template } from 'shared/schema';
+//import { Template } from 'shared/schema';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -55,12 +55,13 @@ const useStyles = makeStyles((theme) =>
 );
 
 export default function TemplateCard({
-  template,
+  //template,
   height,
 }: {
-  template: LocalModel<Template>;
+  //template: Template;
   height: number;
 }) {
+  const template: any = {}; // TODO: replace once actual data defined
   const classes = useStyles();
   const callLink = `/start/${template.id}?from=${encodeURIComponent('/')}`;
 
