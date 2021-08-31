@@ -28,7 +28,7 @@ export default function useWorkspaces() {
       .from<Member & { workspace: Workspace }>(Collections.MEMBERS)
       .select(
         ` *,
-          workspace:${Collections.WORKSPACES}(*)
+          workspace:workspaceId (*)
         `,
       )
       .eq('userId', user.id)
