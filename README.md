@@ -182,3 +182,4 @@ However, be careful with using `height: 100%` on flex items as [it has undefined
 ## TODO:
 
 - Write test case for unique invites model
+- Figure out why it push user to login screen after register email confirm

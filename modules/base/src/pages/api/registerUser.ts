@@ -26,8 +26,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const createdAt = new Date();
 
+  // TODO: move this client side after we can disable require email signup in supabase
   const data = await supabase.auth.signUp({ email: body.email, password: body.password });
   if (data.error || !data.user) {
+    return res.status(400).end();
+  }
+
+  // insert default user record
+  const userData: UserDetails = {
+    id: data.user.id,
+    email: data.user.email,
+    displayName: body.name,
+    createdAt,
+  };
+
+  const userRet = await supabase.from<UserDetails>(Collections.USER_DETAILS).insert(userData);
+  if (userRet.error) {
+    console.error('Error inserting user record', userRet.error);
     return res.status(400).end();
   }
 
@@ -87,20 +102,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }),
   );
 
-  // insert default user record
-  const userData: UserDetails = {
-    id: data.user.id,
-    email: data.user.email,
-    displayName: body.name,
-    defaultWorkspaceId: lastInvitedWorkspaceId ?? workspaceRet.data[0].id,
-    createdAt,
-  };
-
-  const userRet = await supabase.from<UserDetails>(Collections.USER_DETAILS).insert(userData);
-  if (userRet.error) {
-    console.error('Error inserting user record', userRet.error);
-    return res.status(400).end();
-  }
+  // finally, update user again to set defaultWorkspaceId
+  // NOTE: this is purposely written as a seperate update of the user record (since the record was just created in this call), because of the different foreign relations that postgres enforces
+  await supabase
+    .from<UserDetails>(Collections.USER_DETAILS)
+    .update(
+      {
+        defaultWorkspaceId: lastInvitedWorkspaceId ?? workspaceRet.data[0].id,
+      },
+      { returning: 'minimal' },
+    )
+    .eq('id', data.user.id);
 
   return res.status(200).end();
 };
