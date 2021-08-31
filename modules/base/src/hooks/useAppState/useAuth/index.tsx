@@ -1,7 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { Collections, UserDetails } from 'shared/schema';
+import fetch from 'isomorphic-unfetch';
 import supabase from '~/utils/supabase';
+
+const REGISTER_ENDPOINT = '/api/registerUser';
 
 export default function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -16,27 +19,6 @@ export default function useAuth() {
     setSession(null);
     setUser(null);
   }, []);
-
-  const upsertDefaultUserDetailsRecord = useCallback(
-    async (newUser: User, name?: string) => {
-      const userData: UserDetails = {
-        id: newUser.id,
-        email: newUser.email,
-        displayName: name,
-        createdAt: new Date(),
-      };
-
-      const ret = await supabase.from<UserDetails>(Collections.USER_DETAILS).upsert(userData);
-      if (ret.error) {
-        console.error('Error upserting user record', ret.error);
-        await signOut();
-        return;
-      }
-
-      setUserDetails(userData);
-    },
-    [signOut],
-  );
 
   useEffect(() => {
     const currentSession = supabase.auth.session();
@@ -78,15 +60,12 @@ export default function useAuth() {
         .eq('id', user.id)
         .single()
         .then(async (res) => {
-          if (!res.data) {
-            // if data doesn't exist, upsert a new record
-            await upsertDefaultUserDetailsRecord(user);
-          } else {
+          if (res.data) {
             setUserDetails(res.data);
           }
         });
     }
-  }, [user, upsertDefaultUserDetailsRecord]);
+  }, [user]);
 
   const signInWithEmailAndPassword = useCallback(
     async (email, password) => {
@@ -122,20 +101,25 @@ export default function useAuth() {
         await signOut();
       }
 
-      const data = await supabase.auth.signUp({ email, password });
-      if (data.error) {
-        throw data.error;
-      }
+      const params = JSON.stringify({
+        email,
+        password,
+        name,
+      });
 
-      if (data.user) {
-        await upsertDefaultUserDetailsRecord(data.user, name);
-      }
+      const res = await fetch(REGISTER_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: params,
+      });
 
-      setSession(data.session);
-      setUser(data.user);
-      return data.user;
+      if (!res.ok) {
+        throw new Error('Cannot register for user');
+      }
     },
-    [user, signOut, upsertDefaultUserDetailsRecord],
+    [user, signOut],
   );
 
   return {

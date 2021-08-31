@@ -150,8 +150,8 @@ export default function RegisterPage() {
         .then(() => {
           router.replace('/');
         })
-        .catch((errMsg) => {
-          setAuthError(errMsg);
+        .catch((err) => {
+          setAuthError(err);
           setSubmitting(false);
         });
     },

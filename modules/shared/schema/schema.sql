@@ -39,6 +39,8 @@ create table public.invites (
   "workspaceId"   bigint references public.workspaces on delete cascade not null,
   "inviterId"     uuid references auth.users not null,
   "email"         text not null,
-  "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null
+  "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null,
+
+  unique("workspaceId", "email")
 );
 comment on table public.invites is 'Stores the user to workspace relationship';
