@@ -25,7 +25,7 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { isBrowser } from 'shared/utils';
-import { Logo, VideoCallIcon, CallHistoryIcon } from '~/components/Icons';
+import { Logo, AppsIcon } from '~/components/Icons';
 import { useAppState } from '~/hooks/useAppState';
 import Menu from './Menu';
 
@@ -166,24 +166,24 @@ export default function Nav({
         <Divider className={classes.divider} />
 
         <List className={classes.list}>
-          <Link href="/">
+          <Link href="/" passHref>
             <ListItem button onClick={closeModal} className={routeSelectedClassname('/')}>
               <ListItemIcon>
-                <VideoCallIcon />
+                <AppsIcon />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="h3">Rooms</Typography>
+                <Typography variant="h3">Sheets</Typography>
               </ListItemText>
             </ListItem>
           </Link>
 
-          <Link href="/history">
-            <ListItem button onClick={closeModal} className={routeSelectedClassname('/history')}>
+          <Link href="/apps" passHref>
+            <ListItem button onClick={closeModal} className={routeSelectedClassname('/apps')}>
               <ListItemIcon>
-                <CallHistoryIcon />
+                <AppsIcon />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="h3">History</Typography>
+                <Typography variant="h3">Apps</Typography>
               </ListItemText>
             </ListItem>
           </Link>

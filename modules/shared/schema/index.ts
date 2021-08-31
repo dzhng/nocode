@@ -5,7 +5,12 @@ export enum Collections {
   WORKSPACES = 'workspaces',
   MEMBERS = 'members',
   INVITES = 'invites',
+  APPS = 'apps',
 }
+
+/**
+ * Admin schemas
+ */
 
 export declare interface UserDetails {
   id?: string;
@@ -39,5 +44,18 @@ export declare interface Invite {
   workspaceId: number;
   inviterId: string;
   email: string;
+  createdAt: Date;
+}
+
+/**
+ * Data schemas
+ */
+
+export declare interface App {
+  id?: number;
+  name: string;
+  workspaceId: number;
+  creatorId: string;
+  isDeleted: boolean;
   createdAt: Date;
 }

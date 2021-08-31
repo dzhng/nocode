@@ -1,30 +1,9 @@
-import {
-  ArrowBackIosOutlined as BackIcon,
-  VideoCallOutlined as VideoCallIcon,
-  VideoCall as VideoCallFilledIcon,
-  RecentActorsOutlined as PresentIcon,
-  VideoLibraryOutlined as VideoIcon,
-  PollOutlined as PollIcon,
-  LiveHelpOutlined as QuestionsIcon,
-  ScreenShareOutlined as ScreenShareIcon,
-  GroupOutlined as BreakoutIcon,
-  HistoryOutlined as CallHistoryIcon,
-} from '@material-ui/icons';
+import { ArrowBackIosOutlined as BackIcon, AppsOutlined as AppsIcon } from '@material-ui/icons';
 
 // re-export standardized icons so they are consistent
-export {
-  BackIcon,
-  VideoCallIcon,
-  VideoCallFilledIcon,
-  PresentIcon,
-  VideoIcon,
-  PollIcon,
-  QuestionsIcon,
-  ScreenShareIcon,
-  BreakoutIcon,
-  CallHistoryIcon,
-};
+export { BackIcon, AppsIcon };
 
 export const Logo = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  // eslint-disable-next-line @next/next/no-img-element
   <img src="/logo.png" {...props} />
 );
