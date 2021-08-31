@@ -101,4 +101,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error('Error inserting user record', userRet.error);
     return res.status(400).end();
   }
+
+  return res.redirect('/register-confirm').end();
 };

@@ -34,4 +34,6 @@ export default withAuth(async (req, res, user) => {
   console.log('Inviting users with emails: ', body.emails);
   // cycle through each email, send invite email
   // TODO
+
+  return res.status(200).end();
 });

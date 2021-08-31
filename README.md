@@ -181,5 +181,4 @@ However, be careful with using `height: 100%` on flex items as [it has undefined
 
 ## TODO:
 
-- Look into moving all /pages/api functions to Cloud Functions, so can get rid of service account credentials and keep pages structure clean (frontend only)
-- Add logic to auto mark a call as finished if it's 4hr+. Fallback in case Twilio's webhooks fail
+- Write test case for unique invites model

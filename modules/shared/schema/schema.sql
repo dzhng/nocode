@@ -8,7 +8,7 @@ create table public.users (
   "email"         text,
   "photoURL"      text,
   "bio"           text,
-  "defaultWorkspaceId" uuid,
+  "defaultWorkspaceId" bigint references public.workspaces on delete set null,
   "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null
 );
 comment on table public.users is 'Profile data for each user.';
