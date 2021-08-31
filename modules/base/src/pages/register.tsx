@@ -148,7 +148,7 @@ export default function RegisterPage() {
       setSubmitting(true);
       register(values.email, values.password, values.name)
         .then(() => {
-          router.replace('/');
+          router.replace('/register-confirm');
         })
         .catch((err) => {
           setAuthError(err);

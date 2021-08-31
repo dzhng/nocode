@@ -102,5 +102,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).end();
   }
 
-  return res.redirect('/register-confirm').end();
+  return res.status(200).end();
 };
