@@ -285,7 +285,7 @@ export default function Home() {
 
         {currentWorkspace && !isLoadingTemplates && (
           <Grid item {...cardItemSizeProps}>
-            <Link href="/template/create">
+            <Link href="/template/create" passHref>
               {/* Need to wrap Card in div since Link doesn't work with functional components. See: https://github.com/vercel/next.js/issues/7915 */}
               <div>
                 <CreateCard height={cardHeight} />
@@ -298,7 +298,7 @@ export default function Home() {
           ? loadingTemplateSkeletons
           : templates.map((template) => (
               <Grid item {...cardItemSizeProps} key={template.id}>
-                <Link href={`/template/${template.id}`}>
+                <Link href={`/template/${template.id}`} passHref>
                   {/* Need to wrap Card in div since Link doesn't work with functional components. See: https://github.com/vercel/next.js/issues/7915 */}
                   <div>
                     <TemplateCard template={template} height={cardHeight} />

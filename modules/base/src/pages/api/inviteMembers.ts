@@ -1,15 +1,15 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import assert from 'assert';
 import * as yup from 'yup';
 import { Collections, Member } from 'shared/schema';
 import supabase from '~/utils/supabase';
+import { withAuth } from '~/utils/api';
 
 interface RequestBody {
   workspaceId: number;
   emails: string[];
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default withAuth(async (req, res, user) => {
   if (req.method !== 'POST') {
     return res.status(400).end();
   }
@@ -20,11 +20,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const emails = body.emails.filter((email) => yup.string().email().isValidSync(email));
   assert(emails.length > 0);
-
-  const { user, error } = await supabase.auth.api.getUserByCookie(req);
-  if (error || !user) {
-    return res.status(401).end();
-  }
 
   // check if user has permission to invite
   const ret = await supabase
@@ -39,4 +34,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('Inviting users with emails: ', body.emails);
   // cycle through each email, send invite email
   // TODO
-};
+});
