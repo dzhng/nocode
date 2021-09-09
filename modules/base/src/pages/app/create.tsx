@@ -1,43 +1,28 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { Collections, App } from 'shared/schema';
-import supabase from '~/utils/supabase';
 import { useAppState } from '~/hooks/useAppState';
+import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import withPrivateRoute from '~/components/PrivateRoute/withPrivateRoute';
 import CreateContainer from '~/components/CreateAppContainer';
 
 export default withPrivateRoute(function CreateCallPage() {
   const router = useRouter();
-  const { user, currentWorkspaceId } = useAppState();
+  const { currentWorkspaceId } = useAppState();
+  const { createApp } = useWorkspaceApps(currentWorkspaceId);
 
   // prefetch next page for fast loading
   router.prefetch('/app/[slug]');
 
   const create = useCallback(
-    async (values) => {
-      if (!user || !currentWorkspaceId) {
-        return Promise.reject('User is not authenticated');
-      }
-
-      // before adding, replace timestamp with server helper
-      const data: App = {
-        name: values.name,
-        workspaceId: currentWorkspaceId,
-        creatorId: user.id,
-        isDeleted: false,
-        createdAt: new Date(),
-      };
-
-      const ret = await supabase.from<App>(Collections.APPS).insert(data);
-      if (ret.error || !ret.data) {
-        console.error('Error creating app', ret.error);
-        return;
-      }
+    async (values: { name: string }) => {
+      const app = await createApp(values);
 
       // navigate to new tempalate page to set it up
-      router.push(`/app/${ret.data[0].id}`);
+      if (app) {
+        router.push(`/app/${app.id}`);
+      }
     },
-    [router, user, currentWorkspaceId],
+    [router, createApp],
   );
 
   return <CreateContainer save={create} />;

@@ -11,7 +11,8 @@ import UserAvatar from '~/components/UserAvatar';
 import Nav from '~/components/Nav';
 import { useAppState } from '~/hooks/useAppState';
 import useWorkspaceMembers from '~/hooks/useWorkspaceMembers';
-import TemplateCard from './TemplateCard';
+import useWorkspaceApps from '~/hooks/useWorkspaceApps';
+import AppCard from './AppCard';
 import CreateCard from './CreateCard';
 import { AddMemberDialog } from './AddMemberMenuItem';
 import LeaveMenuItem from './LeaveMenuItem';
@@ -115,15 +116,13 @@ const cardItemSizeProps: { [key: string]: 12 | 6 | 4 | 3 | 2 } = {
 };
 
 export default function Home() {
-  const templates: any[] = []; // TODO: replace with actual data later
-  const isLoadingTemplates = false;
-
   const classes = useStyles();
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const { currentWorkspace, isWorkspacesReady, leaveWorkspace, deleteWorkspace } = useAppState();
+  const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspace?.id);
   const { members, isAdmin, isLoadingMembers, inviteMembers, removeMembers } = useWorkspaceMembers(
     currentWorkspace?.id,
   );
@@ -135,7 +134,7 @@ export default function Home() {
     setSettingsMenuOpen(false);
   }, []);
 
-  const loadingTemplateSkeletons = [0, 1, 2].map((key) => (
+  const loadingAppSkeletons = [0, 1, 2].map((key) => (
     <Grid item {...cardItemSizeProps} key={key}>
       <Skeleton variant="rect" height={cardHeight} className={classes.cardSkeleton} />
     </Grid>
@@ -167,7 +166,7 @@ export default function Home() {
 
             <span className={classes.membersList}>{loadingMemberSkeletons}</span>
           </Grid>
-          {loadingTemplateSkeletons}
+          {loadingAppSkeletons}
         </Grid>
       </div>
     );
@@ -283,7 +282,7 @@ export default function Home() {
           </span>
         </Grid>
 
-        {currentWorkspace && !isLoadingTemplates && (
+        {currentWorkspace && !isLoadingApps && (
           <Grid item {...cardItemSizeProps}>
             <Link href="/app/create" passHref>
               {/* Need to wrap Card in div since Link doesn't work with functional components. See: https://github.com/vercel/next.js/issues/7915 */}
@@ -294,14 +293,14 @@ export default function Home() {
           </Grid>
         )}
 
-        {isLoadingTemplates
-          ? loadingTemplateSkeletons
-          : templates.map((template) => (
-              <Grid item {...cardItemSizeProps} key={template.id}>
-                <Link href={`/template/${template.id}`} passHref>
+        {isLoadingApps
+          ? loadingAppSkeletons
+          : apps.map((app) => (
+              <Grid item {...cardItemSizeProps} key={app.id}>
+                <Link href={`/app/${app.id}`} passHref>
                   {/* Need to wrap Card in div since Link doesn't work with functional components. See: https://github.com/vercel/next.js/issues/7915 */}
                   <div>
-                    <TemplateCard template={template} height={cardHeight} />
+                    <AppCard app={app} height={cardHeight} />
                   </div>
                 </Link>
               </Grid>

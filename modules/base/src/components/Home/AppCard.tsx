@@ -1,7 +1,7 @@
 import { Typography, Card, Button, Tooltip } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { VideoCall } from '@material-ui/icons';
-//import { Template } from 'shared/schema';
+import { App } from 'shared/schema';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -54,32 +54,18 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-// TODO: replace once actual data defined
-export default function TemplateCard({ template, height }: { template: any; height: number }) {
+export default function AppCard({ app, height }: { app: App; height: number }) {
   const classes = useStyles();
-  const callLink = `/start/${template.id}?from=${encodeURIComponent('/')}`;
 
   return (
     <Card className={classes.card} style={{ height }}>
       <div className={classes.title}>
-        <Typography variant="h2">{template.name}</Typography>
+        <Typography variant="h2">{app.name}</Typography>
       </div>
       <div className={classes.footer}>
         <div>
-          <Typography variant="body1">
-            <b>{template.activities.length}</b> activities
-          </Typography>
+          <Typography variant="body1">Edit this app</Typography>
         </div>
-        <a
-          href={callLink}
-          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}
-        >
-          <Tooltip title="Start call" placement="top">
-            <Button color="secondary" variant="contained">
-              <VideoCall />
-            </Button>
-          </Tooltip>
-        </a>
       </div>
     </Card>
   );

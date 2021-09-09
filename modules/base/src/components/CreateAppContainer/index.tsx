@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
 
-      '& >button': {
+      '& >a': {
         position: 'fixed',
         top: theme.spacing(1),
         left: theme.spacing(1),
@@ -33,6 +33,10 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(3),
       marginLeft: 'auto',
       marginRight: 'auto',
+
+      [theme.breakpoints.up('sm')]: {
+        minWidth: 500,
+      },
 
       '& h1,p': {
         marginBottom: theme.spacing(1),

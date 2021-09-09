@@ -172,18 +172,18 @@ export default function Nav({
                 <AppsIcon />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="h3">Sheets</Typography>
+                <Typography variant="h3">Apps</Typography>
               </ListItemText>
             </ListItem>
           </Link>
 
-          <Link href="/apps" passHref>
-            <ListItem button onClick={closeModal} className={routeSelectedClassname('/apps')}>
+          <Link href="/settings" passHref>
+            <ListItem button onClick={closeModal} className={routeSelectedClassname('/settings')}>
               <ListItemIcon>
                 <AppsIcon />
               </ListItemIcon>
               <ListItemText>
-                <Typography variant="h3">Apps</Typography>
+                <Typography variant="h3">Settings</Typography>
               </ListItemText>
             </ListItem>
           </Link>
