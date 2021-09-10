@@ -6,14 +6,11 @@ declare module '@material-ui/core/styles/createTheme' {
     headerBarHeight: number;
     transitionTime: string;
     dividerBorder: string;
-    callControlHeightXs: number;
-    callControlHeight: number;
 
     customMixins: {
       modalPaper: CSSProperties;
       activitiesBar: CSSProperties;
       activitiesBarMini: CSSProperties;
-      callButton: CSSProperties;
       scrollBar: CSSProperties;
       disableScrollBar: CSSProperties;
       overflowScrollGradient: CSSProperties;
@@ -25,8 +22,6 @@ declare module '@material-ui/core/styles/createTheme' {
     headerBarHeight?: number;
     transitionTime?: string;
     dividerBorder?: string;
-    callControlHeightXs?: number;
-    callControlHeight?: number;
 
     customMixins: {
       modalPaper?: CSSProperties;
@@ -115,11 +110,9 @@ export default createTheme({
   },
 
   // custom
-  headerBarHeight: 40,
+  headerBarHeight: 64,
   transitionTime: '0.3s',
   dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
-  callControlHeightXs: 48,
-  callControlHeight: 64, // enough for large fab (56) + 1 spacing
 
   customMixins: {
     modalPaper: {

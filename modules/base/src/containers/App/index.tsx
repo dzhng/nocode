@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@material-ui/core';
+import {
+  GridOnOutlined as SheetIcon,
+  ViewDayOutlined as ViewIcon,
+  SettingsOutlined as AutomateIcon,
+} from '@material-ui/icons';
 import { clone } from 'lodash';
 import { DataTypes, ColumnType, RowType, CellType } from '~/types';
 import DataTable from '~/components/DataTable';
@@ -10,18 +16,19 @@ const useStyles = makeStyles((theme) =>
     container: {
       width: '100%',
       height: '100%',
+      marginTop: theme.headerBarHeight,
     },
     navBar: {
       width: '100%',
       borderBottom: theme.dividerBorder,
       height: theme.headerBarHeight,
     },
-    logo: {
-      height: theme.headerBarHeight - 10,
-      margin: 5,
+    centerButtons: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
     content: {
-      height: `calc(100% - ${theme.headerBarHeight}px)`,
+      height: '100%',
       display: 'flex',
     },
   }),
@@ -82,21 +89,45 @@ export default function AppContainer() {
   };
 
   return (
-    <div className={classes.container}>
-      <div className={classes.navBar}>
-        <BackButton />
-        <img className={classes.logo} src="/logo.png" />
+    <>
+      <AppBar position="fixed" color="transparent">
+        <Toolbar>
+          <BackButton />
+          <Typography variant="h1">Hello World</Typography>
+
+          <div className={classes.centerButtons}>
+            <Tooltip title="Database" placement="bottom">
+              <IconButton>
+                <SheetIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Views" placement="bottom">
+              <IconButton>
+                <ViewIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Automations" placement="bottom">
+              <IconButton>
+                <AutomateIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Toolbar>
+      </AppBar>
+      <div className={classes.container}>
+        <div className={classes.content}>
+          <DataTable
+            columns={columns}
+            data={data}
+            addColumn={addColumn}
+            addRow={addRow}
+            changeCell={changeCell}
+            changeColumn={changeColumn}
+          />
+        </div>
       </div>
-      <div className={classes.content}>
-        <DataTable
-          columns={columns}
-          data={data}
-          addColumn={addColumn}
-          addRow={addRow}
-          changeCell={changeCell}
-          changeColumn={changeColumn}
-        />
-      </div>
-    </div>
+    </>
   );
 }
