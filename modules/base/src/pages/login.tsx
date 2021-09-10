@@ -9,7 +9,7 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 
 import { useAppState } from '~/hooks/useAppState';
-import LoadingContainer from '~/components/LoadingContainer';
+import LoadingContainer from '~/containers/Loading';
 import { Logo } from '~/components/Icons';
 
 const FormSchema = yup.object().shape({

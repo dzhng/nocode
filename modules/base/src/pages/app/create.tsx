@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useAppState } from '~/hooks/useAppState';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
+import CreateContainer from '~/containers/CreateApp';
 import withPrivateRoute from '~/components/PrivateRoute/withPrivateRoute';
-import CreateContainer from '~/components/CreateAppContainer';
 
 export default withPrivateRoute(function CreateCallPage() {
   const router = useRouter();
