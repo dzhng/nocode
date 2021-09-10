@@ -4,7 +4,7 @@ import { Typography, Button, CircularProgress, Paper } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import BackButton from '~/components/BackButton/BackButton';
+import BackButton from '~/components/BackButton';
 
 const FormSchema = yup.object().shape({
   name: yup.string().min(1, 'Too Short!').max(50, 'Too Long!').required(),

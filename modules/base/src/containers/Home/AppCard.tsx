@@ -1,6 +1,5 @@
-import { Typography, Card, Button, Tooltip } from '@material-ui/core';
+import { Typography, Card } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { VideoCall } from '@material-ui/icons';
 import { App } from 'shared/schema';
 
 const useStyles = makeStyles((theme) =>

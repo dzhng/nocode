@@ -3,6 +3,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { clone } from 'lodash';
 import { DataTypes, ColumnType, RowType, CellType } from '~/types';
 import DataTable from '~/components/DataTable';
+import BackButton from '~/components/BackButton';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -83,6 +84,7 @@ export default function Sheet() {
   return (
     <div className={classes.container}>
       <div className={classes.navBar}>
+        <BackButton />
         <img className={classes.logo} src="/logo.png" />
       </div>
       <div className={classes.content}>
