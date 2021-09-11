@@ -1,6 +1,5 @@
-import { Typography, Card } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { AddCircleOutline as AddIcon } from '@material-ui/icons';
+import { Typography, Card } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -27,20 +26,26 @@ const useStyles = makeStyles((theme) =>
         letterSpacing: 0,
       },
     },
-    icon: {
-      fontSize: '3rem',
-      color: 'white',
-    },
   }),
 );
 
-export default function CreateCard({ height }: { height: number }) {
+export default function CardButton({
+  height,
+  title,
+  icon,
+  ...props
+}: {
+  height: number;
+  title: string;
+  icon: React.ReactNode;
+  [props: string]: any;
+}) {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card} style={{ height }}>
-      <Typography variant="h2">New App</Typography>
-      <AddIcon className={classes.icon} />
+    <Card className={classes.card} style={{ height }} {...props}>
+      <Typography variant="h2">{title}</Typography>
+      {icon}
     </Card>
   );
 }

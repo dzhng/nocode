@@ -3,17 +3,21 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { Typography, Grid, Menu, MenuItem, IconButton, Tooltip, Hidden } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { MoreVert as MoreIcon, Menu as MenuIcon } from '@material-ui/icons';
+import {
+  MoreVert as MoreIcon,
+  Menu as MenuIcon,
+  AddCircleOutline as AddIcon,
+} from '@material-ui/icons';
 import { Skeleton } from '@material-ui/lab';
 import useDimensions from 'react-cool-dimensions';
 
 import UserAvatar from '~/components/UserAvatar';
 import Nav from '~/components/Nav';
+import CardButton from '~/components/CardButton';
 import { useAppState } from '~/hooks/useAppState';
 import useWorkspaceMembers from '~/hooks/useWorkspaceMembers';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import AppCard from './AppCard';
-import CreateCard from './CreateCard';
 import { AddMemberDialog } from './AddMemberMenuItem';
 import LeaveMenuItem from './LeaveMenuItem';
 import DeleteMenuItem from './DeleteMenuItem';
@@ -287,7 +291,18 @@ export default function Home() {
             <Link href="/app/create" passHref>
               {/* Need to wrap Card in div since Link doesn't work with functional components. See: https://github.com/vercel/next.js/issues/7915 */}
               <div>
-                <CreateCard height={cardHeight} />
+                <CardButton
+                  title="New App"
+                  height={cardHeight}
+                  icon={
+                    <AddIcon
+                      style={{
+                        fontSize: '3rem',
+                        color: 'white',
+                      }}
+                    />
+                  }
+                />
               </div>
             </Link>
           </Grid>

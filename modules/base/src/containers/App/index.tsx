@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) =>
     },
     appBar: {
       borderBottom: theme.dividerBorder,
+      backgroundColor: 'white',
     },
     centerButtons: {
       marginLeft: 'auto',
@@ -70,6 +71,7 @@ export default function AppContainer() {
           </div>
         </Toolbar>
       </AppBar>
+
       <div className={classes.container}>
         {tab === 'sheet' && <SheetContainer />}
         {tab === 'page' && <PageContainer />}
