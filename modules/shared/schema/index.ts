@@ -6,6 +6,8 @@ export enum Collections {
   MEMBERS = 'members',
   INVITES = 'invites',
   APPS = 'apps',
+  SHEETS = 'sheets',
+  RECORDS = 'records',
 }
 
 /**
