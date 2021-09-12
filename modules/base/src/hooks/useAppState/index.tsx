@@ -16,7 +16,7 @@ export interface StateContextType {
   signInWithGoogle(): Promise<User | null>;
   signOut(): Promise<void>;
   isAuthReady?: boolean;
-  register(email: string, password: string, name: string): Promise<User | null>;
+  register(email: string, password: string, name: string): Promise<void>;
 
   // workspaces
   currentWorkspaceId?: number;
