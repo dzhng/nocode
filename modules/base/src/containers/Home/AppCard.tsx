@@ -39,12 +39,6 @@ const useStyles = makeStyles((theme) =>
       borderTop: '1px solid ' + theme.palette.grey[200],
       height: 70,
 
-      '& button': {
-        ...theme.customMixins.callButton,
-        marginRight: theme.spacing(2),
-        height: 38,
-      },
-
       '& p': {
         color: theme.palette.grey[600],
         marginLeft: theme.spacing(2),
