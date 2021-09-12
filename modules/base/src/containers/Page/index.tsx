@@ -2,7 +2,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { AddCircleOutline as AddIcon } from '@material-ui/icons';
 import CardButton from '~/components/CardButton';
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     container: {
       width: 200,
