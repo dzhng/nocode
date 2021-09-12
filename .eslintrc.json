@@ -14,6 +14,11 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
+  "settings": {
+    "next": {
+      "rootDir": "modules/*/src"
+    }
+  },
   "rules": {
     "no-shadow": "off",
     "react/react-in-jsx-scope": "off",
@@ -25,6 +30,7 @@
     "jsx-a11y/interactive-supports-focus": "off",
     "react/require-default-props": "off",
     "no-param-reassign": "off",
-    "import/no-anonymous-default-export": "off"
+    "import/no-anonymous-default-export": "off",
+    "@next/next/no-html-link-for-pages": "off"
   }
 }
