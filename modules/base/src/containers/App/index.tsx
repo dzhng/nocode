@@ -6,6 +6,7 @@ import {
   ViewDayOutlined as ViewIcon,
   SettingsOutlined as AutomateIcon,
 } from '@material-ui/icons';
+import useApp from '~/hooks/useApp';
 import BackButton from '~/components/BackButton';
 import SheetContainer from '~/containers/Sheet';
 import PageContainer from '~/containers/Page';
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-export default function AppContainer() {
+export default function AppContainer({ appId }: { appId: number }) {
   const classes = useStyles();
   const [tab, setTab] = useState<'sheet' | 'page' | 'automation'>('sheet');
 
@@ -73,7 +74,7 @@ export default function AppContainer() {
       </AppBar>
 
       <div className={classes.container}>
-        {tab === 'sheet' && <SheetContainer />}
+        {tab === 'sheet' && <SheetContainer appId={appId} />}
         {tab === 'page' && <PageContainer />}
         {tab === 'automation' && <AutomationContainer />}
       </div>

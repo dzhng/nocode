@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { clone } from 'lodash';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { DataTypes, ColumnType, RowType, CellType } from '~/types';
+import { DataTypes, ColumnType, Record, CellType } from 'shared/schema';
+import useApp from '~/hooks/useApp';
 import DataTable from '~/components/DataTable';
 
 const useStyles = makeStyles(() =>
@@ -13,8 +14,9 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-export default function SheetContainer() {
+export default function SheetContainer({ appId }: { appId: number }) {
   const classes = useStyles();
+  const { sheets, isLoadingSheets, createSheet } = useApp(appId);
 
   const [columns, setColumns] = useState<ColumnType[]>([
     {
@@ -34,9 +36,7 @@ export default function SheetContainer() {
     },
   ]);
 
-  const [data, setData] = useState<RowType[]>([
-    { _id: '1', '1': 'Jay-Z', '2': 1, '3': new Date() },
-  ]);
+  const [data, setData] = useState<Record[]>([{ _id: '1', '1': 'Jay-Z', '2': 1, '3': new Date() }]);
 
   const addColumn = (type: ColumnType) => {
     setColumns([...columns, type]);
