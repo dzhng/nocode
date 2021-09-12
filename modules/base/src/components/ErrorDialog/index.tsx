@@ -7,10 +7,10 @@ import {
   DialogContentText,
 } from '@material-ui/core';
 
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 
 export default function ErrorDialog() {
-  const { error, setError } = useAppState();
+  const { error, setError } = useGlobalState();
 
   const message: string | null = error instanceof Error ? error.message : error;
 

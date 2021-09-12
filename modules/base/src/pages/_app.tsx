@@ -9,7 +9,7 @@ import '~/utils/progress-indicator';
 import theme from '~/theme';
 import Head from '~/components/App/Head';
 import ErrorDialog from '~/components/ErrorDialog';
-import { AppStateProvider } from '~/hooks/useAppState';
+import { GlobalStateProvider } from '~/hooks/useGlobalState';
 
 import './styles.css';
 
@@ -32,12 +32,12 @@ export default function App({ Component, pageProps }: AppProps) {
         anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
         variant="info"
       >
-        <AppStateProvider>
+        <GlobalStateProvider>
           <Head />
           <CssBaseline />
           <ErrorDialog />
           <Component previousPage={previousPage} {...pageProps} />
-        </AppStateProvider>
+        </GlobalStateProvider>
       </SnackbarProvider>
     </MuiThemeProvider>
   );

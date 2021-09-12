@@ -14,7 +14,7 @@ import useDimensions from 'react-cool-dimensions';
 import UserAvatar from '~/components/UserAvatar';
 import Nav from '~/components/Nav';
 import CardButton from '~/components/CardButton';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import useWorkspaceMembers from '~/hooks/useWorkspaceMembers';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import AppCard from './AppCard';
@@ -125,7 +125,7 @@ export default function Home() {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
-  const { currentWorkspace, isWorkspacesReady, leaveWorkspace, deleteWorkspace } = useAppState();
+  const { currentWorkspace, isWorkspacesReady, leaveWorkspace, deleteWorkspace } = useGlobalState();
   const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspace?.id);
   const { members, isAdmin, isLoadingMembers, inviteMembers, removeMembers } = useWorkspaceMembers(
     currentWorkspace?.id,

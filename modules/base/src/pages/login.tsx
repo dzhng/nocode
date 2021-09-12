@@ -8,7 +8,7 @@ import { Divider, Typography, Button, Paper, Container, CircularProgress } from 
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import LoadingContainer from '~/containers/Loading';
 import { Logo } from '~/components/Icons';
 
@@ -130,7 +130,7 @@ const LoginForm = ({ isSubmitting }: { isSubmitting: boolean }) => {
 export default function LoginPage({ previousPage }: { previousPage?: string }) {
   const classes = useStyles();
   const router = useRouter();
-  const { signInWithEmailAndPassword, isAuthReady, signInWithGoogle } = useAppState();
+  const { signInWithEmailAndPassword, isAuthReady, signInWithGoogle } = useGlobalState();
   const [authError, setAuthError] = useState<Error | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 

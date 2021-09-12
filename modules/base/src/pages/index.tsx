@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import withPrivateRoute from '~/components/PrivateRoute/withPrivateRoute';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import Home from '~/containers/Home';
 
 export default withPrivateRoute(function IndexPage() {
-  const { queryForWorkspaces } = useAppState();
+  const { queryForWorkspaces } = useGlobalState();
 
   useEffect(() => {
     queryForWorkspaces();

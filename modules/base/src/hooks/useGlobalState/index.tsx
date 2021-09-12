@@ -32,7 +32,7 @@ export interface StateContextType {
 
 export const StateContext = createContext<StateContextType>(null!);
 
-export function AppStateProvider(props: React.PropsWithChildren<{}>) {
+export function GlobalStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<Error | string | null>(null);
 
   const contextValue: StateContextType = {
@@ -45,10 +45,10 @@ export function AppStateProvider(props: React.PropsWithChildren<{}>) {
   return <StateContext.Provider value={contextValue}>{props.children}</StateContext.Provider>;
 }
 
-export function useAppState() {
+export default function useGlobalState() {
   const context = useContext(StateContext);
   if (!context) {
-    throw new Error('useAppState must be used within the AppStateProvider');
+    throw new Error('useGlobalState must be used within the GlobalStateProvider');
   }
   return context;
 }

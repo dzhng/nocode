@@ -26,7 +26,7 @@ import {
 import { Skeleton } from '@material-ui/lab';
 import { isBrowser } from 'shared/utils';
 import { Logo, AppsIcon } from '~/components/Icons';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import Menu from './Menu';
 
 const NewWorkspaceValue = -1;
@@ -131,7 +131,7 @@ export default function Nav({
     currentWorkspaceId,
     setCurrentWorkspaceId,
     createWorkspace,
-  } = useAppState();
+  } = useGlobalState();
 
   const routeSelectedClassname = useCallback(
     (route) => {

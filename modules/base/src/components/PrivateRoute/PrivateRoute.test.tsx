@@ -1,12 +1,12 @@
 import { screen, render } from '@testing-library/react';
 import { useRouter } from 'next/router';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import PrivateRoute from './PrivateRoute';
 
 jest.mock('next/router');
-jest.mock('~/hooks/useAppState');
+jest.mock('~/hooks/useGlobalState');
 
-const mockUseAppState = useAppState as jest.Mock<any>;
+const mockUseState = useGlobalState as jest.Mock<any>;
 const mockUseRouter = useRouter as jest.Mock<any>;
 const MockComponent = () => <h1 data-testid="mock">test</h1>;
 
@@ -17,7 +17,7 @@ describe('the PrivateRoute component', () => {
   describe('with auth enabled', () => {
     describe('when isAuthReady is true', () => {
       it('should redirect to /login when there is no user', () => {
-        mockUseAppState.mockImplementation(() => ({ user: false, isAuthReady: true }));
+        mockUseState.mockImplementation(() => ({ user: false, isAuthReady: true }));
         render(
           <PrivateRoute>
             <MockComponent />
@@ -28,7 +28,7 @@ describe('the PrivateRoute component', () => {
       });
 
       it('should render children when there is a user', () => {
-        mockUseAppState.mockImplementation(() => ({ user: {}, isAuthReady: true }));
+        mockUseState.mockImplementation(() => ({ user: {}, isAuthReady: true }));
         render(
           <PrivateRoute>
             <MockComponent />
@@ -40,7 +40,7 @@ describe('the PrivateRoute component', () => {
 
     describe('when isAuthReady is false', () => {
       it('should not render children', () => {
-        mockUseAppState.mockImplementation(() => ({ user: false, isAuthReady: false }));
+        mockUseState.mockImplementation(() => ({ user: false, isAuthReady: false }));
         render(
           <PrivateRoute>
             <MockComponent />

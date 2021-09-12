@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Collections, App } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 
 export default function useWorkspaceMembers(workspaceId?: number) {
-  const { user } = useAppState();
+  const { user } = useGlobalState();
   const [apps, setApps] = useState<App[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
 

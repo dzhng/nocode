@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 
 export default function PrivateRoute(props: {
   children: React.ReactChild;
 }): React.ReactElement | null {
   const router = useRouter();
-  const { isAuthReady, user } = useAppState();
+  const { isAuthReady, user } = useGlobalState();
 
   useEffect(() => {
     // don't prematurely push to login if auth is not ready

@@ -2,12 +2,12 @@ import { useEffect, useState, useCallback } from 'react';
 import fetch from 'isomorphic-unfetch';
 import { Collections, Member, UserDetails } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 
 const INVITE_ENDPOINT = '/api/inviteMembers';
 
 export default function useWorkspaceMembers(workspaceId?: number) {
-  const { user } = useAppState();
+  const { user } = useGlobalState();
   const [members, setMembers] = useState<UserDetails[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);

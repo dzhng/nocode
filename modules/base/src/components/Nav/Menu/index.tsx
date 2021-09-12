@@ -4,13 +4,13 @@ import { useRouter } from 'next/router';
 import { IconButton, Menu as MenuContainer, MenuItem, Tooltip } from '@material-ui/core';
 import { MoreVert as MoreIcon } from '@material-ui/icons';
 
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import UserAvatar from '~/components/UserAvatar';
 import AboutDialog from '../AboutDialog';
 
 export default function Menu() {
   const router = useRouter();
-  const { userDetails, signOut } = useAppState();
+  const { userDetails, signOut } = useGlobalState();
 
   const [aboutOpen, setAboutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

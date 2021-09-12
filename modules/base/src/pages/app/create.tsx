@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import CreateContainer from '~/containers/CreateApp';
 import withPrivateRoute from '~/components/PrivateRoute/withPrivateRoute';
 
 export default withPrivateRoute(function CreateCallPage() {
   const router = useRouter();
-  const { currentWorkspaceId } = useAppState();
+  const { currentWorkspaceId } = useGlobalState();
   const { createApp } = useWorkspaceApps(currentWorkspaceId);
 
   // prefetch next page for fast loading

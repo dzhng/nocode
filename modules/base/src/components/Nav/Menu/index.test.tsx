@@ -1,12 +1,9 @@
 import { screen, render, within } from '@testing-library/react';
 import fireEvent from '@testing-library/user-event';
-import { useAppState } from '~/hooks/useAppState';
+import useGlobalState from '~/hooks/useGlobalState';
 import Menu from './index';
 
-jest.mock('~/state');
-jest.mock('~/hooks/Video/useVideoContext/useVideoContext');
-
-const mockUseAppState = useAppState as jest.Mock<any>;
+const mockUseState = useGlobalState as jest.Mock<any>;
 
 describe('the Menu component', () => {
   const mockDisconnect = jest.fn();
@@ -14,13 +11,13 @@ describe('the Menu component', () => {
 
   describe('when there is a user', () => {
     it('should render the UserAvatar component', () => {
-      mockUseAppState.mockImplementation(() => ({ user: {}, signOut: jest.fn() }));
+      mockUseState.mockImplementation(() => ({ user: {}, signOut: jest.fn() }));
       render(<Menu />);
       expect(screen.queryByTestId('avatar')).toBeInTheDocument();
     });
 
     it('should include the logout button in the menu', () => {
-      mockUseAppState.mockImplementation(() => ({
+      mockUseState.mockImplementation(() => ({
         user: { displayName: 'Test User' },
         signOut: jest.fn(),
       }));
@@ -31,7 +28,7 @@ describe('the Menu component', () => {
     });
 
     it('should display the user name in the menu', () => {
-      mockUseAppState.mockImplementation(() => ({
+      mockUseState.mockImplementation(() => ({
         user: { displayName: 'Test User' },
         signOut: jest.fn(),
       }));
@@ -43,7 +40,7 @@ describe('the Menu component', () => {
 
     it('should disconnect from the room and stop all tracks on signout', () => {
       const mockSignOut = jest.fn(() => Promise.resolve());
-      mockUseAppState.mockImplementation(() => ({
+      mockUseState.mockImplementation(() => ({
         user: { displayName: 'Test User' },
         signOut: mockSignOut,
       }));
@@ -61,13 +58,13 @@ describe('the Menu component', () => {
 
   describe('when there is not a user', () => {
     it('should render the "More" icon', () => {
-      mockUseAppState.mockImplementation(() => ({ user: null, signOut: jest.fn() }));
+      mockUseState.mockImplementation(() => ({ user: null, signOut: jest.fn() }));
       render(<Menu />);
       expect(screen.queryByTestId('more-icon')).toBeInTheDocument();
     });
 
     it('should not display the user name in the menu', () => {
-      mockUseAppState.mockImplementation(() => ({
+      mockUseState.mockImplementation(() => ({
         user: { displayName: undefined },
         signOut: jest.fn(),
       }));
@@ -78,7 +75,7 @@ describe('the Menu component', () => {
     });
 
     it('should not include the logout button in the menu', () => {
-      mockUseAppState.mockImplementation(() => ({ user: null }));
+      mockUseState.mockImplementation(() => ({ user: null }));
       render(<Menu />);
       fireEvent.click(screen.getByTestId('more-icon'));
       const menu = screen.getByTestId('menu');

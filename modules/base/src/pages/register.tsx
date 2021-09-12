@@ -13,7 +13,7 @@ import {
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { ErrorOutline as ErrorIcon } from '@material-ui/icons';
-import { useAppState } from '~/hooks/useAppState';
+import useGloblState from '~/hooks/useGlobalState';
 import { Logo } from '~/components/Icons';
 
 const FormSchema = Yup.object().shape({
@@ -139,7 +139,7 @@ export default function RegisterPage() {
   const classes = useStyles();
   const router = useRouter();
 
-  const { register } = useAppState();
+  const { register } = useGlobalState();
   const [authError, setAuthError] = useState<Error | null>(null);
 
   const handleSubmit = useCallback(
