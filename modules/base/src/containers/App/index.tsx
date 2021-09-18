@@ -6,7 +6,6 @@ import {
   ViewDayOutlined as ViewIcon,
   SettingsOutlined as AutomateIcon,
 } from '@material-ui/icons';
-import useApp from '~/hooks/useApp';
 import BackButton from '~/components/BackButton';
 import SheetContainer from '~/containers/Sheet';
 import PageContainer from '~/containers/Page';

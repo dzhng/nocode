@@ -1,5 +1,6 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { DataTypes, ColumnType, RowType, CellType } from '~/types';
+import { Sheet } from 'shared/schema';
+import useSheet from '~/hooks/useSheet';
 import Cell from './Cell';
 
 interface PropTypes {
@@ -53,15 +54,9 @@ function AddNewRow({ onClick }: { onClick(): void }) {
   );
 }
 
-export default function DataTable({
-  columns,
-  data,
-  addColumn,
-  addRow,
-  changeCell,
-  changeColumn,
-}: PropTypes) {
+export default function DataTable({ sheet }: { sheet: Sheet }) {
   const classes = useStyles();
+  const { records, createRecord, editRecord, addColumn } = useSheet(sheet.id);
 
   const onAddColumn = () =>
     addColumn({

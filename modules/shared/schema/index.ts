@@ -122,7 +122,7 @@ export interface TableMeta {
 }
 
 export interface ColumnType {
-  columnId: string;
+  id?: number;
   name: string;
   type: DataTypes;
   defaultValue?: CellType;
@@ -134,15 +134,24 @@ export interface ColumnType {
  * Row and Cell definitions
  */
 
-export type CellType = string | number | Date | object | string[] | number[];
-
 export interface Record {
   id?: number;
   sheetId: number;
   order: number;
-  data: {
-    [columnID: string]: CellType | undefined;
-  };
+  createdAt: Date;
+  modifiedAt: Date;
+}
+
+export type CellType = string | number | Date | object | string[] | number[];
+
+export interface Cell {
+  id?: number;
+  recordId: number;
+  columnId: number;
+  dataString?: string;
+  dataNumber?: number;
+  dataDate?: Date;
+  dataJSON?: object | string[] | number[];
   createdAt: Date;
   modifiedAt: Date;
 }

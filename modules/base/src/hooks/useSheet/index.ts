@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Collections, Record, CellType } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
+import useColumns from './columns';
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
@@ -10,7 +11,7 @@ export default function useSheet(sheetId?: number) {
   const [isLoadingRecords, setIsLoadingRecords] = useState(true);
 
   useEffect(() => {
-    const loadSheets = async () => {
+    const loadRecords = async () => {
       const ret = await supabase
         .from<Record>(Collections.RECORDS)
         .select('*')
@@ -32,7 +33,7 @@ export default function useSheet(sheetId?: number) {
       return;
     }
 
-    loadSheets();
+    loadRecords();
   }, [sheetId, user]);
 
   const createRecord = useCallback(
@@ -144,5 +145,6 @@ export default function useSheet(sheetId?: number) {
     createRecord,
     editRecord,
     reorderRecord,
+    ...useColumns(sheetId),
   };
 }
