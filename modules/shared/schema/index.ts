@@ -144,13 +144,13 @@ export interface Record {
 
 export type CellType = string | number | Date | object | string[] | number[];
 
+// all cell data can be stored eitehr as string, number, or json. string and numbers are explicitly exposed so that postgres can index
 export interface Cell {
   id?: number;
   recordId: number;
   columnId: number;
   dataString?: string;
   dataNumber?: number;
-  dataDate?: Date;
   dataJSON?: object | string[] | number[];
   createdAt: Date;
   modifiedAt: Date;
