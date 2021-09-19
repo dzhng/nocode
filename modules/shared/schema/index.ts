@@ -157,6 +157,7 @@ export const CellSchema = z.object({
   dataNumber: z.number().optional(),
   dataJSON: CellTypeSchema,
   createdAt: z.date(),
+  modifiedAt: z.date(),
 });
 export type Cell = z.infer<typeof CellSchema>;
 

@@ -84,6 +84,7 @@ create table public.cells (
   "dataNumber"    bigint default null,
   "dataJSON"      jsonb default null,
   "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null,
+  "modifiedAt"    timestamp with time zone default timezone('utc'::text, now()) not null
 );
 comment on table public.cells is 'A cell contains an individual piece of data, the data is distributed into different typed columns for sorting purposes';
 
