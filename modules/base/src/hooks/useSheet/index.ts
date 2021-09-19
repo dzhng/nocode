@@ -37,8 +37,7 @@ export default function useSheet(sheetId?: number) {
     loadRecords();
   }, [sheetId, user]);
 
-  // TODO
-  const test = trpc.useQuery(['record.hello', { text: 'david' }]);
+  const createRecordMutation = trpc.useMutation('record.create');
 
   const createRecord = useCallback(
     async (cellData: { [id: string]: CellType }, atEnd: boolean) => {
@@ -59,25 +58,18 @@ export default function useSheet(sheetId?: number) {
 
       // before adding, replace timestamp with server helper
       const now = new Date();
-      const data: Record = {
+      const record: Record = {
         sheetId,
         order,
-        data: cellData,
         createdAt: now,
-        modifiedAt: now,
       };
 
-      supabase
-        .from<Record>(Collections.RECORDS)
-        .insert(data)
-        .then(null, (e) => {
-          console.error('Error creating record', e);
-        });
+      createRecordMutation.mutate({ record, data: cellData });
 
-      const newRecords = atEnd ? [...records, data] : [data, ...records];
+      const newRecords = atEnd ? [...records, record] : [record, ...records];
       setRecords(newRecords);
     },
-    [user, sheetId, records, isLoadingRecords],
+    [user, sheetId, records, createRecordMutation, isLoadingRecords],
   );
 
   const editRecord = useCallback(

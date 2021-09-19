@@ -80,8 +80,7 @@ export enum DataTypes {
   Location = 'location',
 
   // select from a list of predefined text or numbers
-  SingleSelection = 'single_selection',
-  MultipleSelection = 'multiple_selection',
+  Selection = 'selection',
 
   // map to value from another table, based on a value from this row
   Relation = 'relation',
@@ -155,7 +154,7 @@ export const CellSchema = z.object({
   columnId: z.number(),
   dataString: z.string().optional(),
   dataNumber: z.number().optional(),
-  dataJSON: CellTypeSchema,
+  dataJSON: CellTypeSchema.optional(),
   createdAt: z.date(),
   modifiedAt: z.date(),
 });
