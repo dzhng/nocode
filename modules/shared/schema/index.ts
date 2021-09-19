@@ -1,4 +1,5 @@
 // make sure this typescript schema aligns with schema.sql
+import { z } from 'zod';
 
 export enum Collections {
   USER_DETAILS = 'users',
@@ -8,69 +9,67 @@ export enum Collections {
   APPS = 'apps',
   SHEETS = 'sheets',
   RECORDS = 'records',
+  CELLS = 'cells',
+  CELL_CHANGE = 'cellchange',
 }
 
 /**
  * Admin schemas
  */
 
-export declare interface UserDetails {
-  id?: string;
-  displayName?: string;
-  email?: string | null;
-  photoURL?: string | null;
-  bio?: string | null;
-  defaultWorkspaceId?: number;
-  createdAt: Date;
-}
+export const UserDetailsSchema = z.object({
+  id: z.string().uuid().optional(),
+  displayName: z.string().nullish(),
+  email: z.string().nullish(),
+  photoURL: z.string().nullish(),
+  bio: z.string().nullish(),
+  defaultWorkspaceId: z.number().nullish(),
+  createdAt: z.date(),
+});
+export type UserDetails = z.infer<typeof UserDetailsSchema>;
 
-export declare interface Workspace {
-  id?: number;
-  name: string;
-  isDeleted: boolean;
-  createdAt: Date;
-}
+export const WorkspaceSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  isDeleted: z.boolean(),
+  createdAt: z.date(),
+});
+export type Workspace = z.infer<typeof WorkspaceSchema>;
 
-export type MemberRoles = 'owner' | 'member' | 'deleted';
+export const MemberRolesSchema = z.enum(['owner', 'member', 'deleted']);
+export type MemberRoles = z.infer<typeof MemberRolesSchema>;
 
-export declare interface Member {
-  id?: number;
-  workspaceId: number;
-  userId: string;
-  role: MemberRoles;
-  createdAt: Date;
-}
+export const MemberSchema = z.object({
+  id: z.number().optional(),
+  workspaceId: z.number(),
+  userId: z.string().uuid(),
+  role: MemberRolesSchema,
+  createdAt: z.date(),
+});
+export type Member = z.infer<typeof MemberSchema>;
 
-export declare interface Invite {
-  id?: number;
-  workspaceId: number;
-  inviterId: string;
-  email: string;
-  createdAt: Date;
-}
+export const InviteSchema = z.object({
+  id: z.number().optional(),
+  workspaceId: z.number(),
+  inviterId: z.string().uuid(),
+  email: z.string().email(),
+  createdAt: z.date(),
+});
+export type Invite = z.infer<typeof InviteSchema>;
 
 /**
  * Data schemas
  */
 
-export declare interface App {
-  id?: number;
-  name: string;
-  workspaceId: number;
-  creatorId: string;
-  isDeleted: boolean;
-  createdAt: Date;
-}
-
-export declare interface Sheet {
-  id?: number;
-  appId: number;
-  name: string;
-  order: number;
-  columns: ColumnType[];
-  isDeleted: boolean;
-  createdAt: Date;
-}
+export const AppSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  workspaceId: z.number(),
+  creatorId: z.string().uuid(),
+  isDeleted: z.boolean(),
+  createdAt: z.date(),
+});
+export type App = z.infer<typeof AppSchema>;
 
 export enum DataTypes {
   Text = 'text',
@@ -84,74 +83,103 @@ export enum DataTypes {
   SingleSelection = 'single_selection',
   MultipleSelection = 'multiple_selection',
 
-  // can be text, image, number, file, date, or location
-  List = 'list',
-
   // map to value from another table, based on a value from this row
-  RelationOne = 'relation_one',
-  RelationMany = 'relation_many',
+  Relation = 'relation',
 }
+export const DataTypesSchema = z.nativeEnum(DataTypes);
+
+/**
+ * Cell Data Definitions
+ */
+export const CellTypeSchema = z
+  .string()
+  .or(z.number())
+  .or(z.date())
+  .or(z.object({})) // make sure to parse with .passthrough() if this is used
+  .or(z.string().array())
+  .or(z.number().array());
+export type CellType = z.infer<typeof CellTypeSchema>;
 
 /**
  * Column definitions
  */
 
-export interface SelectionMeta {
-  type: DataTypes.Text | DataTypes.Number;
-  // all potiential options that can be selected
-  options: string[] | number[];
-}
+export const SelectionMetaSchema = z.object({
+  type: z.enum([DataTypes.Text, DataTypes.Number]),
+  options: z.array(z.string()).or(z.array(z.number())),
+});
+export type SelectionMeta = z.infer<typeof SelectionMetaSchema>;
 
-export interface ListMeta {
-  // the type of data that is stored in the list
-  type: DataTypes;
-}
-
-export interface RelationMeta {
+export const RelationMetaSchema = z.object({
   // the column in the current table that serves as the key
-  keyColumnId: string;
+  keyColumnId: z.string(),
 
   // point to the location of the relational data value
-  valueTableId: string;
-  valueColumnId: string;
-}
+  valueSheetId: z.string(),
+  valueColumnId: z.string(),
+});
+export type RelationMeta = z.infer<typeof RelationMetaSchema>;
 
-export interface TableMeta {
-  width?: number;
-  isHidden?: boolean;
-}
+export const TableMetaSchema = z.object({
+  width: z.number().optional(),
+  isHidden: z.boolean().optional(),
+});
+export type TableMeta = z.infer<typeof TableMetaSchema>;
 
-export interface ColumnType {
-  id?: number;
-  name: string;
-  type: DataTypes;
-  defaultValue?: CellType;
-  typeMetadata?: SelectionMeta | ListMeta | RelationMeta;
-  tableMetadata?: TableMeta;
-}
+export const ColumnTypeSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  type: DataTypesSchema,
+  defaultValue: CellTypeSchema.optional(),
+  typeMetadata: SelectionMetaSchema.or(RelationMetaSchema).optional(),
+  tableMetadata: TableMetaSchema.optional(),
+});
+export type ColumnType = z.infer<typeof ColumnTypeSchema>;
 
 /**
  * Row and Cell definitions
  */
 
-export interface Record {
-  id?: number;
-  sheetId: number;
-  order: number;
-  createdAt: Date;
-  modifiedAt: Date;
-}
+export const RecordSchema = z.object({
+  id: z.number().optional(),
+  sheetId: z.number(),
+  order: z.number(),
+  createdAt: z.date(),
+});
+export type Record = z.infer<typeof RecordSchema>;
 
-export type CellType = string | number | Date | object | string[] | number[];
+// all cell data can be stored either as string, number, or json. string and numbers are explicitly exposed so that postgres can index
+export const CellSchema = z.object({
+  id: z.number().optional(),
+  recordId: z.number(),
+  columnId: z.number(),
+  dataString: z.string().optional(),
+  dataNumber: z.number().optional(),
+  dataJSON: CellTypeSchema,
+  createdAt: z.date(),
+});
+export type Cell = z.infer<typeof CellSchema>;
 
-// all cell data can be stored eitehr as string, number, or json. string and numbers are explicitly exposed so that postgres can index
-export interface Cell {
-  id?: number;
-  recordId: number;
-  columnId: number;
-  dataString?: string;
-  dataNumber?: number;
-  dataJSON?: object | string[] | number[];
-  createdAt: Date;
-  modifiedAt: Date;
-}
+export const SheetSchema = z.object({
+  id: z.number().optional(),
+  appId: z.number(),
+  name: z.string(),
+  order: z.number(),
+  columns: ColumnTypeSchema.array(),
+  isDeleted: z.boolean(),
+  createdAt: z.date(),
+});
+export type Sheet = z.infer<typeof SheetSchema>;
+
+/**
+ * Track app / sheet / record / cell change timestamps
+ */
+export const CellChangeSchema = z.object({
+  id: z.number().optional(),
+  appId: z.number(),
+  sheetId: z.number(),
+  recordId: z.number(),
+  cellId: z.number(),
+  modifiedAt: z.date(),
+});
+export type CellChange = z.infer<typeof CellChangeSchema>;
