@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Collections, Record, CellType } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
+import { trpc } from '~/utils/trpc';
 import useColumns from './columns';
 
 export default function useSheet(sheetId?: number) {
@@ -35,6 +36,9 @@ export default function useSheet(sheetId?: number) {
 
     loadRecords();
   }, [sheetId, user]);
+
+  // TODO
+  const test = trpc.useQuery(['record.hello', { text: 'david' }]);
 
   const createRecord = useCallback(
     async (cellData: { [id: string]: CellType }, atEnd: boolean) => {

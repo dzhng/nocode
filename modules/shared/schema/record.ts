@@ -26,7 +26,7 @@ export const GenerateRecordDataSchema = (sheet: Sheet) => {
 };
 
 export interface RecordData extends Record {
-  data: {
-    [columnId: string]: CellData;
+  data?: {
+    [columnId: string]: CellData | undefined;
   };
 }
