@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { forEach } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
 import { CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
@@ -9,25 +10,25 @@ import useColumns from './columns';
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const [records, setRecords] = useState<Record[]>([]);
-  const [cells, setCells] = useState<CellData[]>([]);
+  const [cells, setCells] = useState<{ [id: string]: CellData }>({});
   //const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoadingRecords, setIsLoadingRecords] = useState(true);
 
   useEffect(() => {
     const loadRecords = async () => {
-      const ret = await supabase
+      const recordRet = await supabase
         .from<Record>(Collections.RECORDS)
         .select('*')
         .eq('sheetId', sheetId)
         .order('order', { ascending: true })
         .limit(5000);
 
-      if (ret.error || !ret.data) {
+      if (recordRet.error || !recordRet.data) {
         setRecords([]);
         return;
       }
+      setRecords(recordRet.data);
 
-      setRecords(ret.data);
       setIsLoadingRecords(false);
     };
 
@@ -44,13 +45,37 @@ export default function useSheet(sheetId?: number) {
       const recordsClone = [...records, record];
       recordsClone.sort((a, b) => a.order - b.order);
       setRecords(recordsClone);
+
+      if (data) {
+        const cellsClone = { ...cells };
+        data.forEach((cell) => {
+          cellsClone[cell.id] = cell;
+        });
+        setCells(cellsClone);
+      }
     },
-    onSuccess: (_, { record, data }) => {},
-    onError: (_, error) => {},
+    onError: (error, { record, data }) => {
+      console.error('Error creating record', error);
+      // undo the optimistic insert
+      const recordsClone = [...records];
+      const insertedIndex = recordsClone.findIndex((r) => r.id === record.id);
+      if (insertedIndex !== -1) {
+        recordsClone.splice(insertedIndex, 1);
+        setRecords(recordsClone);
+      }
+
+      if (data) {
+        const cellsClone = { ...cells };
+        data.forEach((cell) => {
+          delete cellsClone[cell.id];
+        });
+        setCells(cellsClone);
+      }
+    },
   });
 
   const createRecord = useCallback(
-    async (cellData: { [id: string]: CellType }, atEnd: boolean) => {
+    async (data: { [id: number]: CellType }, atEnd: boolean) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated');
       }
@@ -74,10 +99,19 @@ export default function useSheet(sheetId?: number) {
         createdAt: now,
       };
 
-      createRecordMutation.mutate({ record, data: cellData });
+      // create the data object
+      const cellData: CellData[] = [];
+      forEach(data, (value, key) => {
+        const ret: CellData = {
+          id: Number(key),
+          data: value,
+          createdAt: now,
+          modifiedAt: now,
+        };
+        cellData.push(ret);
+      });
 
-      const newRecords = atEnd ? [...records, record] : [record, ...records];
-      setRecords(newRecords);
+      createRecordMutation.mutate({ record, data: cellData });
     },
     [user, sheetId, records, createRecordMutation, isLoadingRecords],
   );

@@ -6,7 +6,7 @@ import useAuth from '../useAuth';
 export default function useWorkspaces() {
   const { user, userDetails, isAuthReady } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<number | undefined>();
+  const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<number | undefined | null>();
   const [isWorkspacesReady, setIsWorkspacesReady] = useState(false);
 
   // make sure currentWorkspaceId is always up to date when user details changes

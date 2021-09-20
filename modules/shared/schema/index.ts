@@ -176,10 +176,11 @@ export type Sheet = z.infer<typeof SheetSchema>;
  */
 export const CellChangeSchema = z.object({
   id: z.number().optional(),
+  userId: z.string().uuid(),
   appId: z.number(),
   sheetId: z.number(),
   recordId: z.number(),
-  cellId: z.number(),
+  columnId: z.number(),
   modifiedAt: z.date(),
 });
 export type CellChange = z.infer<typeof CellChangeSchema>;

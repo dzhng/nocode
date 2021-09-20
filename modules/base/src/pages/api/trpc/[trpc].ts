@@ -5,7 +5,7 @@ import supabase from '~/utils/supabase';
 
 import recordRouter from '~/routers/record';
 
-export async function createContext({ req }: trpcNext.CreateNextContextOptions) {
+async function createContext({ req }: trpcNext.CreateNextContextOptions) {
   const { user, error } = await supabase.auth.api.getUserByCookie(req);
   if (error || !user) {
     return null;
@@ -15,7 +15,7 @@ export async function createContext({ req }: trpcNext.CreateNextContextOptions) 
     user,
   };
 }
-type Context = trpc.inferAsyncReturnType<typeof createContext>;
+export type Context = trpc.inferAsyncReturnType<typeof createContext>;
 
 const appRouter = trpc
   .router<Context>()
