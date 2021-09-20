@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Collections, Record, CellType } from 'shared/schema';
+import { CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
@@ -8,6 +9,7 @@ import useColumns from './columns';
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const [records, setRecords] = useState<Record[]>([]);
+  const [cells, setCells] = useState<CellData[]>([]);
   //const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoadingRecords, setIsLoadingRecords] = useState(true);
 
@@ -37,7 +39,15 @@ export default function useSheet(sheetId?: number) {
     loadRecords();
   }, [sheetId, user]);
 
-  const createRecordMutation = trpc.useMutation('record.create');
+  const createRecordMutation = trpc.useMutation('record.create', {
+    onMutate: ({ record, data }) => {
+      const recordsClone = [...records, record];
+      recordsClone.sort((a, b) => a.order - b.order);
+      setRecords(recordsClone);
+    },
+    onSuccess: (_, { record, data }) => {},
+    onError: (_, error) => {},
+  });
 
   const createRecord = useCallback(
     async (cellData: { [id: string]: CellType }, atEnd: boolean) => {

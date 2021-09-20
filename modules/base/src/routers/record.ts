@@ -1,27 +1,94 @@
 import * as trpc from '@trpc/server';
-import { forEach } from 'lodash';
 import { z } from 'zod';
-import { Collections, Sheet, Record, RecordSchema, DataTypes, Cell } from 'shared/schema';
-import { makeRecordDataSchema, CellData } from 'shared/schema/record';
+import { compact } from 'lodash';
+import { Collections, Sheet, Record, RecordSchema, Cell } from 'shared/schema';
+import { CellDataSchema, CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
-import { dataFieldForCell } from '~/utils/record';
+import { dataFieldForCell, cellTypeForDataField } from '~/utils/record';
 
 export default trpc
   .router()
-  .query('hello', {
+  .query('infiniteQuery', {
     input: z.object({
-      text: z.string().nullish(),
+      sheetId: z.number(),
+      // maps to useInfiniteQuery on client side
+      limit: z.number().min(1).max(100).nullish(),
+      cursor: z.number().nullish(),
     }),
-    resolve({ input }) {
+    async resolve({ input }) {
+      const { sheetId, limit: _limit, cursor: _cursor } = input;
+      const limit = _limit ?? 100;
+      const cursor = _cursor ?? 0;
+
+      const { data: sheetData } = await supabase
+        .from<Sheet>(Collections.SHEETS)
+        .select('*')
+        .eq('id', sheetId)
+        .single();
+      if (!sheetData) {
+        throw new trpc.TRPCError({
+          code: 'NOT_FOUND',
+        });
+      }
+
+      const recordRet = await supabase
+        .from<Record>(Collections.RECORDS)
+        .select('*')
+        .eq('sheetId', sheetId)
+        .order('order', { ascending: true })
+        .range(cursor, cursor + limit - 1);
+      if (recordRet.error || !recordRet.data) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
+      const recordIds = compact(recordRet.data.map((r) => r.id));
+      const cellRet = await supabase
+        .from<Cell>(Collections.CELLS)
+        .select('*')
+        .in('recordId', recordIds);
+      if (cellRet.error || !cellRet.data) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
+      // transform cells into digestable CellData
+      const cellData = compact(
+        cellRet.data.map((cell) => {
+          const column = sheetData.columns.find((c) => c.id === cell.columnId);
+          if (!column || !cell.id) {
+            return null;
+          }
+
+          const cellType = cellTypeForDataField(column, cell);
+          if (!cellType) {
+            return null;
+          }
+
+          const data: CellData = {
+            id: cell.id,
+            data: cellType,
+            createdAt: cell.createdAt,
+            modifiedAt: cell.modifiedAt,
+          };
+
+          return data;
+        }),
+      );
+
       return {
-        greeting: `hello ${input?.text ?? 'world'}`,
+        records: recordRet.data,
+        cells: cellData,
+        nextCursor: cursor + limit,
       };
     },
   })
   .mutation('create', {
     input: z.object({
       record: RecordSchema,
-      data: z.any(),
+      data: CellDataSchema.array().optional(),
     }),
     async resolve({ input }) {
       const { record, data } = input;
@@ -48,16 +115,9 @@ export default trpc
 
       // insert the data into individual cell records
       if (data) {
-        const dataSchema = makeRecordDataSchema(sheetData);
-        const parsed = dataSchema.safeParse(data);
-        if (!parsed.success) {
-          console.warn('Error parsing data on record create');
-          return;
-        }
-
         // build an array of cell objects from the data
         const cells: Cell[] = [];
-        forEach(parsed.data, (value: CellData) => {
+        data.forEach((value) => {
           const column = sheetData.columns.find((c) => c.id === value.id);
           if (!column) return;
 
@@ -72,13 +132,7 @@ export default trpc
           });
         });
 
-        await Promise.all(
-          cells.map((cell) => {
-            return supabase.from<Cell>(Collections.CELLS).insert(cell, { returning: 'minimal' });
-          }),
-        ).catch((e) => {
-          console.warn('Error inserting cell data', e);
-        });
+        await supabase.from<Cell>(Collections.CELLS).insert(cells, { returning: 'minimal' });
       }
     },
   });
