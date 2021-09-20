@@ -159,7 +159,7 @@ export default trpc
     input: z.object({
       recordId: z.number(),
       columnId: z.number(),
-      data: CellTypeSchema,
+      data: CellTypeSchema.or(z.null()), // null means clear the cell
     }),
     async resolve({ input, ctx }) {
       // fetch the sheet to get column info
@@ -213,6 +213,52 @@ export default trpc
           recordId: recordData.id,
           columnId: input.columnId,
           modifiedAt: now,
+        },
+        { returning: 'minimal' },
+      );
+    },
+  })
+  .mutation('delete', {
+    input: z.object({
+      recordId: z.number(),
+    }),
+    async resolve({ input, ctx }) {
+      // fetch the sheet to get column info
+      const { data: recordData } = await supabase
+        .from<Record & { sheet: Sheet }>(Collections.RECORDS)
+        .select(
+          ` *,
+            sheet:sheetId (*) 
+          `,
+        )
+        .eq('id', input.recordId)
+        .single();
+      if (!recordData) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
+      // NOTE: cells should be auto deleted because of postgres cascade
+      const { error } = await supabase
+        .from<Record>(Collections.RECORDS)
+        .delete({ returning: 'minimal' })
+        .eq('id', input.recordId);
+
+      if (error) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
+      // insert change obj
+      await supabase.from<CellChange>(Collections.CELL_CHANGE).insert(
+        {
+          userId: ctx?.user.id,
+          appId: recordData.sheet.appId,
+          sheetId: recordData.sheetId,
+          recordId: recordData.id,
+          modifiedAt: new Date(),
         },
         { returning: 'minimal' },
       );

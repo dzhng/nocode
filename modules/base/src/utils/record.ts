@@ -1,21 +1,21 @@
 import { ColumnType, CellType, DataTypes, SelectionMeta } from 'shared/schema';
 
-export function dataFieldForCell(column: ColumnType, data: CellType) {
+export function dataFieldForCell(column: ColumnType, data: CellType | null) {
   if (
     column.type === DataTypes.Text ||
     (column.type === DataTypes.Selection &&
       (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Text)
   ) {
-    return [{ dataString: String(data) }, 'dataString'];
+    return [{ dataString: data === null ? null : String(data) }, 'dataString'];
   } else if (
     column.type === DataTypes.Number ||
     column.type === DataTypes.Date ||
     (column.type === DataTypes.Selection &&
       (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Number)
   ) {
-    return [{ dataNumber: Number(data) }, 'dataNumber'];
+    return [{ dataNumber: data === null ? null : Number(data) }, 'dataNumber'];
   } else {
-    return [{ dataJSON: data }, 'dataJSON'];
+    return [{ dataJSON: data === null ? null : data }, 'dataJSON'];
   }
 }
 
