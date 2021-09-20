@@ -96,7 +96,8 @@ export const CellTypeSchema = z
   .or(z.date())
   .or(z.object({})) // make sure to parse with .passthrough() if this is used
   .or(z.string().array())
-  .or(z.number().array());
+  .or(z.number().array())
+  .or(z.null());
 export type CellType = z.infer<typeof CellTypeSchema>;
 
 /**

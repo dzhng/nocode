@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { CellTypeSchema } from './index';
 
 export const CellDataSchema = z.object({
-  id: z.number(),
+  columnId: z.number(),
   data: CellTypeSchema,
   createdAt: z.date(),
   modifiedAt: z.date(),

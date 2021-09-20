@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { forEach } from 'lodash';
+import { forEach, without } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
 import { CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
@@ -10,12 +10,14 @@ import useColumns from './columns';
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const [records, setRecords] = useState<Record[]>([]);
-  const [cells, setCells] = useState<{ [id: string]: CellData }>({});
+  // all cells, seperated by recordIds
+  const [cells, setCells] = useState<{ [recordId: number]: CellData[] }>({});
   //const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoadingRecords, setIsLoadingRecords] = useState(true);
 
   useEffect(() => {
     const loadRecords = async () => {
+      // REWRITE TO USE USEQUERY
       const recordRet = await supabase
         .from<Record>(Collections.RECORDS)
         .select('*')
@@ -47,10 +49,7 @@ export default function useSheet(sheetId?: number) {
       setRecords(recordsClone);
 
       if (data) {
-        const cellsClone = { ...cells };
-        data.forEach((cell) => {
-          cellsClone[cell.id] = cell;
-        });
+        const cellsClone = { ...cells, [record.id ?? 0]: data };
         setCells(cellsClone);
       }
     },
@@ -66,11 +65,31 @@ export default function useSheet(sheetId?: number) {
 
       if (data) {
         const cellsClone = { ...cells };
-        data.forEach((cell) => {
-          delete cellsClone[cell.id];
-        });
+        delete cellsClone[record.id ?? 0];
         setCells(cellsClone);
       }
+    },
+  });
+
+  let lastCellsSnapshot: typeof cells = {};
+  const editRecordMutation = trpc.useMutation('record.edit', {
+    onMutate: ({ recordId, columnId, data }) => {
+      // save so we can restore on error
+      lastCellsSnapshot = cells;
+
+      const currentCells = [...cells[recordId]];
+      const cell = currentCells.find((c) => c.columnId === columnId);
+      if (cell) {
+        const cellsClone = {
+          ...cells,
+          [recordId]: [...without(currentCells, cell), { ...cell, data, modifiedAt: new Date() }],
+        };
+        setCells(cellsClone);
+      }
+    },
+    onError: (error) => {
+      console.error('Error editing record', error);
+      setCells(lastCellsSnapshot);
     },
   });
 
@@ -103,7 +122,7 @@ export default function useSheet(sheetId?: number) {
       const cellData: CellData[] = [];
       forEach(data, (value, key) => {
         const ret: CellData = {
-          id: Number(key),
+          columnId: Number(key),
           data: value,
           createdAt: now,
           modifiedAt: now,
@@ -117,7 +136,7 @@ export default function useSheet(sheetId?: number) {
   );
 
   const editRecord = useCallback(
-    async (id: number, cellData: { [id: string]: CellType }) => {
+    async (id: number, columnId: number, data: CellType) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated');
       }
@@ -127,24 +146,9 @@ export default function useSheet(sheetId?: number) {
         return Promise.reject('Invalid record');
       }
 
-      const now = new Date();
-      supabase
-        .from<Record>(Collections.RECORDS)
-        .update({
-          data: cellData,
-          modifiedAt: now,
-        })
-        .eq('id', id)
-        .then(null, (e) => {
-          console.error('Error editing record', e);
-        });
-
-      const newRecords = [...records];
-      newRecords[localIndex].data = cellData;
-      newRecords[localIndex].modifiedAt = now;
-      setRecords(newRecords);
+      editRecordMutation.mutate({ recordId: id, columnId, data });
     },
-    [user, sheetId, records],
+    [user, sheetId, records, editRecordMutation],
   );
 
   const reorderRecord = useCallback(

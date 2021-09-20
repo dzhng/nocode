@@ -67,7 +67,7 @@ export default trpc
       const cellData = compact(
         cellRet.data.map((cell) => {
           const column = sheetData.columns.find((c) => c.id === cell.columnId);
-          if (!column || !cell.id) {
+          if (!column) {
             return null;
           }
 
@@ -77,7 +77,7 @@ export default trpc
           }
 
           const data: CellData = {
-            id: cell.id,
+            columnId: cell.columnId,
             data: cellType,
             createdAt: cell.createdAt,
             modifiedAt: cell.modifiedAt,
@@ -125,14 +125,14 @@ export default trpc
         // build an array of cell objects from the data
         const cells: Cell[] = [];
         data.forEach((value) => {
-          const column = sheetData.columns.find((c) => c.id === value.id);
+          const column = sheetData.columns.find((c) => c.id === value.columnId);
           if (!column) return;
 
           const dataField = dataFieldForCell(column, value.data);
 
           cells.push({
             recordId: recordData[0].id ?? 0,
-            columnId: value.id,
+            columnId: value.columnId,
             createdAt: value.createdAt,
             modifiedAt: value.modifiedAt,
             ...dataField,
@@ -159,7 +159,7 @@ export default trpc
     input: z.object({
       recordId: z.number(),
       columnId: z.number(),
-      data: CellTypeSchema.or(z.null()), // null means clear the cell
+      data: CellTypeSchema,
     }),
     async resolve({ input, ctx }) {
       // fetch the sheet to get column info
