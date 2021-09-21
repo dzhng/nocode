@@ -1,16 +1,7 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { Sheet } from 'shared/schema';
+import { Sheet, DataTypes } from 'shared/schema';
 import useSheet from '~/hooks/useSheet';
 import Cell from './Cell';
-
-interface PropTypes {
-  columns: ColumnType[];
-  data: RowType[];
-  addColumn(type: ColumnType): void;
-  addRow(index: number): void;
-  changeCell(location: { columnID: string; rowID?: string }, value?: CellType): void;
-  changeColumn(columnID: string, newData: { name: string; type: DataTypes }): void;
-}
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -56,28 +47,32 @@ function AddNewRow({ onClick }: { onClick(): void }) {
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const classes = useStyles();
-  const { records, createRecord, editRecord, addColumn } = useSheet(sheet.id);
+  const { records, cellForRecord, editRecord, createRecord, addColumn } = useSheet(sheet.id);
 
-  const onAddColumn = () =>
-    addColumn({
+  const onAddColumn = () => {};
+  /*addColumn({
       columnID: String(Math.floor(Math.random() * 1000)),
       name: 'test',
       type: DataTypes.Text,
-    });
+      });*/
 
-  const onAddRow = () => addRow(0);
+  const onAddRow = () => createRecord({}, true);
+
+  const changeColumn = (_: number, __: { name: string; type: DataTypes }) => {};
 
   return (
     <div className={classes.container}>
       <div className={classes.columnHeader}>
-        {columns.map((column) => (
-          <div key={column.columnID} className={classes.cellContainer}>
+        {sheet.columns.map((column) => (
+          <div key={column.id} className={classes.cellContainer}>
             <Cell
               isHeader
               column={column}
-              onChange={(newData) =>
-                changeColumn(column.columnID, { name: String(newData), type: column.type })
-              }
+              onChange={(newData) => {
+                if (column.id) {
+                  changeColumn(column.id, { name: String(newData), type: column.type });
+                }
+              }}
             />
           </div>
         ))}
@@ -85,16 +80,18 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       </div>
 
       <div className={classes.rowContainer}>
-        {data.map((dataRow) => (
-          <div key={dataRow._id} className={classes.row}>
-            {columns.map((column) => (
-              <div key={column.columnID} className={classes.cellContainer}>
+        {records.map((record) => (
+          <div key={record.id} className={classes.row}>
+            {sheet.columns.map((column) => (
+              <div key={column.id} className={classes.cellContainer}>
                 <Cell
                   column={column}
-                  data={dataRow[column.columnID]}
-                  onChange={(newData) =>
-                    changeCell({ columnID: column.columnID, rowID: dataRow._id }, newData)
-                  }
+                  data={record.id && column.id && cellForRecord(record.id, column.id)}
+                  onChange={(newData) => {
+                    if (record.id && column.id && newData !== undefined) {
+                      editRecord(record.id, column.id, newData);
+                    }
+                  }}
                 />
               </div>
             ))}

@@ -18,18 +18,21 @@ const useStyles = makeStyles(() =>
       flexShrink: 0,
       height: 40,
       background: '#DEDEDE',
+      display: 'flex',
+      flexDirection: 'row',
     },
     tab: {
       height: 40,
       width: 200,
       background: '#CCC',
+      flexShrink: 0,
     },
   }),
 );
 
 export default function SheetContainer({ appId }: { appId: number }) {
   const classes = useStyles();
-  const { sheets /*, isLoadingSheets, createSheet*/ } = useApp(appId);
+  const { sheets, createSheet /*, isLoadingSheets*/ } = useApp(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
 
   return (
@@ -43,6 +46,9 @@ export default function SheetContainer({ appId }: { appId: number }) {
             {sheet.name}
           </div>
         ))}
+        <div className={classes.tab} onClick={() => createSheet({ name: 'hello world' })}>
+          Create +
+        </div>
       </div>
     </div>
   );

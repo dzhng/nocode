@@ -56,9 +56,13 @@ export default function useApp(appId?: number) {
         return Promise.reject('Error creating sheet');
       }
 
-      return ret.data[0];
+      // add new sheet to end of sheets list
+      const newSheet = ret.data[0];
+      setSheets([...sheets, newSheet]);
+
+      return newSheet;
     },
-    [user, appId],
+    [user, appId, sheets],
   );
 
   return {

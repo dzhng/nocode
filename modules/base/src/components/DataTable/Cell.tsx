@@ -1,6 +1,6 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { formatRelativeDate } from 'shared/utils';
-import { DataTypes, CellType, ColumnType } from '~/types';
+import { DataTypes, CellType, ColumnType } from 'shared/schema';
 
 import { TextCellInput, NumberCellInput } from './CellInput';
 
@@ -42,24 +42,9 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
       return <span>{data instanceof Date ? formatRelativeDate(data) : ''}</span>;
     } else if (column.type === DataTypes.Location) {
       return <TextCellInput value={String(data)} onChange={onChange} />;
-    } else if (
-      column.type === DataTypes.SingleSelection ||
-      column.type === DataTypes.MultipleSelection
-    ) {
-      if (data instanceof Array) {
-        return (
-          <span>
-            {data.map((unit) => (
-              <span key={unit}>{String(unit)}</span>
-            ))}
-          </span>
-        );
-      } else {
-        return <span></span>;
-      }
-    } else if (column.type === DataTypes.List) {
-      return <span>List</span>;
-    } else if (column.type === DataTypes.RelationOne || column.type === DataTypes.RelationMany) {
+    } else if (column.type === DataTypes.Selection) {
+      return <span></span>;
+    } else if (column.type === DataTypes.Relation) {
       return <span>Relational</span>;
     } else {
       return <span>Unknown Data Type</span>;

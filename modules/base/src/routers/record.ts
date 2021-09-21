@@ -189,7 +189,7 @@ export default trpc
       const dataField = dataFieldForCell(column, input.data);
       const { error } = await supabase
         .from<Cell>(Collections.CELLS)
-        .update(
+        .upsert(
           {
             modifiedAt: now,
             ...dataField,

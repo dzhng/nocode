@@ -183,12 +183,21 @@ export default function useSheet(sheetId?: number) {
     [user, sheetId, records],
   );
 
+  const cellForRecord = useCallback(
+    (recordId: number, columnId: number) => {
+      const recordCells = cells[recordId];
+      return recordCells.find((c) => c.columnId === columnId);
+    },
+    [cells],
+  );
+
   return {
     records,
     isLoadingRecords,
     createRecord,
     editRecord,
     reorderRecord,
+    cellForRecord,
     ...useColumns(sheetId),
   };
 }

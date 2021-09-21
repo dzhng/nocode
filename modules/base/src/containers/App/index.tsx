@@ -16,16 +16,22 @@ const useStyles = makeStyles((theme) =>
     container: {
       width: '100%',
       height: '100%',
-      marginTop: theme.headerBarHeight,
-      padding: theme.spacing(1),
+      display: 'flex',
+      flexDirection: 'column',
     },
     appBar: {
+      flexShrink: 0,
       borderBottom: theme.dividerBorder,
       backgroundColor: 'white',
     },
     centerButtons: {
       marginLeft: 'auto',
       marginRight: 'auto',
+    },
+    content: {
+      flexGrow: 1,
+      marginTop: theme.headerBarHeight,
+      padding: theme.spacing(1),
     },
   }),
 );
@@ -35,7 +41,7 @@ export default function AppContainer({ appId }: { appId: number }) {
   const [tab, setTab] = useState<'sheet' | 'page' | 'automation'>('sheet');
 
   return (
-    <>
+    <div className={classes.container}>
       <AppBar className={classes.appBar} position="fixed" color="transparent" elevation={0}>
         <Toolbar>
           <BackButton />
@@ -72,11 +78,11 @@ export default function AppContainer({ appId }: { appId: number }) {
         </Toolbar>
       </AppBar>
 
-      <div className={classes.container}>
+      <div className={classes.content}>
         {tab === 'sheet' && <SheetContainer appId={appId} />}
         {tab === 'page' && <PageContainer />}
         {tab === 'automation' && <AutomationContainer />}
       </div>
-    </>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { includes, trim, without } from 'lodash';
 import clsx from 'clsx';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { Paper, InputBase, IconButton } from '@material-ui/core';
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { Add as AddIcon, HighlightOff as RemoveIcon } from '@material-ui/icons';
@@ -67,7 +67,7 @@ interface EmailOptionType {
   inputValue?: string;
 }
 
-const emailSchema = Yup.string().email().required();
+const emailSchema = z.string().email();
 const filter = createFilterOptions<EmailOptionType>();
 
 const EmailTextField = ({
@@ -88,7 +88,7 @@ const EmailTextField = ({
 
       if (includes(values, email)) {
         setError('This email has already been added');
-      } else if (emailSchema.isValidSync(email)) {
+      } else if (emailSchema.safeParse(email).success) {
         pushEmail(email);
         setError(null);
 
