@@ -65,9 +65,28 @@ export default function useApp(appId?: number) {
     [user, appId, sheets],
   );
 
+  const deleteSheet = useCallback(
+    async (sheetId: number) => {
+      if (!user || !appId) {
+        return Promise.reject('User is not authenticated');
+      }
+
+      const { error } = await supabase
+        .from<Sheet>(Collections.SHEETS)
+        .delete({ returning: 'minimal' })
+        .eq('id', sheetId);
+      if (error) {
+        console.error('Error deleting sheet', error);
+        return Promise.reject('Error deleting sheet');
+      }
+    },
+    [user, appId],
+  );
+
   return {
     sheets,
     isLoadingSheets,
     createSheet,
+    deleteSheet,
   };
 }
