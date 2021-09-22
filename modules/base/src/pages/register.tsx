@@ -139,7 +139,7 @@ export default function RegisterPage() {
   const classes = useStyles();
   const router = useRouter();
 
-  const { register } = useGlobalState();
+  const { register } = useGloblState();
   const [authError, setAuthError] = useState<Error | null>(null);
 
   const handleSubmit = useCallback(

@@ -1,9 +1,7 @@
 // utils/trpc.ts
 import { createReactQueryHooks } from '@trpc/react';
 import type { inferProcedureOutput } from '@trpc/server';
-
 import superjson from 'superjson';
-
 import type { AppRouter } from '~/pages/api/trpc/[trpc]';
 
 export const trpc = createReactQueryHooks<AppRouter>();

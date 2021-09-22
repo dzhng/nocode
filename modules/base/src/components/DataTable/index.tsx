@@ -81,7 +81,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
       <div className={classes.rowContainer}>
         {records.map((record) => (
-          <div key={record.id} className={classes.row}>
+          <div key={record.id ?? -1} className={classes.row}>
             {sheet.columns.map((column) => (
               <div key={column.id} className={classes.cellContainer}>
                 <Cell

@@ -5,6 +5,7 @@ import fetch from 'isomorphic-unfetch';
 import supabase from '~/utils/supabase';
 
 const REGISTER_ENDPOINT = '/api/registerUser';
+const AUTH_ENDPOINT = '/api/auth';
 
 export default function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,7 +21,7 @@ export default function useAuth() {
       setIsAuthReady(true);
     }
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_, newSession) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (newSession && newSession.user) {
         console.log('Auth state changed: update');
         setUser(newSession?.user ?? null);
@@ -31,6 +32,14 @@ export default function useAuth() {
         setUserDetails(null);
         setUser(null);
       }
+
+      // call auth endpoint to set cookies on any auth state changes
+      fetch(AUTH_ENDPOINT, {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        credentials: 'same-origin',
+        body: JSON.stringify({ event, session: newSession }),
+      });
     });
 
     return () => {
