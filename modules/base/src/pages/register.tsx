@@ -9,10 +9,10 @@ import {
   Button,
   Typography,
   CircularProgress,
-} from '@material-ui/core';
+} from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { ErrorOutline as ErrorIcon } from '@material-ui/icons';
+import { ErrorOutline as ErrorIcon } from '@mui/icons-material';
 import useGloblState from '~/hooks/useGlobalState';
 import { Logo } from '~/components/Icons';
 

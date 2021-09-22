@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Router from 'next/router';
 import { withTRPC } from '@trpc/next';
-import { CssBaseline } from '@material-ui/core';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import { CacheProvider, EmotionCache } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 
 import type { AppRouter } from '~/pages/api/trpc/[trpc]';
 import { transformer } from '~/utils/trpc';
+import { createEmotionCache } from '~/utils/emotion';
 import '~/utils/progress-indicator';
 import theme from '~/theme';
 import Head from '~/components/App/Head';
@@ -16,7 +18,14 @@ import { GlobalStateProvider } from '~/hooks/useGlobalState';
 
 import './styles.css';
 
-function App({ Component, pageProps }: AppProps) {
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
+
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
+
+function App({ Component, pageProps, emotionCache = clientSideEmotionCache }: MyAppProps) {
   const [previousPage, setPreviousPage] = useState<string | undefined>();
 
   useEffect(() => {
@@ -28,21 +37,23 @@ function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <SnackbarProvider
-        maxSnack={3}
-        autoHideDuration={3000}
-        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-        variant="info"
-      >
-        <GlobalStateProvider>
-          <Head />
-          <CssBaseline />
-          <ErrorDialog />
-          <Component previousPage={previousPage} {...pageProps} />
-        </GlobalStateProvider>
-      </SnackbarProvider>
-    </MuiThemeProvider>
+    <CacheProvider value={emotionCache}>
+      <ThemeProvider theme={theme}>
+        <SnackbarProvider
+          maxSnack={3}
+          autoHideDuration={3000}
+          anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+          variant="info"
+        >
+          <GlobalStateProvider>
+            <Head />
+            <CssBaseline />
+            <ErrorDialog />
+            <Component previousPage={previousPage} {...pageProps} />
+          </GlobalStateProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
 

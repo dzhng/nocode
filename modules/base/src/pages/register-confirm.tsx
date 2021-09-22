@@ -1,5 +1,5 @@
-import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { Typography, Paper, Container } from '@material-ui/core';
+import { makeStyles, createStyles } from '@mui/styles';
+import { Typography, Paper, Container } from '@mui/material';
 import { Logo } from '~/components/Icons';
 
 const useStyles = makeStyles((theme) =>

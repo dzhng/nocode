@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@material-ui/core';
+import { makeStyles, createStyles } from '@mui/styles';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material';
 import {
   GridOnOutlined as SheetIcon,
   ViewDayOutlined as ViewIcon,
   SettingsOutlined as AutomateIcon,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import BackButton from '~/components/BackButton';
 import SheetContainer from '~/containers/Sheet';
 import PageContainer from '~/containers/Page';

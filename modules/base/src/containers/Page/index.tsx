@@ -1,5 +1,5 @@
-import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { AddCircleOutline as AddIcon } from '@material-ui/icons';
+import { createStyles, makeStyles } from '@mui/styles';
+import { AddCircleOutline as AddIcon } from '@mui/icons-material';
 import CardButton from '~/components/CardButton';
 
 const useStyles = makeStyles(() =>

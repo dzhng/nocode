@@ -1,4 +1,4 @@
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 import { Sheet, DataTypes } from 'shared/schema';
 import useSheet from '~/hooks/useSheet';
 import Cell from './Cell';

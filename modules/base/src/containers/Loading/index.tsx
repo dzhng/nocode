@@ -1,4 +1,4 @@
-import { Container, CircularProgress } from '@material-ui/core';
+import { Container, CircularProgress } from '@mui/material';
 
 export default function LoadingContainer() {
   return (

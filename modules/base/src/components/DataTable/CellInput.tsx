@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, ChangeEvent, KeyboardEvent } from 'react';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 
 const useStyles = makeStyles(() =>
   createStyles({

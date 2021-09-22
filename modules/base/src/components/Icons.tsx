@@ -1,4 +1,4 @@
-import { ArrowBackIosOutlined as BackIcon, AppsOutlined as AppsIcon } from '@material-ui/icons';
+import { ArrowBackIosOutlined as BackIcon, AppsOutlined as AppsIcon } from '@mui/icons-material';
 
 // re-export standardized icons so they are consistent
 export { BackIcon, AppsIcon };

@@ -1,5 +1,5 @@
-import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { Typography, Card } from '@material-ui/core';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Typography, Card } from '@mui/material';
 
 const useStyles = makeStyles((theme) =>
   createStyles({

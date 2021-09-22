@@ -7,7 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-} from '@material-ui/core';
+} from '@mui/material';
 
 interface PropTypes {
   leaveWorkspace(): void;

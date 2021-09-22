@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import * as yup from 'yup';
-import { Typography, Button, CircularProgress, Paper } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Typography, Button, CircularProgress, Paper } from '@mui/material';
+import { createStyles, makeStyles, Theme } from '@mui/styles';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import BackButton from '~/components/BackButton';

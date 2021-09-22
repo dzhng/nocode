@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 import { Sheet } from 'shared/schema';
 import useApp from '~/hooks/useApp';
 import DataTable from '~/components/DataTable';

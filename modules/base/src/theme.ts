@@ -1,7 +1,7 @@
-import { createTheme } from '@material-ui/core';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import { createTheme, Theme } from '@mui/material/styles';
+import { CSSProperties } from '@mui/styles/withStyles';
 
-declare module '@material-ui/core/styles/createTheme' {
+declare module '@mui/material/styles' {
   interface Theme {
     headerBarHeight: number;
     transitionTime: string;
@@ -32,6 +32,11 @@ declare module '@material-ui/core/styles/createTheme' {
   }
 }
 
+// fix typescript complianing about theme missing properties in makeStyles
+declare module '@mui/styles' {
+  interface DefaultTheme extends Theme {}
+}
+
 // colors:
 // Primary is for main actions
 // Secondary is for host or moderation related actions
@@ -41,7 +46,7 @@ export default createTheme({
     borderRadius: 6,
   },
   palette: {
-    type: 'light',
+    mode: 'light',
   },
   typography: {
     // for hero text
@@ -88,16 +93,6 @@ export default createTheme({
       fontSize: '0.8rem',
     },
   },
-  overrides: {
-    MuiTooltip: {
-      arrow: {
-        backgroundColor: 'black',
-      },
-      tooltip: {
-        backgroundColor: 'black',
-      },
-    },
-  },
   // reduce z-index for everything so libs like nprogress will still work (nprogress is 1031)
   zIndex: {
     mobileStepper: 100,
@@ -107,6 +102,21 @@ export default createTheme({
     modal: 130,
     snackbar: 140,
     tooltip: 150,
+  },
+  components: {
+    MuiTooltip: {
+      defaultProps: {
+        arrow: true,
+      },
+      styleOverrides: {
+        arrow: {
+          backgroundColor: 'black',
+        },
+        tooltip: {
+          backgroundColor: 'black',
+        },
+      },
+    },
   },
 
   // custom

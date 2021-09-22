@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 import clsx from 'clsx';
-import { Avatar } from '@material-ui/core';
-import makeStyles from '@material-ui/styles/makeStyles';
-import { Person } from '@material-ui/icons';
+import { Avatar } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { Person } from '@mui/icons-material';
 import { UserDetails } from 'shared/schema';
 
 const useStyles = makeStyles({

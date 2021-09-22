@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@mui/styles';
 import {
   Typography,
   List,
@@ -22,8 +22,9 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-} from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+  Skeleton,
+  SelectChangeEvent,
+} from '@mui/material';
 import { isBrowser } from 'shared/utils';
 import { Logo, AppsIcon } from '~/components/Icons';
 import useGlobalState from '~/hooks/useGlobalState';
@@ -32,7 +33,7 @@ import Menu from './Menu';
 const NewWorkspaceValue = -1;
 const sidebarWidth = 300;
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     drawer: {
       [theme.breakpoints.up('sm')]: {
@@ -41,9 +42,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     select: {
-      // subtract an extra 2 for the border
-      width: sidebarWidth - theme.spacing(2) * 2 - 2,
-      margin: theme.spacing(2),
+      // width minus margin, subtract an extra 2 for the border
+      width: sidebarWidth - 10 * 2 - 2,
+      margin: 10,
     },
     createWorkspaceItem: {
       color: theme.palette.primary.main,
@@ -141,7 +142,7 @@ export default function Nav({
   );
 
   const handleWorkspaceChange = useCallback(
-    (event: React.ChangeEvent<{ value: unknown }>) => {
+    (event: SelectChangeEvent<string | number>) => {
       const value = Number(event.target.value);
       if (value === NewWorkspaceValue) {
         setIsCreatingWorkspace(true);
@@ -211,7 +212,7 @@ export default function Nav({
               </Select>
             </FormControl>
           ) : (
-            <Skeleton variant="rect" height={45} className={classes.select} />
+            <Skeleton variant="rectangular" height={45} className={classes.select} />
           )}
 
           <Divider className={classes.divider} />

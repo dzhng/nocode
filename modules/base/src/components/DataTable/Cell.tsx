@@ -1,4 +1,4 @@
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 import { formatRelativeDate } from 'shared/utils';
 import { DataTypes, CellType, ColumnType } from 'shared/schema';
 

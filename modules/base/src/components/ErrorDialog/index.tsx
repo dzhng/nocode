@@ -5,7 +5,7 @@ import {
   DialogActions,
   DialogTitle,
   DialogContentText,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import useGlobalState from '~/hooks/useGlobalState';
 

@@ -8,9 +8,9 @@ import {
   DialogTitle,
   Button,
   CircularProgress,
-} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+  Alert,
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
 import { UserDetails } from 'shared/schema';
 import MembersField from './MembersField';
 

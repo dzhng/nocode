@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 
-import { IconButton, Menu as MenuContainer, MenuItem, Tooltip } from '@material-ui/core';
-import { MoreVert as MoreIcon } from '@material-ui/icons';
+import { IconButton, Menu as MenuContainer, MenuItem, Tooltip } from '@mui/material';
+import { MoreVert as MoreIcon } from '@mui/icons-material';
 
 import useGlobalState from '~/hooks/useGlobalState';
 import UserAvatar from '~/components/UserAvatar';

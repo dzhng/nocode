@@ -2,14 +2,13 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { includes, trim, without } from 'lodash';
 import clsx from 'clsx';
 import { z } from 'zod';
-import { Paper, InputBase, IconButton } from '@material-ui/core';
-import { Autocomplete, createFilterOptions } from '@material-ui/lab';
-import { Add as AddIcon, HighlightOff as RemoveIcon } from '@material-ui/icons';
-import { createStyles, makeStyles, styled, Theme } from '@material-ui/core/styles';
+import { Paper, InputBase, IconButton, Autocomplete, createFilterOptions } from '@mui/material';
+import { Add as AddIcon, HighlightOff as RemoveIcon } from '@mui/icons-material';
+import { createStyles, makeStyles, styled } from '@mui/styles';
 import { shortName } from 'shared/utils';
 import { UserDetails } from 'shared/schema';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     itemPaper: {
       marginTop: theme.spacing(2),

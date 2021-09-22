@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import * as yup from 'yup';
 import { useRouter } from 'next/router';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { ErrorOutline as ErrorIcon } from '@material-ui/icons';
-import { Divider, Typography, Button, Paper, Container, CircularProgress } from '@material-ui/core';
+import { makeStyles, createStyles } from '@mui/styles';
+import { ErrorOutline as ErrorIcon } from '@mui/icons-material';
+import { Divider, Typography, Button, Paper, Container, CircularProgress } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 

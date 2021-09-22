@@ -1,14 +1,22 @@
 import { useRef, useState, useCallback } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { Typography, Grid, Menu, MenuItem, IconButton, Tooltip, Hidden } from '@material-ui/core';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+import {
+  Typography,
+  Grid,
+  Menu,
+  MenuItem,
+  IconButton,
+  Tooltip,
+  Hidden,
+  Skeleton,
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
 import {
   MoreVert as MoreIcon,
   Menu as MenuIcon,
   AddCircleOutline as AddIcon,
-} from '@material-ui/icons';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/icons-material';
 import useDimensions from 'react-cool-dimensions';
 
 import UserAvatar from '~/components/UserAvatar';
@@ -140,12 +148,17 @@ export default function Home() {
 
   const loadingAppSkeletons = [0, 1, 2].map((key) => (
     <Grid item {...cardItemSizeProps} key={key}>
-      <Skeleton variant="rect" height={cardHeight} className={classes.cardSkeleton} />
+      <Skeleton variant="rectangular" height={cardHeight} className={classes.cardSkeleton} />
     </Grid>
   ));
 
   const loadingMemberSkeletons = (
-    <Skeleton variant="circle" height={avatarSize} width={avatarSize} className={classes.avatar} />
+    <Skeleton
+      variant="circular"
+      height={avatarSize}
+      width={avatarSize}
+      className={classes.avatar}
+    />
   );
 
   const numberOfAvatars = Math.max(Math.floor((width * 0.5) / avatarSize) - 2, 1);
