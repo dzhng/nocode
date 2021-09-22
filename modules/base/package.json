@@ -5,9 +5,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@date-io/dayjs": "^2.10.8",
-    "@material-ui/core": "^4.11.4",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "@mui/material": "^5.0.1",
+    "@mui/styles": "^5.0.1",
     "@supabase/supabase-js": "^1.21.0",
     "@trpc/client": "^9.6.1",
     "@trpc/next": "^9.6.1",
