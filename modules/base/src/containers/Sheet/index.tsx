@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { makeStyles, createStyles } from '@mui/styles';
+import { Menu, MenuItem } from '@mui/material';
 import { Sheet } from 'shared/schema';
 import useApp from '~/hooks/useApp';
 import DataTable from '~/components/DataTable';
@@ -40,8 +41,12 @@ const useStyles = makeStyles((theme) =>
 
 export default function SheetContainer({ appId }: { appId: number }) {
   const classes = useStyles();
-  const { sheets, createSheet, isLoadingSheets } = useApp(appId);
+  const { sheets, createSheet, deleteSheet, isLoadingSheets } = useApp(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
+  const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
+  const [contextMenu, setContextMenu] = useState<null | { x: number; y: number; sheetId: number }>(
+    null,
+  );
 
   // select the first sheet once it loads
   useEffect(() => {
@@ -50,8 +55,44 @@ export default function SheetContainer({ appId }: { appId: number }) {
     }
   }, [isLoadingSheets, sheets]);
 
+  const handleContextMenu = useCallback(
+    (e: MouseEvent<HTMLDivElement>, sheetId: number) => {
+      e.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+              sheetId: sheetId,
+              x: e.clientX - 2,
+              y: e.clientY - 4,
+            }
+          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+            // Other native context menus might behave different.
+            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+            null,
+      );
+    },
+    [contextMenu],
+  );
+
+  const preventContextMenu = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  const handleDelete = useCallback(async () => {
+    if (contextMenu) {
+      setDeletingSheetId(contextMenu.sheetId);
+      setContextMenu(null);
+      await deleteSheet(contextMenu.sheetId);
+      setDeletingSheetId(null);
+    }
+  }, [deleteSheet, contextMenu]);
+
   return (
-    <div className={classes.content}>
+    <div className={classes.content} onContextMenu={preventContextMenu}>
       <div className={classes.tableContainer}>
         {selectedSheet && <DataTable sheet={selectedSheet} />}
       </div>
@@ -61,14 +102,27 @@ export default function SheetContainer({ appId }: { appId: number }) {
             key={sheet.id}
             className={clsx(classes.tab, selectedSheet === sheet && 'selected')}
             onClick={() => setSelectedSheet(sheet)}
+            onContextMenu={(e) => handleContextMenu(e, sheet.id ?? 0)}
           >
-            {sheet.name}
+            {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
           </div>
         ))}
         <div className={classes.tab} onClick={() => createSheet({ name: 'hello world' })}>
           Create +
         </div>
       </div>
+
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null ? { top: contextMenu.y, left: contextMenu.x } : undefined
+        }
+      >
+        <MenuItem onClick={handleClose}>Rename</MenuItem>
+        <MenuItem onClick={handleDelete}>Delete</MenuItem>
+      </Menu>
     </div>
   );
 }

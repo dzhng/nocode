@@ -73,14 +73,20 @@ export default function useApp(appId?: number) {
 
       const { error } = await supabase
         .from<Sheet>(Collections.SHEETS)
-        .delete({ returning: 'minimal' })
+        .update({ isDeleted: true }, { returning: 'minimal' })
         .eq('id', sheetId);
       if (error) {
         console.error('Error deleting sheet', error);
         return Promise.reject('Error deleting sheet');
       }
+
+      // remove deleted sheet
+      const sheetsClone = [...sheets];
+      const idx = sheetsClone.findIndex((s) => s.id === sheetId);
+      sheetsClone.splice(idx, 1);
+      setSheets(sheetsClone);
     },
-    [user, appId],
+    [user, appId, sheets],
   );
 
   return {
