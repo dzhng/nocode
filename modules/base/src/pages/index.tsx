@@ -10,5 +10,7 @@ export default withPrivateRoute(function IndexPage() {
     queryForWorkspaces();
   }, [queryForWorkspaces]);
 
+  // blahb sadf
+
   return <Home />;
 });
