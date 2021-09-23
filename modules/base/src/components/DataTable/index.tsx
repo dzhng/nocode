@@ -95,7 +95,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
               <div key={column.id} className={classes.cellContainer}>
                 <Cell
                   column={column}
-                  data={record.id && cellForRecord(record.id, column.id)}
+                  data={record.id && cellForRecord(record.id, column.id)?.data}
                   onChange={(newData) => {
                     if (record.id && newData !== undefined) {
                       editRecord(record.id, column.id, newData);

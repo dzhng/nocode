@@ -21,13 +21,12 @@ export function dataFieldForCell(column: ColumnType, data: CellType | null) {
 
 export function cellTypeForDataField(
   column: ColumnType,
-  data: { dataNumber?: number; dataString?: string; dataJSON?: CellType },
+  data: { dataNumber?: number | null; dataString?: string | null; dataJSON?: CellType },
 ): CellType | undefined {
   if (column.type === DataTypes.Date) {
     return data.dataNumber && new Date(data.dataNumber);
   }
 
   // only one of these fields should be filled at a time
-  const returnData: CellType | undefined = data.dataString ?? data.dataNumber ?? data.dataJSON;
-  return returnData !== undefined ? returnData : column.defaultValue;
+  return data.dataString ?? data.dataNumber ?? data.dataJSON;
 }

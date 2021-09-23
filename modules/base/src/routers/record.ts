@@ -77,6 +77,7 @@ export default trpc
           }
 
           const data: CellData = {
+            recordId: cell.recordId,
             columnId: cell.columnId,
             data: cellType,
             createdAt: cell.createdAt,

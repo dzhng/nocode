@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { forEach, without } from 'lodash';
+import { forEach, without, flatten } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
 import { CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
@@ -12,35 +12,35 @@ export default function useSheet(sheetId?: number) {
   const [records, setRecords] = useState<Record[]>([]);
   // all cells, seperated by recordIds
   const [cells, setCells] = useState<{ [recordId: number]: CellData[] | undefined }>({});
-  //const [currentPage, setCurrentPage] = useState<number>(0);
-  const [isLoadingRecords, setIsLoadingRecords] = useState(true);
+
+  const recordsQuery = trpc.useInfiniteQuery(
+    [
+      'record.infiniteQuery',
+      {
+        sheetId: sheetId ?? -1,
+        limit: 10,
+      },
+    ],
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  );
 
   useEffect(() => {
-    const loadRecords = async () => {
-      // REWRITE TO USE USEQUERY
-      const recordRet = await supabase
-        .from<Record>(Collections.RECORDS)
-        .select('*')
-        .eq('sheetId', sheetId)
-        .order('order', { ascending: true })
-        .limit(5000);
+    if (recordsQuery.isSuccess && recordsQuery.data) {
+      setRecords(flatten(recordsQuery.data.pages.map((p) => p.records)));
 
-      if (recordRet.error || !recordRet.data) {
-        setRecords([]);
-        return;
-      }
-      setRecords(recordRet.data);
+      const allCells = flatten(recordsQuery.data.pages.map((p) => p.cells));
+      const cellsMap = allCells.reduce((map, value) => {
+        if (!value.recordId) return map;
+        const cells = map[value.recordId];
+        map[value.recordId] = cells ? [...cells, value] : [value];
+        return map;
+      }, {} as { [id: string]: CellData[] });
 
-      setIsLoadingRecords(false);
-    };
-
-    setIsLoadingRecords(true);
-    if (!sheetId) {
-      return;
+      setCells(cellsMap);
     }
-
-    loadRecords();
-  }, [sheetId, user]);
+  }, [recordsQuery.data, recordsQuery.isSuccess]);
 
   const createRecordMutation = trpc.useMutation('record.create', {
     onMutate: ({ record, data }) => {
@@ -71,12 +71,8 @@ export default function useSheet(sheetId?: number) {
     },
   });
 
-  let lastCellsSnapshot: typeof cells = {};
   const editRecordMutation = trpc.useMutation('record.edit', {
     onMutate: ({ recordId, columnId, data }) => {
-      // save so we can restore on error
-      lastCellsSnapshot = cells;
-
       const recordCells = cells[recordId];
       const currentCells = recordCells ? [...recordCells] : [];
       const cell = currentCells.find((c) => c.columnId === columnId);
@@ -86,11 +82,12 @@ export default function useSheet(sheetId?: number) {
           [recordId]: [...without(currentCells, cell), { ...cell, data, modifiedAt: new Date() }],
         };
         setCells(cellsClone);
+        return cells;
       }
     },
-    onError: (error) => {
+    onError: (error, _, context) => {
       console.error('Error editing record', error);
-      setCells(lastCellsSnapshot);
+      setCells(context as { [id: string]: CellData[] });
     },
   });
 
@@ -100,7 +97,7 @@ export default function useSheet(sheetId?: number) {
         return Promise.reject('User is not authenticated');
       }
 
-      if (isLoadingRecords) {
+      if (!recordsQuery.isFetched) {
         return Promise.reject('Cannot create records while still loading');
       }
 
@@ -133,7 +130,7 @@ export default function useSheet(sheetId?: number) {
 
       createRecordMutation.mutate({ record, data: cellData });
     },
-    [user, sheetId, records, createRecordMutation, isLoadingRecords],
+    [user, sheetId, records, createRecordMutation, recordsQuery],
   );
 
   const editRecord = useCallback(
@@ -198,7 +195,7 @@ export default function useSheet(sheetId?: number) {
 
   return {
     records,
-    isLoadingRecords,
+    isLoadingRecords: recordsQuery.isFetching,
     createRecord,
     editRecord,
     reorderRecord,
