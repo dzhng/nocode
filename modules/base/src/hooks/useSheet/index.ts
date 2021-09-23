@@ -11,7 +11,7 @@ export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const [records, setRecords] = useState<Record[]>([]);
   // all cells, seperated by recordIds
-  const [cells, setCells] = useState<{ [recordId: number]: CellData[] }>({});
+  const [cells, setCells] = useState<{ [recordId: number]: CellData[] | undefined }>({});
   //const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoadingRecords, setIsLoadingRecords] = useState(true);
 
@@ -77,7 +77,8 @@ export default function useSheet(sheetId?: number) {
       // save so we can restore on error
       lastCellsSnapshot = cells;
 
-      const currentCells = [...cells[recordId]];
+      const recordCells = cells[recordId];
+      const currentCells = recordCells ? [...recordCells] : [];
       const cell = currentCells.find((c) => c.columnId === columnId);
       if (cell) {
         const cellsClone = {
@@ -186,6 +187,10 @@ export default function useSheet(sheetId?: number) {
   const cellForRecord = useCallback(
     (recordId: number, columnId: number) => {
       const recordCells = cells[recordId];
+      if (!recordCells) {
+        return undefined;
+      }
+
       return recordCells.find((c) => c.columnId === columnId);
     },
     [cells],

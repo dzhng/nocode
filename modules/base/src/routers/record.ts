@@ -174,7 +174,7 @@ export default trpc
         .single();
       if (!recordData) {
         throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: 'NOT_FOUND',
         });
       }
 
@@ -191,16 +191,19 @@ export default trpc
         .from<Cell>(Collections.CELLS)
         .upsert(
           {
+            recordId: input.recordId,
+            columnId: input.columnId,
             modifiedAt: now,
             ...dataField,
           },
-          { returning: 'minimal' },
+          { onConflict: 'recordId,columnId', returning: 'minimal' },
         )
         .match({ recordId: input.recordId, columnId: input.columnId });
 
       if (error) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
         });
       }
 

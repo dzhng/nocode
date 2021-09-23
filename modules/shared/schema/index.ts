@@ -127,7 +127,8 @@ export const TableMetaSchema = z.object({
 export type TableMeta = z.infer<typeof TableMetaSchema>;
 
 export const ColumnTypeSchema = z.object({
-  id: z.number().optional(),
+  // id is not optional here since it should just be generated client side
+  id: z.number(),
   name: z.string(),
   type: DataTypesSchema,
   defaultValue: CellTypeSchema.optional(),
@@ -153,9 +154,9 @@ export const CellSchema = z.object({
   id: z.number().optional(),
   recordId: z.number(),
   columnId: z.number(),
-  dataString: z.string().optional(),
-  dataNumber: z.number().optional(),
-  dataJSON: CellTypeSchema.optional(),
+  dataString: z.string().nullable().optional(),
+  dataNumber: z.number().nullable().optional(),
+  dataJSON: CellTypeSchema.nullable().optional(),
   createdAt: z.date(),
   modifiedAt: z.date(),
 });

@@ -47,14 +47,25 @@ function AddNewRow({ onClick }: { onClick(): void }) {
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const classes = useStyles();
-  const { records, cellForRecord, editRecord, createRecord, addColumn } = useSheet(sheet.id);
+  const {
+    records,
+    cellForRecord,
+    editRecord,
+    createRecord,
+    columns,
+    generateColumnId,
+    addColumn,
+  } = useSheet(sheet.id);
 
-  const onAddColumn = () => {};
-  /*addColumn({
-      columnID: String(Math.floor(Math.random() * 1000)),
-      name: 'test',
-      type: DataTypes.Text,
-      });*/
+  const onAddColumn = () =>
+    addColumn(
+      {
+        id: generateColumnId(),
+        name: 'test',
+        type: DataTypes.Text,
+      },
+      columns.length,
+    );
 
   const onAddRow = () => createRecord({}, true);
 
@@ -63,15 +74,13 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
   return (
     <div className={classes.container}>
       <div className={classes.columnHeader}>
-        {sheet.columns.map((column) => (
+        {columns.map((column) => (
           <div key={column.id} className={classes.cellContainer}>
             <Cell
               isHeader
               column={column}
               onChange={(newData) => {
-                if (column.id) {
-                  changeColumn(column.id, { name: String(newData), type: column.type });
-                }
+                changeColumn(column.id, { name: String(newData), type: column.type });
               }}
             />
           </div>
@@ -82,13 +91,13 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       <div className={classes.rowContainer}>
         {records.map((record) => (
           <div key={record.id ?? -1} className={classes.row}>
-            {sheet.columns.map((column) => (
+            {columns.map((column) => (
               <div key={column.id} className={classes.cellContainer}>
                 <Cell
                   column={column}
-                  data={record.id && column.id && cellForRecord(record.id, column.id)}
+                  data={record.id && cellForRecord(record.id, column.id)}
                   onChange={(newData) => {
-                    if (record.id && column.id && newData !== undefined) {
+                    if (record.id && newData !== undefined) {
                       editRecord(record.id, column.id, newData);
                     }
                   }}

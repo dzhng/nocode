@@ -6,16 +6,16 @@ export function dataFieldForCell(column: ColumnType, data: CellType | null) {
     (column.type === DataTypes.Selection &&
       (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Text)
   ) {
-    return [{ dataString: data === null ? null : String(data) }, 'dataString'];
+    return { dataString: data === null ? null : String(data) };
   } else if (
     column.type === DataTypes.Number ||
     column.type === DataTypes.Date ||
     (column.type === DataTypes.Selection &&
       (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Number)
   ) {
-    return [{ dataNumber: data === null ? null : Number(data) }, 'dataNumber'];
+    return { dataNumber: data === null ? null : Number(data) };
   } else {
-    return [{ dataJSON: data === null ? null : data }, 'dataJSON'];
+    return { dataJSON: data === null ? null : data };
   }
 }
 

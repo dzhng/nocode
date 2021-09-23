@@ -21,6 +21,17 @@ export default function useAuth() {
       setIsAuthReady(true);
     }
 
+    // fetch auth cookies on startup if already logged in
+    const currentSession = supabase.auth.session();
+    if (currentSession) {
+      fetch(AUTH_ENDPOINT, {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        credentials: 'same-origin',
+        body: JSON.stringify({ event: 'SIGNED_IN', session: currentSession }),
+      });
+    }
+
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (newSession && newSession.user) {
         console.log('Auth state changed: update');

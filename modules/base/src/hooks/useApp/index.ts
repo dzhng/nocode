@@ -8,11 +8,13 @@ export default function useApp(appId?: number) {
   const [sheets, setSheets] = useState<Sheet[]>([]);
   const [isLoadingSheets, setIsLoadingSheets] = useState(true);
 
+  // NOTE: excluding columns field for sheets (too big)
+  // columns should be queried via useSheet
   useEffect(() => {
     const loadSheets = async () => {
       const ret = await supabase
         .from<Sheet>(Collections.SHEETS)
-        .select('*')
+        .select('id, name, appId, order, createdAt')
         .eq('appId', appId)
         .eq('isDeleted', false)
         .order('order', { ascending: true });
