@@ -39,5 +39,9 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
     }
   };
 
-  return isHeader ? <TextCellInput value={column.name} onChange={onChange} /> : getCellComponent();
+  return isHeader ? (
+    <TextCellInput value={column.name} onChange={onChange} isHeader />
+  ) : (
+    getCellComponent()
+  );
 }

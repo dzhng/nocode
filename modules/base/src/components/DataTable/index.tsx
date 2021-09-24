@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Box } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
@@ -5,6 +6,7 @@ import useSheet from '~/hooks/useSheet';
 import Cell from './Cell';
 
 const DefaultCellLength = 100;
+const DefaultCellHeight = 40;
 const CellBorderRadius = 5;
 
 const useStyles = makeStyles((theme) =>
@@ -14,11 +16,11 @@ const useStyles = makeStyles((theme) =>
       height: '100%',
     },
     columnHeader: {
-      height: 40,
+      height: DefaultCellHeight,
     },
     rowContainer: {},
     row: {
-      height: 40,
+      height: DefaultCellHeight,
     },
     cellContainer: {
       display: 'inline-block',
@@ -59,8 +61,9 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     generateColumnId,
     addColumn,
   } = useSheet(sheet.id);
+  const [hoveredRecord, setHoveredRecord] = useState<number | null>(null);
 
-  const onAddColumn = () =>
+  const onAddColumn = useCallback(() => {
     addColumn(
       {
         id: generateColumnId(),
@@ -69,10 +72,19 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       },
       columns.length,
     );
+  }, [addColumn, generateColumnId, columns.length]);
 
-  const onAddRow = () => createRecord({}, true);
+  const onAddRow = useCallback(() => createRecord({}, true), [createRecord]);
 
-  const changeColumn = (_: number, __: { name: string; type: DataTypes }) => {};
+  const changeColumn = useCallback((_: number, __: { name: string; type: DataTypes }) => {}, []);
+
+  const onRowHover = useCallback((recordId: number) => {
+    setHoveredRecord(recordId);
+  }, []);
+
+  const onRowHoverLeave = useCallback(() => {
+    setHoveredRecord(null);
+  }, []);
 
   return (
     <div className={classes.container}>
@@ -82,6 +94,8 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
             key={column.id}
             className={classes.cellContainer}
             sx={{
+              fontWeight: 'bold',
+              backgroundColor: 'grey.100',
               borderLeft: columnIdx === 0 ? 1 : 0,
               borderTop: 1,
               borderBottom: 1,
@@ -105,33 +119,43 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       <div className={classes.rowContainer}>
         {records.map((record, recordIdx) => (
           <div key={record.id ?? -1} className={classes.row}>
-            {columns.map((column, columnIdx) => (
-              <Box
-                key={column.id}
-                className={classes.cellContainer}
-                sx={{
-                  borderLeft: columnIdx === 0 ? 1 : 0,
-                  borderBottom: 1,
-                  borderRight: 1,
-                  borderBottomLeftRadius:
-                    recordIdx === records.length - 1 && columnIdx === 0 ? CellBorderRadius : 0,
-                  borderBottomRightRadius:
-                    recordIdx === records.length - 1 && columnIdx === columns.length - 1
-                      ? CellBorderRadius
-                      : 0,
-                }}
-              >
-                <Cell
-                  column={column}
-                  data={record.id && cellForRecord(record.id, column.id)?.data}
-                  onChange={(newData) => {
-                    if (record.id && newData !== undefined) {
-                      editRecord(record.id, column.id, newData);
-                    }
+            <Box
+              onMouseOver={() => onRowHover(record.id ?? -1)}
+              onMouseLeave={onRowHoverLeave}
+              sx={{
+                display: 'inline-block',
+                height: DefaultCellHeight,
+                bgcolor: (theme) => (hoveredRecord === record.id ? theme.hoverColor : 'white'),
+              }}
+            >
+              {columns.map((column, columnIdx) => (
+                <Box
+                  key={column.id}
+                  className={classes.cellContainer}
+                  sx={{
+                    borderLeft: columnIdx === 0 ? 1 : 0,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderBottomLeftRadius:
+                      recordIdx === records.length - 1 && columnIdx === 0 ? CellBorderRadius : 0,
+                    borderBottomRightRadius:
+                      recordIdx === records.length - 1 && columnIdx === columns.length - 1
+                        ? CellBorderRadius
+                        : 0,
                   }}
-                />
-              </Box>
-            ))}
+                >
+                  <Cell
+                    column={column}
+                    data={record.id && cellForRecord(record.id, column.id)?.data}
+                    onChange={(newData) => {
+                      if (record.id && newData !== undefined) {
+                        editRecord(record.id, column.id, newData);
+                      }
+                    }}
+                  />
+                </Box>
+              ))}
+            </Box>
           </div>
         ))}
       </div>

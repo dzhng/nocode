@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, ChangeEvent, KeyboardEvent } from 'react';
 import { makeStyles, createStyles } from '@mui/styles';
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -7,10 +8,15 @@ const useStyles = makeStyles((theme) =>
       width: '100%',
       height: '100%',
       border: 'none',
+      backgroundColor: 'transparent',
+      padding: 7,
 
       '&.focus-visible': {
         outline: `${theme.palette.primary.light} auto 2px`,
       },
+    },
+    header: {
+      fontWeight: 'bold',
     },
   }),
 );
@@ -18,9 +24,11 @@ const useStyles = makeStyles((theme) =>
 export function TextCellInput({
   value,
   onChange,
+  isHeader,
 }: {
   value?: string;
   onChange(input: string): void;
+  isHeader?: boolean;
 }) {
   const [trueValue, setTrueValue] = useState('');
   const classes = useStyles();
@@ -50,7 +58,7 @@ export function TextCellInput({
 
   return (
     <input
-      className={classes.input}
+      className={clsx(classes.input, isHeader && classes.header)}
       type="text"
       value={trueValue}
       onChange={onValueChange}
