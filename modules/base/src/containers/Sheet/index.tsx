@@ -12,9 +12,12 @@ const useStyles = makeStyles((theme) =>
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
     },
     tableContainer: {
       flexGrow: 1,
+      overflow: 'scroll',
+      ...theme.customMixins.scrollBar,
     },
     tabContainer: {
       flexShrink: 0,

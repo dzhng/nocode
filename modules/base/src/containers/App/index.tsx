@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) =>
       flexGrow: 1,
       marginTop: theme.headerBarHeight,
       padding: theme.spacing(1),
+      overflow: 'hidden',
     },
   }),
 );
