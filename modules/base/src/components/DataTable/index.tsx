@@ -1,7 +1,11 @@
 import { makeStyles, createStyles } from '@mui/styles';
+import { Box } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import useSheet from '~/hooks/useSheet';
 import Cell from './Cell';
+
+const DefaultCellLength = 100;
+const CellBorderRadius = 5;
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -18,10 +22,10 @@ const useStyles = makeStyles((theme) =>
     },
     cellContainer: {
       display: 'inline-block',
-      width: 100,
+      width: DefaultCellLength,
       height: '100%',
-      border: theme.dividerBorder,
       overflow: 'hidden',
+      borderColor: theme.palette.grey[300],
     },
   }),
 );
@@ -73,8 +77,19 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
   return (
     <div className={classes.container}>
       <div className={classes.columnHeader}>
-        {columns.map((column) => (
-          <div key={column.id} className={classes.cellContainer}>
+        {columns.map((column, columnIdx) => (
+          <Box
+            key={column.id}
+            className={classes.cellContainer}
+            sx={{
+              borderLeft: columnIdx === 0 ? 1 : 0,
+              borderTop: 1,
+              borderBottom: 1,
+              borderRight: 1,
+              borderTopLeftRadius: columnIdx === 0 ? CellBorderRadius : 0,
+              borderTopRightRadius: columnIdx === columns.length - 1 ? CellBorderRadius : 0,
+            }}
+          >
             <Cell
               isHeader
               column={column}
@@ -82,16 +97,30 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                 changeColumn(column.id, { name: String(newData), type: column.type });
               }}
             />
-          </div>
+          </Box>
         ))}
         <AddNewColumnHeader onClick={onAddColumn} />
       </div>
 
       <div className={classes.rowContainer}>
-        {records.map((record) => (
+        {records.map((record, recordIdx) => (
           <div key={record.id ?? -1} className={classes.row}>
-            {columns.map((column) => (
-              <div key={column.id} className={classes.cellContainer}>
+            {columns.map((column, columnIdx) => (
+              <Box
+                key={column.id}
+                className={classes.cellContainer}
+                sx={{
+                  borderLeft: columnIdx === 0 ? 1 : 0,
+                  borderBottom: 1,
+                  borderRight: 1,
+                  borderBottomLeftRadius:
+                    recordIdx === records.length - 1 && columnIdx === 0 ? CellBorderRadius : 0,
+                  borderBottomRightRadius:
+                    recordIdx === records.length - 1 && columnIdx === columns.length - 1
+                      ? CellBorderRadius
+                      : 0,
+                }}
+              >
                 <Cell
                   column={column}
                   data={record.id && cellForRecord(record.id, column.id)?.data}
@@ -101,7 +130,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                     }
                   }}
                 />
-              </div>
+              </Box>
             ))}
           </div>
         ))}

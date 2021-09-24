@@ -5,6 +5,7 @@ declare module '@mui/material/styles' {
   interface Theme {
     headerBarHeight: number;
     transitionTime: string;
+    borderColor: string;
     dividerBorder: string;
 
     customMixins: {
@@ -21,6 +22,7 @@ declare module '@mui/material/styles' {
   interface ThemeOptions {
     headerBarHeight?: number;
     transitionTime?: string;
+    borderColor?: string;
     dividerBorder?: string;
 
     customMixins: {
@@ -122,6 +124,7 @@ export default createTheme({
   // custom
   headerBarHeight: 64,
   transitionTime: '0.3s',
+  borderColor: 'rgba(0,0,0,0.12)',
   dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
 
   customMixins: {

@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback, ChangeEvent, KeyboardEvent } from 'react';
 import { makeStyles, createStyles } from '@mui/styles';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     input: {
       width: '100%',
       height: '100%',
+      border: 'none',
+
+      '&.focus-visible': {
+        outline: `${theme.palette.primary.light} auto 2px`,
+      },
     },
   }),
 );

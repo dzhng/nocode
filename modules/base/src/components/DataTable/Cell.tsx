@@ -1,4 +1,3 @@
-import { makeStyles, createStyles } from '@mui/styles';
 import { formatRelativeDate } from 'shared/utils';
 import { DataTypes, CellType, ColumnType } from 'shared/schema';
 
@@ -11,18 +10,7 @@ interface PropTypes {
   onChange(data?: CellType): void;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    container: {
-      width: '100%',
-      height: '100%',
-    },
-  }),
-);
-
 export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
-  const classes = useStyles();
-
   const getCellComponent = (): JSX.Element => {
     if (column.type === DataTypes.Text) {
       // should show empty string for empty text cell, or else React may recycle old values
@@ -51,11 +39,5 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
     }
   };
 
-  const displayComponent = isHeader ? (
-    <TextCellInput value={column.name} onChange={onChange} />
-  ) : (
-    getCellComponent()
-  );
-
-  return <div className={classes.container}>{displayComponent}</div>;
+  return isHeader ? <TextCellInput value={column.name} onChange={onChange} /> : getCellComponent();
 }
