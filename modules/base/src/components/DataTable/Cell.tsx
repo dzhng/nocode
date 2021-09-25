@@ -5,16 +5,23 @@ import { TextCellInput, NumberCellInput } from './CellInput';
 
 interface PropTypes {
   column: ColumnType;
+  defaultHeight: number;
   data?: CellType;
   isHeader?: boolean;
   onChange(data?: CellType): void;
 }
 
-export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
+export default function Cell({ column, defaultHeight, data, isHeader, onChange }: PropTypes) {
   const getCellComponent = (): JSX.Element => {
     if (column.type === DataTypes.Text) {
       // should show empty string for empty text cell, or else React may recycle old values
-      return <TextCellInput value={data === undefined ? '' : String(data)} onChange={onChange} />;
+      return (
+        <TextCellInput
+          value={data === undefined ? '' : String(data)}
+          onChange={onChange}
+          defaultHeight={defaultHeight}
+        />
+      );
     } else if (column.type === DataTypes.Image) {
       return <span>Image</span>; // TODO
     } else if (column.type === DataTypes.Number) {
@@ -22,6 +29,7 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
         <NumberCellInput
           value={data === undefined ? undefined : Number(data)}
           onChange={onChange}
+          defaultHeight={defaultHeight}
         />
       );
     } else if (column.type === DataTypes.File) {
@@ -29,7 +37,9 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
     } else if (column.type === DataTypes.Date) {
       return <span>{data instanceof Date ? formatRelativeDate(data) : ''}</span>;
     } else if (column.type === DataTypes.Location) {
-      return <TextCellInput value={String(data)} onChange={onChange} />;
+      return (
+        <TextCellInput value={String(data)} onChange={onChange} defaultHeight={defaultHeight} />
+      );
     } else if (column.type === DataTypes.Selection) {
       return <span></span>;
     } else if (column.type === DataTypes.Relation) {
@@ -40,7 +50,7 @@ export default function Cell({ column, data, isHeader, onChange }: PropTypes) {
   };
 
   return isHeader ? (
-    <TextCellInput value={column.name} onChange={onChange} isHeader />
+    <TextCellInput value={column.name} onChange={onChange} defaultHeight={defaultHeight} isHeader />
   ) : (
     getCellComponent()
   );

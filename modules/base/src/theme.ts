@@ -114,7 +114,7 @@ export default createTheme({
       },
       styleOverrides: {
         arrow: {
-          backgroundColor: 'black',
+          color: 'black',
         },
         tooltip: {
           backgroundColor: 'black',

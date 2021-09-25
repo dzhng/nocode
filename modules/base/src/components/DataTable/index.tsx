@@ -1,7 +1,8 @@
-import { useCallback, useState } from 'react';
-import { makeStyles, createStyles } from '@mui/styles';
+import { useCallback, useState, useMemo } from 'react';
+import { styled } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import useSheet from '~/hooks/useSheet';
+import { AddIcon } from '~/components/Icons';
 import { Table, TableHead, TableBody } from './Table';
 import Header from './Header';
 import Row from './Row';
@@ -9,26 +10,28 @@ import Row from './Row';
 const DefaultCellWidth = 100;
 const DefaultCellHeight = 40;
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    container: {
-      width: '100%',
-      height: '100%',
-    },
-    row: {
-      height: DefaultCellHeight,
-    },
-  }),
-);
+const AddNewRow = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: theme.palette.grey[100],
+  height: DefaultCellHeight,
+  fontWeight: 'bold',
+  color: theme.palette.grey[700],
+  borderRadius: 5,
+  cursor: 'pointer',
+  boxShadow: '0px 1px 2px 0px rgb(0 0 0 / 8%)',
 
-function AddNewRow({ onClick }: { onClick(): void }) {
-  const classes = useStyles();
-  return (
-    <div className={classes.row} onClick={onClick}>
-      +
-    </div>
-  );
-}
+  '&>svg': {
+    marginLeft: 10,
+    marginRight: 5,
+  },
+
+  '&:hover': {
+    backgroundColor: theme.hoverColor,
+    color: theme.palette.primary.main,
+  },
+}));
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const {
@@ -40,7 +43,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     generateColumnId,
     addColumn,
   } = useSheet(sheet.id);
-  const [hoveredRecord, setHoveredRecord] = useState<number | null>(null);
+  const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
   const onAddColumn = useCallback(() => {
     addColumn(
@@ -57,13 +60,15 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   const changeColumnName = useCallback(async (_: number, __: string) => {}, []);
 
-  const onRowHover = useCallback((recordId: number) => {
-    setHoveredRecord(recordId);
-  }, []);
-
-  const onRowHoverLeave = useCallback(() => {
-    setHoveredRecord(null);
-  }, []);
+  const totalRowWidth = useMemo(
+    () =>
+      columns.reduce(
+        (sum, column) =>
+          sum + (column?.tableMetadata?.width ? column.tableMetadata.width : DefaultCellWidth),
+        0,
+      ),
+    [columns],
+  );
 
   return (
     <Table>
@@ -71,9 +76,8 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
         <Header
           columns={columns}
           height={DefaultCellHeight}
-          defaultWidth={DefaultCellWidth}
+          width={DefaultCellWidth}
           changeColumnName={(id, data) => changeColumnName(id, data)}
-          onAddColumn={onAddColumn}
         />
       </TableHead>
 
@@ -83,16 +87,17 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
             key={record.id ?? -1}
             columns={columns}
             width={DefaultCellWidth}
-            isHovered={hoveredRecord === record.id}
-            onHover={() => onRowHover(record.id ?? -1)}
-            onHoverLeave={onRowHoverLeave}
             defaultHeight={DefaultCellHeight}
             dataForColumn={(columnId) => record.id && cellForRecord(record.id, columnId)?.data}
             editRecord={(columnId, data) => record.id && editRecord(record.id, columnId, data)}
+            onAddColumn={onAddColumn}
           />
         ))}
 
-        <AddNewRow onClick={onAddRow} />
+        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + 62 }}>
+          <AddIcon />
+          New record
+        </AddNewRow>
       </TableBody>
     </Table>
   );

@@ -6,10 +6,10 @@ const useStyles = makeStyles(() =>
   createStyles({
     input: {
       width: '100%',
-      height: '100%',
       border: 'none',
       backgroundColor: 'transparent',
       padding: 7,
+      color: 'inherit',
 
       '&.focus-visible': {
         outline: 'none',
@@ -23,10 +23,12 @@ const useStyles = makeStyles(() =>
 
 export function TextCellInput({
   value,
+  defaultHeight,
   onChange,
   isHeader,
 }: {
   value?: string;
+  defaultHeight: number;
   onChange(input: string): void;
   isHeader?: boolean;
 }) {
@@ -59,6 +61,7 @@ export function TextCellInput({
   return (
     <input
       className={clsx(classes.input, isHeader && classes.header)}
+      style={{ minHeight: defaultHeight }}
       type="text"
       value={trueValue}
       onChange={onValueChange}
@@ -70,9 +73,11 @@ export function TextCellInput({
 
 export function NumberCellInput({
   value,
+  defaultHeight,
   onChange,
 }: {
   value?: number;
+  defaultHeight: number;
   onChange(input?: number): void;
 }) {
   const [trueValue, setTrueValue] = useState<number | undefined>();
@@ -109,6 +114,7 @@ export function NumberCellInput({
   return (
     <input
       className={classes.input}
+      style={{ minHeight: defaultHeight }}
       type="number"
       value={value === undefined ? '' : value}
       onChange={onValueChange}

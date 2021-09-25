@@ -1,56 +1,85 @@
+import { styled, IconButton, Tooltip } from '@mui/material';
 import { ColumnType, CellType } from 'shared/schema';
+import { AddIcon } from '~/components/Icons';
 import Cell from './Cell';
 import { TableRow, TableCell } from './Table';
 
 interface PropTypes {
   columns: ColumnType[];
   width: number;
-  isHovered: boolean;
-  onHover: () => void;
-  onHoverLeave: () => void;
   defaultHeight: number;
   dataForColumn(columnId: number): CellType | undefined;
   editRecord(columnId: number, data: CellType): void;
+  onAddColumn(): void;
 }
+
+// @ts-ignore 'divider' is illegal but can still be used
+const Divider = styled('divider')(({ theme }) => ({
+  display: 'inline-block',
+  width: 0,
+  borderRight: `1px solid ${theme.borderColor}`,
+  marginLeft: '-1px',
+  marginTop: 7,
+  marginBottom: 7,
+}));
+
+const NewColumnButton = styled('div')(({ theme }) => ({
+  width: 60,
+  textAlign: 'center',
+
+  '& button': {
+    marginTop: '5px',
+  },
+
+  '& svg': {
+    width: 20,
+    height: 20,
+    color: theme.palette.primary.main,
+  },
+}));
 
 export default function Row({
   columns,
   width,
-  isHovered,
-  onHover,
-  onHoverLeave,
   defaultHeight,
   dataForColumn,
   editRecord,
+  onAddColumn,
 }: PropTypes) {
   return (
-    <TableRow
-      onMouseOver={onHover}
-      onMouseLeave={onHoverLeave}
-      sx={{
-        width: 'fit-content',
-        bgcolor: (theme) => (isHovered ? theme.hoverColor : 'white'),
-      }}
-    >
-      {columns.map((column) => (
-        <TableCell
-          key={column.id}
-          sx={{
-            minHeight: defaultHeight,
-            width,
-          }}
-        >
-          <Cell
-            column={column}
-            data={dataForColumn(column.id)}
-            onChange={(newData) => {
-              if (newData !== undefined) {
-                editRecord(column.id, newData);
-              }
+    <TableRow>
+      {columns.map((column, columnIdx) => (
+        <>
+          <TableCell
+            key={column.id}
+            sx={{
+              minHeight: defaultHeight,
+              width,
+              borderTopRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
+              borderBottomRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
             }}
-          />
-        </TableCell>
+          >
+            <Cell
+              column={column}
+              defaultHeight={defaultHeight}
+              data={dataForColumn(column.id)}
+              onChange={(newData) => {
+                if (newData !== undefined) {
+                  editRecord(column.id, newData);
+                }
+              }}
+            />
+          </TableCell>
+          {columnIdx !== columns.length - 1 && <Divider />}
+        </>
       ))}
+      <NewColumnButton role="button" onClick={onAddColumn}>
+        <Tooltip placement="top" title="Add new column">
+          <IconButton size="small">
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      </NewColumnButton>
     </TableRow>
   );
 }
