@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, ChangeEvent, KeyboardEvent } from 're
 import { makeStyles, createStyles } from '@mui/styles';
 import clsx from 'clsx';
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     input: {
       width: '100%',
@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) =>
       padding: 7,
 
       '&.focus-visible': {
-        outline: `${theme.palette.primary.light} auto 2px`,
+        outline: 'none',
       },
     },
     header: {

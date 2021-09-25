@@ -1,7 +1,6 @@
-import { Box } from '@mui/material';
 import { ColumnType, CellType } from 'shared/schema';
 import Cell from './Cell';
-import CellContainer from './CellContainer';
+import { TableRow, TableCell } from './Table';
 
 interface PropTypes {
   columns: ColumnType[];
@@ -25,22 +24,20 @@ export default function Row({
   editRecord,
 }: PropTypes) {
   return (
-    <Box
+    <TableRow
       onMouseOver={onHover}
       onMouseLeave={onHoverLeave}
       sx={{
-        height: defaultHeight,
         width: 'fit-content',
         bgcolor: (theme) => (isHovered ? theme.hoverColor : 'white'),
       }}
     >
-      {columns.map((column, columnIdx) => (
-        <CellContainer
+      {columns.map((column) => (
+        <TableCell
           key={column.id}
           sx={{
+            minHeight: defaultHeight,
             width,
-            borderLeft: columnIdx === 0 ? undefined : 'none',
-            borderTop: 'none',
           }}
         >
           <Cell
@@ -52,8 +49,8 @@ export default function Row({
               }
             }}
           />
-        </CellContainer>
+        </TableCell>
       ))}
-    </Box>
+    </TableRow>
   );
 }

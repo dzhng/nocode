@@ -1,16 +1,13 @@
 import { useCallback, useState } from 'react';
 import { makeStyles, createStyles } from '@mui/styles';
-import { Box } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import useSheet from '~/hooks/useSheet';
-import { AddIcon } from '~/components/Icons';
-import Cell from './Cell';
-import CellContainer from './CellContainer';
+import { Table, TableHead, TableBody } from './Table';
+import Header from './Header';
 import Row from './Row';
 
-const DefaultCellLength = 100;
+const DefaultCellWidth = 100;
 const DefaultCellHeight = 40;
-const CellBorderRadius = 5;
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -24,24 +21,6 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-function AddNewColumnHeader({ onClick }: { onClick(): void }) {
-  return (
-    <CellContainer
-      sx={{
-        width: DefaultCellLength,
-        backgroundColor: 'grey.100',
-        borderTopRightRadius: CellBorderRadius,
-        borderLeft: 'none',
-        textAlign: 'center',
-        '& svg': { width: 20, height: 20, mt: '9px', color: 'primary.main' },
-      }}
-      onClick={onClick}
-    >
-      <AddIcon />
-    </CellContainer>
-  );
-}
-
 function AddNewRow({ onClick }: { onClick(): void }) {
   const classes = useStyles();
   return (
@@ -52,7 +31,6 @@ function AddNewRow({ onClick }: { onClick(): void }) {
 }
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
-  const classes = useStyles();
   const {
     records,
     cellForRecord,
@@ -77,7 +55,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   const onAddRow = useCallback(() => createRecord({}, true), [createRecord]);
 
-  const changeColumn = useCallback((_: number, __: { name: string; type: DataTypes }) => {}, []);
+  const changeColumnName = useCallback(async (_: number, __: string) => {}, []);
 
   const onRowHover = useCallback((recordId: number) => {
     setHoveredRecord(recordId);
@@ -88,47 +66,34 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
   }, []);
 
   return (
-    <Box className={classes.container}>
-      <Box sx={{ width: 'fit-content', height: DefaultCellHeight }}>
-        {columns.map((column, columnIdx) => (
-          <CellContainer
-            key={column.id}
-            sx={{
-              width: DefaultCellLength,
-              height: DefaultCellHeight,
-              fontWeight: 'bold',
-              backgroundColor: 'grey.100',
-              borderLeft: columnIdx === 0 ? undefined : 'none',
-              borderTopLeftRadius: columnIdx === 0 ? CellBorderRadius : 0,
-            }}
-          >
-            <Cell
-              isHeader
-              column={column}
-              onChange={(newData) => {
-                changeColumn(column.id, { name: String(newData), type: column.type });
-              }}
-            />
-          </CellContainer>
-        ))}
-        <AddNewColumnHeader onClick={onAddColumn} />
-      </Box>
-
-      {records.map((record) => (
-        <Row
-          key={record.id ?? -1}
+    <Table>
+      <TableHead sx={{ width: 'fit-content', height: DefaultCellHeight }}>
+        <Header
           columns={columns}
-          width={DefaultCellLength}
-          isHovered={hoveredRecord === record.id}
-          onHover={() => onRowHover(record.id ?? -1)}
-          onHoverLeave={onRowHoverLeave}
-          defaultHeight={DefaultCellHeight}
-          dataForColumn={(columnId) => record.id && cellForRecord(record.id, columnId)?.data}
-          editRecord={(columnId, data) => record.id && editRecord(record.id, columnId, data)}
+          height={DefaultCellHeight}
+          defaultWidth={DefaultCellWidth}
+          changeColumnName={(id, data) => changeColumnName(id, data)}
+          onAddColumn={onAddColumn}
         />
-      ))}
+      </TableHead>
 
-      <AddNewRow onClick={onAddRow} />
-    </Box>
+      <TableBody>
+        {records.map((record) => (
+          <Row
+            key={record.id ?? -1}
+            columns={columns}
+            width={DefaultCellWidth}
+            isHovered={hoveredRecord === record.id}
+            onHover={() => onRowHover(record.id ?? -1)}
+            onHoverLeave={onRowHoverLeave}
+            defaultHeight={DefaultCellHeight}
+            dataForColumn={(columnId) => record.id && cellForRecord(record.id, columnId)?.data}
+            editRecord={(columnId, data) => record.id && editRecord(record.id, columnId, data)}
+          />
+        ))}
+
+        <AddNewRow onClick={onAddRow} />
+      </TableBody>
+    </Table>
   );
 }
