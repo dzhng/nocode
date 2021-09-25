@@ -72,7 +72,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   return (
     <Table>
-      <TableHead sx={{ width: 'fit-content', height: DefaultCellHeight }}>
+      <TableHead sx={{ marginLeft: '40px' }}>
         <Header
           columns={columns}
           height={DefaultCellHeight}
@@ -94,7 +94,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           />
         ))}
 
-        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + 62 }}>
+        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + 102 }}>
           <AddIcon />
           New record
         </AddNewRow>

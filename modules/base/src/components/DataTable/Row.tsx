@@ -3,6 +3,7 @@ import { ColumnType, CellType } from 'shared/schema';
 import { AddIcon } from '~/components/Icons';
 import Cell from './Cell';
 import { TableRow, TableCell } from './Table';
+import Checkbox from './Checkbox';
 
 interface PropTypes {
   columns: ColumnType[];
@@ -12,6 +13,11 @@ interface PropTypes {
   editRecord(columnId: number, data: CellType): void;
   onAddColumn(): void;
 }
+
+const SelectorCell = styled('div')(() => ({
+  width: 40,
+  backgroundColor: '#FFF',
+}));
 
 // @ts-ignore 'divider' is illegal but can still be used
 const Divider = styled('divider')(({ theme }) => ({
@@ -48,6 +54,11 @@ export default function Row({
 }: PropTypes) {
   return (
     <TableRow>
+      <SelectorCell>
+        <Checkbox isChecked={false} />
+      </SelectorCell>
+      <Divider />
+
       {columns.map((column, columnIdx) => (
         <>
           <TableCell
