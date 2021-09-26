@@ -7,6 +7,8 @@ import { TableRow, TableCell } from './Table';
 import { SelectorCellSize, NewColumnCellSize } from './const';
 
 interface PropTypes {
+  isDragging?: boolean;
+  dragHandleProps?: any;
   columns: ColumnType[];
   width: number;
   defaultHeight: number;
@@ -46,6 +48,8 @@ const NewColumnButton = styled('div')(({ theme }) => ({
 }));
 
 export default function Row({
+  isDragging,
+  dragHandleProps,
   columns,
   width,
   defaultHeight,
@@ -56,7 +60,7 @@ export default function Row({
   return (
     <TableRow>
       <SelectorCell>
-        <DragHandle />
+        <DragHandle isDragging={false} {...dragHandleProps} />
       </SelectorCell>
       <Divider />
 

@@ -1,6 +1,8 @@
 import { useCallback, useState, useMemo } from 'react';
 import { styled } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+
 import useSheet from '~/hooks/useSheet';
 import { AddIcon } from '~/components/Icons';
 import { Table, TableHead, TableBody } from './Table';
@@ -58,6 +60,8 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   const changeColumnName = useCallback(async (_: number, __: string) => {}, []);
 
+  const onDragEnd = useCallback((result: DropResult) => {}, []);
+
   const totalRowWidth = useMemo(
     () =>
       columns.reduce(
@@ -80,17 +84,42 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       </TableHead>
 
       <TableBody>
-        {records.map((record) => (
-          <Row
-            key={record.id ?? -1}
-            columns={columns}
-            width={DefaultCellWidth}
-            defaultHeight={DefaultCellHeight}
-            dataForColumn={(columnId) => record.id && cellForRecord(record.id, columnId)?.data}
-            editRecord={(columnId, data) => record.id && editRecord(record.id, columnId, data)}
-            onAddColumn={onAddColumn}
-          />
-        ))}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="droppable">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {records.map((record, index) => (
+                  <Draggable key={record.id ?? -1} draggableId={String(record.id)} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        style={provided.draggableProps.style}
+                      >
+                        <Row
+                          isDragging={snapshot.isDragging}
+                          dragHandleProps={provided.dragHandleProps}
+                          columns={columns}
+                          width={DefaultCellWidth}
+                          defaultHeight={DefaultCellHeight}
+                          dataForColumn={(columnId) =>
+                            record.id && cellForRecord(record.id, columnId)?.data
+                          }
+                          editRecord={(columnId, data) =>
+                            record.id && editRecord(record.id, columnId, data)
+                          }
+                          onAddColumn={onAddColumn}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         <AddNewRow
           onClick={onAddRow}
