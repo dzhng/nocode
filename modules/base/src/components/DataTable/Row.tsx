@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { styled, IconButton, Tooltip } from '@mui/material';
 import { ColumnType, CellType } from 'shared/schema';
 import { AddIcon } from '~/components/Icons';
@@ -22,8 +23,7 @@ const SelectorCell = styled('div')(() => ({
   backgroundColor: '#FFF',
 }));
 
-// @ts-ignore 'divider' is illegal but can still be used
-const Divider = styled('divider')(({ theme }) => ({
+const Divider = styled('span')(({ theme }) => ({
   display: 'inline-block',
   width: 0,
   borderRight: `1px solid ${theme.borderColor}`,
@@ -65,9 +65,8 @@ export default function Row({
       <Divider />
 
       {columns.map((column, columnIdx) => (
-        <>
+        <Fragment key={column.id}>
           <TableCell
-            key={column.id}
             sx={{
               minHeight: defaultHeight,
               width,
@@ -87,7 +86,7 @@ export default function Row({
             />
           </TableCell>
           {columnIdx !== columns.length - 1 && <Divider />}
-        </>
+        </Fragment>
       ))}
       <NewColumnButton role="button" onClick={onAddColumn}>
         <Tooltip placement="top" title="Add new column">

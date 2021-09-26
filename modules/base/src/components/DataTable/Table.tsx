@@ -31,7 +31,7 @@ export const TableRow = styled('div')(({ theme }) => ({
     boxShadow: `0px 1px 3px 0px ${theme.hoverColor}`,
     border: `1px solid ${theme.palette.primary.light}`,
 
-    '& divider': {
+    '& span': {
       borderColor: theme.palette.primary.light,
     },
   },
