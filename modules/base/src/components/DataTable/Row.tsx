@@ -2,8 +2,9 @@ import { styled, IconButton, Tooltip } from '@mui/material';
 import { ColumnType, CellType } from 'shared/schema';
 import { AddIcon } from '~/components/Icons';
 import Cell from './Cell';
+import DragHandle from './DragHandle';
 import { TableRow, TableCell } from './Table';
-import Checkbox from './Checkbox';
+import { SelectorCellSize, NewColumnCellSize } from './const';
 
 interface PropTypes {
   columns: ColumnType[];
@@ -15,7 +16,7 @@ interface PropTypes {
 }
 
 const SelectorCell = styled('div')(() => ({
-  width: 40,
+  width: SelectorCellSize,
   backgroundColor: '#FFF',
 }));
 
@@ -30,7 +31,7 @@ const Divider = styled('divider')(({ theme }) => ({
 }));
 
 const NewColumnButton = styled('div')(({ theme }) => ({
-  width: 60,
+  width: NewColumnCellSize,
   textAlign: 'center',
 
   '& button': {
@@ -55,7 +56,7 @@ export default function Row({
   return (
     <TableRow>
       <SelectorCell>
-        <Checkbox isChecked={false} />
+        <DragHandle />
       </SelectorCell>
       <Divider />
 

@@ -14,8 +14,6 @@ export default function Checkbox({
       size="small"
       onClick={toggleChecked}
       sx={{
-        marginTop: '5px',
-        marginLeft: '4px',
         color: 'grey.500',
 
         '& #checked': {
@@ -35,7 +33,10 @@ export default function Checkbox({
           },
         },
 
-        '&>svg': { width: 20, height: 20 },
+        '&>svg': {
+          width: 20,
+          height: 20,
+        },
       }}
     >
       <CheckedIcon id="checked" />

@@ -6,9 +6,7 @@ import { AddIcon } from '~/components/Icons';
 import { Table, TableHead, TableBody } from './Table';
 import Header from './Header';
 import Row from './Row';
-
-const DefaultCellWidth = 100;
-const DefaultCellHeight = 40;
+import { SelectorCellSize, NewColumnCellSize, DefaultCellWidth, DefaultCellHeight } from './const';
 
 const AddNewRow = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -94,7 +92,10 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           />
         ))}
 
-        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + 102 }}>
+        <AddNewRow
+          onClick={onAddRow}
+          sx={{ width: totalRowWidth + SelectorCellSize + NewColumnCellSize + 2 }}
+        >
           <AddIcon />
           New record
         </AddNewRow>
