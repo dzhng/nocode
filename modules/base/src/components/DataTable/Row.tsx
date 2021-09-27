@@ -11,7 +11,7 @@ interface PropTypes {
   isDragging?: boolean;
   dragHandleProps?: any;
   columns: ColumnType[];
-  width: number;
+  minWidth: number;
   defaultHeight: number;
   dataForColumn(columnId: number): CellType | undefined;
   editRecord(columnId: number, data: CellType): void;
@@ -51,7 +51,7 @@ export default function Row({
   isDragging,
   dragHandleProps,
   columns,
-  width,
+  minWidth,
   defaultHeight,
   dataForColumn,
   editRecord,
@@ -69,7 +69,7 @@ export default function Row({
           <TableCell
             sx={{
               minHeight: defaultHeight,
-              width,
+              width: column.tableMetadata?.width ?? minWidth,
               borderTopRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
               borderBottomRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
             }}

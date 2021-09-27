@@ -43,6 +43,8 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     columns,
     generateColumnId,
     addColumn,
+    changeColumnName,
+    changeColumnWidth,
   } = useSheet(sheet.id);
   const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
@@ -58,8 +60,6 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
   }, [addColumn, generateColumnId, columns.length]);
 
   const onAddRow = useCallback(() => createRecord({}, true), [createRecord]);
-
-  const changeColumnName = useCallback(async (_: number, __: string) => {}, []);
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -85,12 +85,13 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   return (
     <Table>
-      <TableHead sx={{ marginLeft: '40px' }}>
+      <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
         <Header
           columns={columns}
           height={DefaultCellHeight}
-          width={DefaultCellWidth}
-          changeColumnName={(id, data) => changeColumnName(id, data)}
+          minWidth={DefaultCellWidth}
+          changeColumnName={changeColumnName}
+          changeColumnWidth={changeColumnWidth}
         />
       </TableHead>
 
@@ -111,7 +112,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                           isDragging={snapshot.isDragging}
                           dragHandleProps={provided.dragHandleProps}
                           columns={columns}
-                          width={DefaultCellWidth}
+                          minWidth={DefaultCellWidth}
                           defaultHeight={DefaultCellHeight}
                           dataForColumn={(columnId) =>
                             record.id && cellForRecord(record.id, columnId)?.data

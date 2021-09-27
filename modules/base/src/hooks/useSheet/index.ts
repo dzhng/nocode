@@ -30,7 +30,7 @@ export default function useSheet(sheetId?: number) {
   );
 
   useEffect(() => {
-    if (recordsQuery.isSuccess && recordsQuery.data) {
+    if (recordsQuery.data) {
       setRecords(flatten(recordsQuery.data.pages.map((p) => p.records)));
 
       const allCells = flatten(recordsQuery.data.pages.map((p) => p.cells));
@@ -43,7 +43,7 @@ export default function useSheet(sheetId?: number) {
 
       setCells(cellsMap);
     }
-  }, [recordsQuery.data, recordsQuery.isSuccess]);
+  }, [recordsQuery.data]);
 
   const createRecordMutation = trpc.useMutation('record.create', {
     onMutate: ({ record, data }) => {
