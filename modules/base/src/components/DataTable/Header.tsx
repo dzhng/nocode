@@ -52,7 +52,7 @@ export default function HeaderRow({
         <Box sx={{ position: 'relative' }} key={column.id}>
           {/* Have divider ahead and positioned behind via margin
           so that dragging won't change it's position */}
-          <DraggableCore onDrag={(_, data) => handleDrag(column.id, data)}>
+          <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(column.id, data)}>
             <Divider
               sx={{
                 left: (column.tableMetadata?.width ?? minWidth) - DividerWidth,
