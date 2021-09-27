@@ -39,6 +39,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     cellForRecord,
     editRecord,
     createRecord,
+    reorderRecord,
     columns,
     generateColumnId,
     addColumn,
@@ -60,7 +61,21 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   const changeColumnName = useCallback(async (_: number, __: string) => {}, []);
 
-  const onDragEnd = useCallback((result: DropResult) => {}, []);
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      const { source, destination } = result;
+      if (!destination) {
+        return;
+      }
+
+      const sourceId = records[source.index].id;
+      const destinationId = records[destination.index].id;
+      if (sourceId && destinationId) {
+        reorderRecord(sourceId, destinationId, destination.index > source.index);
+      }
+    },
+    [reorderRecord, records],
+  );
 
   const totalRowWidth = useMemo(
     () =>

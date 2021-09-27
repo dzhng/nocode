@@ -150,7 +150,7 @@ export default function useSheet(sheetId?: number) {
   );
 
   const reorderRecord = useCallback(
-    async (id: number, nextTo: Record, after: boolean) => {
+    async (id: number, nextToId: number, after: boolean) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated');
       }
@@ -160,6 +160,10 @@ export default function useSheet(sheetId?: number) {
         return Promise.reject('Invalid record');
       }
 
+      const nextTo = records.find((rec) => rec.id === nextToId);
+      if (!nextTo) {
+        return Promise.reject('Invalid nextTo record');
+      }
       const newOrderNumber = after ? nextTo.order + 1 : nextTo.order - 1;
 
       // save new order number
