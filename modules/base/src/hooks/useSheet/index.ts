@@ -7,6 +7,9 @@ import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
 import useColumns from './columns';
 
+// the amount of space given between each new order number
+const OrderNumberSpacing = 5000;
+
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const [records, setRecords] = useState<Record[]>([]);
@@ -105,8 +108,8 @@ export default function useSheet(sheetId?: number) {
         records.length === 0
           ? 0
           : atEnd
-          ? records[records.length - 1].order + 10
-          : records[0].order - 10;
+          ? records[records.length - 1].order + OrderNumberSpacing
+          : records[0].order - OrderNumberSpacing;
 
       // before adding, replace timestamp with server helper
       const now = new Date();
@@ -150,37 +153,55 @@ export default function useSheet(sheetId?: number) {
   );
 
   const reorderRecord = useCallback(
-    async (id: number, nextToId: number, after: boolean) => {
+    async (sourceIndex: number, destinationIndex: number) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated');
       }
 
-      const localIndex = records.findIndex((rec) => rec.id === id);
-      if (localIndex === -1) {
-        return Promise.reject('Invalid record');
-      }
-
-      const nextTo = records.find((rec) => rec.id === nextToId);
-      if (!nextTo) {
-        return Promise.reject('Invalid nextTo record');
-      }
-      const newOrderNumber = after ? nextTo.order + 1 : nextTo.order - 1;
-
-      // save new order number
-      supabase
-        .from<Record>(Collections.RECORDS)
-        .update({
-          order: newOrderNumber,
-        })
-        .eq('id', id)
-        .then(null, (e) => {
-          console.error('Error editing record', e);
-        });
+      const destinationRecord = records[destinationIndex];
+      const sourceRecord = records[sourceIndex];
+      sourceRecord.order = destinationRecord.order; // this will be changed later on in this method
 
       const newRecords = [...records];
-      newRecords[localIndex].order = newOrderNumber;
-      newRecords.sort((a, b) => a.order - b.order);
+      newRecords.splice(sourceIndex, 1);
+      newRecords.splice(destinationIndex, 0, sourceRecord);
+
+      // run through all records again, and look for instances where record order number is the same
+      let lastOrderNum: number = newRecords[0].order;
+      const recordsChanged: Record[] = [sourceRecord];
+      for (let i = 1; i < newRecords.length; i++) {
+        const record = newRecords[i];
+
+        if (record.order <= lastOrderNum) {
+          const nextRecord = newRecords[i + 1];
+          if (!nextRecord) {
+            record.order = lastOrderNum + OrderNumberSpacing;
+          } else if (nextRecord.order > lastOrderNum + 1) {
+            record.order = Math.floor(lastOrderNum + (nextRecord.order - lastOrderNum) / 2);
+          } else {
+            record.order = lastOrderNum + 1;
+          }
+          recordsChanged.push(record);
+        }
+        lastOrderNum = record.order;
+      }
+
       setRecords(newRecords);
+
+      // save new order number for all records that changed
+      await Promise.all(
+        recordsChanged.map(async (record) => {
+          return supabase
+            .from<Record>(Collections.RECORDS)
+            .update({
+              order: record.order,
+            })
+            .eq('id', record.id)
+            .then(null, (e) => {
+              console.error('Error editing record', e);
+            });
+        }),
+      );
     },
     [user, sheetId, records],
   );

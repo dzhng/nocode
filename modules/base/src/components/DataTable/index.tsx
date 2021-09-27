@@ -68,13 +68,9 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
         return;
       }
 
-      const sourceId = records[source.index].id;
-      const destinationId = records[destination.index].id;
-      if (sourceId && destinationId) {
-        reorderRecord(sourceId, destinationId, destination.index > source.index);
-      }
+      reorderRecord(source.index, destination.index);
     },
-    [reorderRecord, records],
+    [reorderRecord],
   );
 
   const totalRowWidth = useMemo(
