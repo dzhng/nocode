@@ -6,8 +6,11 @@ import useAuth from './useAuth';
 import useWorkspaces from './useWorkspaces';
 
 export interface StateContextType {
+  // UI
   error: Error | string | null;
   setError(error: Error | string | null): void;
+  isNavOpen: boolean;
+  setIsNavOpen(isOpen: boolean): void;
 
   // auth
   user?: User | null;
@@ -19,7 +22,7 @@ export interface StateContextType {
   register(email: string, password: string, name: string): Promise<void>;
 
   // workspaces
-  currentWorkspaceId?: number;
+  currentWorkspaceId?: number | null;
   currentWorkspace?: Workspace;
   setCurrentWorkspaceId(workspaceId?: number): void;
   workspaces?: Workspace[];
@@ -34,10 +37,13 @@ export const StateContext = createContext<StateContextType>(null!);
 
 export function GlobalStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<Error | string | null>(null);
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   const contextValue: StateContextType = {
     error,
     setError,
+    isNavOpen,
+    setIsNavOpen,
     ...useAuth(),
     ...useWorkspaces(),
   };

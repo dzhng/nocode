@@ -131,9 +131,15 @@ export default function Home() {
   const classes = useStyles();
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
-  const { currentWorkspace, isWorkspacesReady, leaveWorkspace, deleteWorkspace } = useGlobalState();
+  const {
+    currentWorkspace,
+    isWorkspacesReady,
+    leaveWorkspace,
+    deleteWorkspace,
+    isNavOpen,
+    setIsNavOpen,
+  } = useGlobalState();
   const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspace?.id);
   const { members, isAdmin, isLoadingMembers, inviteMembers, removeMembers } = useWorkspaceMembers(
     currentWorkspace?.id,
@@ -167,12 +173,12 @@ export default function Home() {
   if (!isWorkspacesReady) {
     return (
       <div className={classes.container}>
-        <Nav mobileOpen={mobileOpen} closeModal={() => setMobileOpen(false)} />
+        <Nav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
         <Grid container className={classes.grid} spacing={3}>
           <Grid item xs={12} className={classes.titleBar} ref={observe}>
             <div className={classes.titleSection}>
               <Hidden smUp implementation="css">
-                <IconButton onClick={() => setMobileOpen(true)}>
+                <IconButton onClick={() => setIsNavOpen(true)}>
                   <MenuIcon />
                 </IconButton>
               </Hidden>
@@ -193,7 +199,7 @@ export default function Home() {
   if (!currentWorkspace) {
     return (
       <div className={classes.container}>
-        <Nav mobileOpen={mobileOpen} closeModal={() => setMobileOpen(false)} />
+        <Nav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
         <Grid
           container
           spacing={0}
@@ -211,13 +217,13 @@ export default function Home() {
 
   return (
     <div className={classes.container}>
-      <Nav mobileOpen={mobileOpen} closeModal={() => setMobileOpen(false)} />
+      <Nav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       <Grid container className={classes.grid} spacing={3}>
         <Grid item xs={12} className={classes.titleBar} ref={observe}>
           <div className={classes.titleSection}>
             <Hidden smUp implementation="css">
-              <IconButton onClick={() => setMobileOpen(true)}>
+              <IconButton onClick={() => setIsNavOpen(true)}>
                 <MenuIcon />
               </IconButton>
             </Hidden>

@@ -113,13 +113,7 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
-export default function Nav({
-  mobileOpen,
-  closeModal,
-}: {
-  mobileOpen: boolean;
-  closeModal(): void;
-}) {
+export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): void }) {
   const classes = useStyles();
   const router = useRouter();
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
@@ -148,17 +142,17 @@ export default function Nav({
         setIsCreatingWorkspace(true);
       } else {
         setCurrentWorkspaceId(value);
-        closeModal();
+        onClose();
       }
     },
-    [setCurrentWorkspaceId, closeModal],
+    [setCurrentWorkspaceId, onClose],
   );
 
   const handleCreateWorkspace = useCallback(() => {
     setIsCreatingWorkspace(false);
     createWorkspace(newWorkspaceName);
-    closeModal();
-  }, [newWorkspaceName, createWorkspace, closeModal]);
+    onClose();
+  }, [newWorkspaceName, createWorkspace, onClose]);
 
   const drawer = useMemo(
     () => (
@@ -168,7 +162,7 @@ export default function Nav({
 
         <List className={classes.list}>
           <Link href="/" passHref>
-            <ListItem button onClick={closeModal} className={routeSelectedClassname('/')}>
+            <ListItem button onClick={onClose} className={routeSelectedClassname('/')}>
               <ListItemIcon>
                 <AppsIcon />
               </ListItemIcon>
@@ -179,7 +173,7 @@ export default function Nav({
           </Link>
 
           <Link href="/settings" passHref>
-            <ListItem button onClick={closeModal} className={routeSelectedClassname('/settings')}>
+            <ListItem button onClick={onClose} className={routeSelectedClassname('/settings')}>
               <ListItemIcon>
                 <AppsIcon />
               </ListItemIcon>
@@ -234,7 +228,7 @@ export default function Nav({
       isWorkspacesReady,
       workspaces,
       userDetails,
-      closeModal,
+      onClose,
     ],
   );
 
@@ -281,8 +275,8 @@ export default function Nav({
           container={container}
           variant="temporary"
           anchor="left"
-          open={mobileOpen}
-          onClose={closeModal}
+          open={isOpen}
+          onClose={onClose}
           classes={{
             paper: classes.drawerPaper,
           }}
