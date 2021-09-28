@@ -2,6 +2,7 @@ import { useCallback, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { createStyles, makeStyles } from '@mui/styles';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import {
   Typography,
   List,
@@ -26,7 +27,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { isBrowser } from 'shared/utils';
-import { Logo, AppIcon } from '~/components/Icons';
+import { Logo, AppIcon, PlainAddIcon } from '~/components/Icons';
 import useGlobalState from '~/hooks/useGlobalState';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import Menu from './Menu';
@@ -109,6 +110,8 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
   } = useGlobalState();
   const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspaceId);
 
+  router.prefetch('/app/create');
+
   const isRouteSelected = useCallback(
     (route) => {
       return route === router.pathname;
@@ -154,16 +157,35 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
         </Link>
         <Divider className={classes.divider} />
 
-        <Typography
-          variant="h5"
-          sx={{
-            color: 'grey.700',
-            ml: 2,
-            mt: 2,
-          }}
-        >
-          <b>Apps</b>
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2, mt: 2 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              color: 'grey.700',
+              fontWeight: 600,
+              flexGrow: 1,
+            }}
+          >
+            Apps
+          </Typography>
+
+          <Link href="/app/create" passHref>
+            <Tooltip title="Create new app">
+              <IconButton
+                size="small"
+                sx={{
+                  width: 25,
+                  height: 25,
+                  mr: 1.5,
+                  '& svg': { width: 20, height: 20 },
+                  '&:hover': { color: 'primary.main' },
+                }}
+              >
+                <PlainAddIcon />
+              </IconButton>
+            </Tooltip>
+          </Link>
+        </Box>
 
         <List>
           {isLoadingApps
@@ -195,7 +217,15 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                       <AppIcon />
                     </ListItemIcon>
                     <ListItemText>
-                      <Typography variant="h3">{app.name}</Typography>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontWeight: 500,
+                          color: 'grey.800',
+                        }}
+                      >
+                        {app.name}
+                      </Typography>
                     </ListItemText>
                   </ListItem>
                 </Link>
@@ -240,6 +270,9 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     ),
     [
       classes,
+      apps,
+      isLoadingApps,
+      loadingAppSkeletons,
       isRouteSelected,
       currentWorkspaceId,
       handleWorkspaceChange,

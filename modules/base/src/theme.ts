@@ -124,7 +124,7 @@ export default createTheme({
   },
 
   // custom
-  headerBarHeight: 64,
+  headerBarHeight: 60,
   transitionTime: '0.3s',
   dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
   borderColor: 'rgba(0,0,0,0.12)',
@@ -139,6 +139,7 @@ export default createTheme({
       // scroll bar customization
       '&::-webkit-scrollbar': {
         width: 8,
+        height: 8,
       },
       '&::-webkit-scrollbar-track': {
         background: 'none',
