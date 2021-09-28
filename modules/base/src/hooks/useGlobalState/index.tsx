@@ -22,7 +22,7 @@ export interface StateContextType {
   register(email: string, password: string, name: string): Promise<void>;
 
   // workspaces
-  currentWorkspaceId?: number | null;
+  currentWorkspaceId?: number;
   currentWorkspace?: Workspace;
   setCurrentWorkspaceId(workspaceId?: number): void;
   workspaces?: Workspace[];

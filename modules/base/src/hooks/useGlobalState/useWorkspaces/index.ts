@@ -6,13 +6,13 @@ import useAuth from '../useAuth';
 export default function useWorkspaces() {
   const { user, userDetails, isAuthReady } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<number | undefined | null>();
+  const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<number | undefined>();
   const [isWorkspacesReady, setIsWorkspacesReady] = useState(false);
 
   // make sure currentWorkspaceId is always up to date when user details changes
   useEffect(() => {
     if (userDetails) {
-      _setCurrentWorkspaceId(userDetails?.defaultWorkspaceId);
+      _setCurrentWorkspaceId(userDetails?.defaultWorkspaceId ?? undefined);
     }
   }, [userDetails]);
 

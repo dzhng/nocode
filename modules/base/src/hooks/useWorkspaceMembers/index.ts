@@ -14,6 +14,8 @@ export default function useWorkspaceMembers(workspaceId?: number) {
 
   useEffect(() => {
     const loadMemberUsers = async () => {
+      setIsLoadingMembers(true);
+
       const ret = await supabase
         .from<Member & { user: UserDetails }>(Collections.MEMBERS)
         .select(
@@ -37,7 +39,6 @@ export default function useWorkspaceMembers(workspaceId?: number) {
       setIsLoadingMembers(false);
     };
 
-    setIsLoadingMembers(true);
     if (!workspaceId) {
       return;
     }

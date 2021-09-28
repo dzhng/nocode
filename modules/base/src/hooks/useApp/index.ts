@@ -12,6 +12,8 @@ export default function useApp(appId?: number) {
   // columns should be queried via useSheet
   useEffect(() => {
     const loadSheets = async () => {
+      setIsLoadingSheets(true);
+
       const ret = await supabase
         .from<Sheet>(Collections.SHEETS)
         .select('id, name, appId, order, createdAt')
@@ -28,7 +30,6 @@ export default function useApp(appId?: number) {
       setIsLoadingSheets(false);
     };
 
-    setIsLoadingSheets(true);
     if (!appId) {
       return;
     }

@@ -10,6 +10,8 @@ export default function useWorkspaceMembers(workspaceId?: number) {
 
   useEffect(() => {
     const loadApps = async () => {
+      setIsLoadingApps(true);
+
       const ret = await supabase
         .from<App>(Collections.APPS)
         .select('*')
@@ -25,7 +27,6 @@ export default function useWorkspaceMembers(workspaceId?: number) {
       setIsLoadingApps(false);
     };
 
-    setIsLoadingApps(true);
     if (!workspaceId) {
       return;
     }

@@ -26,12 +26,13 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { isBrowser } from 'shared/utils';
-import { Logo, AppsIcon } from '~/components/Icons';
+import { Logo, AppIcon } from '~/components/Icons';
 import useGlobalState from '~/hooks/useGlobalState';
+import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import Menu from './Menu';
 
 const NewWorkspaceValue = -1;
-const sidebarWidth = 300;
+const sidebarWidth = 250;
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -58,24 +59,6 @@ const useStyles = makeStyles((theme) =>
     drawerPaper: {
       width: sidebarWidth,
     },
-    list: {
-      '& .MuiListItemIcon-root': {
-        minWidth: 40,
-        color: theme.palette.secondary.main,
-      },
-      '& .MuiListItem-root': {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
-        paddingLeft: theme.spacing(1),
-        paddingRight: theme.spacing(1),
-        width: 'auto',
-        borderRadius: 21,
-        color: theme.palette.grey[900],
-      },
-      '& .selected': {
-        color: theme.palette.secondary.main,
-      },
-    },
     drawerContent: {
       height: '100%',
       display: 'flex',
@@ -97,14 +80,11 @@ const useStyles = makeStyles((theme) =>
         marginBottom: 'auto',
       },
     },
-    displayName: {
-      textAlign: 'right',
-    },
     title: {
-      padding: theme.spacing(2.5),
+      padding: theme.spacing(1.5),
       objectFit: 'contain',
-      width: 140,
-      height: 85,
+      width: 120,
+      height: 60,
     },
     divider: {
       marginLeft: theme.spacing(2),
@@ -127,10 +107,11 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     setCurrentWorkspaceId,
     createWorkspace,
   } = useGlobalState();
+  const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspaceId);
 
-  const routeSelectedClassname = useCallback(
+  const isRouteSelected = useCallback(
     (route) => {
-      return route === router.pathname ? 'selected' : undefined;
+      return route === router.pathname;
     },
     [router],
   );
@@ -154,34 +135,71 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     onClose();
   }, [newWorkspaceName, createWorkspace, onClose]);
 
+  const loadingAppSkeletons = [0, 2, 1].map((key) => (
+    <Skeleton
+      key={key}
+      variant="rectangular"
+      sx={{ borderRadius: 12, width: `${60 - key * 10}%`, mt: '5px', mb: '5px', ml: 1, mr: 1 }}
+      height={25}
+    />
+  ));
+
   const drawer = useMemo(
     () => (
       <div className={classes.drawerContent}>
-        <Logo className={classes.title} />
+        <Link href="/" passHref>
+          <a style={{ lineHeight: 0 }}>
+            <Logo className={classes.title} />
+          </a>
+        </Link>
         <Divider className={classes.divider} />
 
-        <List className={classes.list}>
-          <Link href="/" passHref>
-            <ListItem button onClick={onClose} className={routeSelectedClassname('/')}>
-              <ListItemIcon>
-                <AppsIcon />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="h3">Apps</Typography>
-              </ListItemText>
-            </ListItem>
-          </Link>
+        <Typography
+          variant="h5"
+          sx={{
+            color: 'grey.700',
+            ml: 2,
+            mt: 2,
+          }}
+        >
+          <b>Apps</b>
+        </Typography>
 
-          <Link href="/settings" passHref>
-            <ListItem button onClick={onClose} className={routeSelectedClassname('/settings')}>
-              <ListItemIcon>
-                <AppsIcon />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="h3">Settings</Typography>
-              </ListItemText>
-            </ListItem>
-          </Link>
+        <List>
+          {isLoadingApps
+            ? loadingAppSkeletons
+            : apps.map((app) => (
+                <Link key={app.id ?? -1} href={`/app/${app.id}`} passHref>
+                  <ListItem
+                    button
+                    onClick={onClose}
+                    sx={{
+                      marginLeft: 1,
+                      marginRight: 1,
+                      paddingLeft: 1,
+                      paddingRight: 1,
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      width: 'auto',
+                      borderRadius: 18,
+                      color: isRouteSelected(`/app/${app.id}`) ? 'secondary.main' : 'grey.900',
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 25,
+                        color: 'secondary.main',
+                        '& svg': { width: 15, height: 15 },
+                      }}
+                    >
+                      <AppIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography variant="h3">{app.name}</Typography>
+                    </ListItemText>
+                  </ListItem>
+                </Link>
+              ))}
         </List>
 
         <div className={classes.drawerContentFooter}>
@@ -213,7 +231,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
 
           <div className={classes.profileMenu}>
             <Menu />
-            <Typography className={classes.displayName} variant="h2">
+            <Typography sx={{ textAlign: 'right' }} variant="h2">
               {userDetails?.displayName ?? ''}
             </Typography>
           </div>
@@ -222,7 +240,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     ),
     [
       classes,
-      routeSelectedClassname,
+      isRouteSelected,
       currentWorkspaceId,
       handleWorkspaceChange,
       isWorkspacesReady,

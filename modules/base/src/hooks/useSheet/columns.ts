@@ -19,6 +19,8 @@ export default function useColumns(sheetId?: number) {
 
   useEffect(() => {
     const loadColumns = async () => {
+      setIsLoadingColumns(true);
+
       // REWRITE TO USE USEQUERY
       const sheetRet = await supabase
         .from<Sheet>(Collections.SHEETS)
@@ -35,7 +37,6 @@ export default function useColumns(sheetId?: number) {
       setIsLoadingColumns(false);
     };
 
-    setIsLoadingColumns(true);
     if (!sheetId) {
       return;
     }
