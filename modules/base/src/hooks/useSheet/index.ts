@@ -160,7 +160,14 @@ export default function useSheet(sheetId?: number) {
 
       const destinationRecord = records[destinationIndex];
       const sourceRecord = records[sourceIndex];
-      sourceRecord.order = destinationRecord.order; // this will be changed later on in this method
+      if (!(sourceRecord && destinationRecord)) {
+        return Promise.reject('Invalid records');
+      }
+
+      sourceRecord.order =
+        destinationIndex === 0
+          ? destinationRecord.order - OrderNumberSpacing
+          : destinationRecord.order; // order number the same because we want to properly reconcile by iterating through all records
 
       const newRecords = [...records];
       newRecords.splice(sourceIndex, 1);
