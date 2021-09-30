@@ -16,13 +16,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
   Skeleton,
   SelectChangeEvent,
 } from '@mui/material';
@@ -30,6 +23,7 @@ import { isBrowser } from 'shared/utils';
 import { Logo, AppIcon, PlainAddIcon } from '~/components/Icons';
 import useGlobalState from '~/hooks/useGlobalState';
 import useWorkspaceApps from '~/hooks/useWorkspaceApps';
+import CreateWorkspace from './CreateWorkspace';
 import Menu from './Menu';
 
 const NewWorkspaceValue = -1;
@@ -98,15 +92,12 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
   const classes = useStyles();
   const router = useRouter();
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
-  const [newWorkspaceName, setNewWorkspaceName] = useState('');
-
   const {
     userDetails,
     workspaces,
     isWorkspacesReady,
     currentWorkspaceId,
     setCurrentWorkspaceId,
-    createWorkspace,
   } = useGlobalState();
   const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspaceId);
 
@@ -131,12 +122,6 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     },
     [setCurrentWorkspaceId, onClose],
   );
-
-  const handleCreateWorkspace = useCallback(() => {
-    setIsCreatingWorkspace(false);
-    createWorkspace(newWorkspaceName);
-    onClose();
-  }, [newWorkspaceName, createWorkspace, onClose]);
 
   const loadingAppSkeletons = [0, 2, 1].map((key) => (
     <Skeleton
@@ -283,43 +268,15 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
     ],
   );
 
-  const createWorkspaceModal = useMemo(
-    () => (
-      <Dialog open={isCreatingWorkspace} onClose={() => setIsCreatingWorkspace(false)}>
-        <DialogTitle>Create New Workspace</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            A workspace allows you to collaborate with a group of co-workers on calls.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Workspace Name"
-            type="text"
-            fullWidth
-            value={newWorkspaceName}
-            onChange={(e) => setNewWorkspaceName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsCreatingWorkspace(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleCreateWorkspace} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    ),
-    [handleCreateWorkspace, isCreatingWorkspace, newWorkspaceName],
-  );
-
   const container = isBrowser ? () => window.document.body : undefined;
 
   return (
     <nav className={classes.drawer} aria-label="mailbox folders">
-      {createWorkspaceModal}
+      <CreateWorkspace
+        open={isCreatingWorkspace}
+        onClose={() => setIsCreatingWorkspace(false)}
+        onCreate={onClose}
+      />
 
       <Hidden smUp implementation="css">
         <Drawer
