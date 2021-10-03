@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useEffect, useCallback, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { createStyles, makeStyles } from '@mui/styles';
@@ -101,7 +101,9 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
   } = useGlobalState();
   const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspaceId);
 
-  router.prefetch('/app/create');
+  useEffect(() => {
+    router.prefetch('/app/create');
+  }, [router]);
 
   const isRouteSelected = useCallback(
     (route) => {

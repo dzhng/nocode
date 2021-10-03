@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Router from 'next/router';
 import { withTRPC } from '@trpc/next';
@@ -18,8 +19,13 @@ import { GlobalStateProvider } from '~/hooks/useGlobalState';
 
 import './styles.css';
 
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
+  Component: NextPageWithLayout;
 }
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -36,6 +42,8 @@ function App({ Component, pageProps, emotionCache = clientSideEmotionCache }: My
     return Router.events.off('beforeHistoryChange', handleChange);
   }, []);
 
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   return (
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={theme}>
@@ -49,7 +57,7 @@ function App({ Component, pageProps, emotionCache = clientSideEmotionCache }: My
             <Head />
             <CssBaseline />
             <ErrorDialog />
-            <Component previousPage={previousPage} {...pageProps} />
+            {getLayout(<Component previousPage={previousPage} {...pageProps} />)}
           </GlobalStateProvider>
         </SnackbarProvider>
       </ThemeProvider>

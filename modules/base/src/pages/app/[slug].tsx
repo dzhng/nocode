@@ -1,8 +1,10 @@
+import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
+import PrivateRoute from '~/components/PrivateRoute';
+import AppLayout from '~/containers/AppLayout';
 import AppContainer from '~/containers/App';
-import withPrivateRoute from '~/components/PrivateRoute/withPrivateRoute';
 
-export default withPrivateRoute(function AppPage() {
+export default function AppPage() {
   const router = useRouter();
   const appId = Number(router.query.slug);
 
@@ -10,5 +12,13 @@ export default withPrivateRoute(function AppPage() {
     return null;
   }
 
-  return <AppContainer appId={appId} />;
-});
+  return (
+    <PrivateRoute>
+      <AppContainer appId={appId} />
+    </PrivateRoute>
+  );
+}
+
+AppPage.getLayout = function getLayout(page: ReactElement) {
+  return <AppLayout>{page}</AppLayout>;
+};

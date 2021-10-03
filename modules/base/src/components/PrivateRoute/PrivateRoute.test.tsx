@@ -1,7 +1,7 @@
 import { screen, render } from '@testing-library/react';
 import { useRouter } from 'next/router';
 import useGlobalState from '~/hooks/useGlobalState';
-import PrivateRoute from './PrivateRoute';
+import PrivateRoute from './index';
 
 jest.mock('next/router');
 jest.mock('~/hooks/useGlobalState');

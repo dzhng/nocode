@@ -1,10 +1,15 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
 import { Box } from '@mui/material';
 import useGlobalState from '~/hooks/useGlobalState';
 import Nav from '~/components/Nav';
 
 export default function AppLayoutContainer({ children }: PropsWithChildren<any>) {
   const { isNavOpen, setIsNavOpen } = useGlobalState();
+
+  const handleClose = useCallback(() => {
+    setIsNavOpen(false);
+  }, [setIsNavOpen]);
+
   return (
     <Box
       sx={{
@@ -14,7 +19,7 @@ export default function AppLayoutContainer({ children }: PropsWithChildren<any>)
         flexDirection: 'row',
       }}
     >
-      <Nav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+      <Nav isOpen={isNavOpen} onClose={handleClose} />
       {children}
     </Box>
   );

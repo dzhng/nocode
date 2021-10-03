@@ -1,4 +1,4 @@
-import PrivateRoute from './PrivateRoute';
+import PrivateRoute from './index';
 
 export default function withPrivateRoute<T>(Component: React.ComponentType<T>) {
   // eslint-disable-next-line react/display-name
