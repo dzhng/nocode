@@ -48,7 +48,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
 
   const isRouteSelected = useCallback(
     (route) => {
-      return route === router.pathname;
+      return route === router.asPath;
     },
     [router],
   );
@@ -100,9 +100,29 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
             <Logo />
           </Box>
         </Link>
+
         <Divider sx={{ ml: 2, mr: 2 }} />
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2, mt: 2 }}>
+        <Link href="/" passHref>
+          <Typography
+            component="a"
+            variant="h5"
+            sx={{
+              ml: 1,
+              mr: 1,
+              mt: 1,
+              padding: 1,
+              color: 'grey.700',
+              fontWeight: 600,
+              textDecoration: 'none',
+              '&:hover': { color: 'primary.main', borderRadius: 18, backgroundColor: 'grey.100' },
+            }}
+          >
+            Home
+          </Typography>
+        </Link>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2, mt: 1 }}>
           <Typography
             variant="h5"
             sx={{
@@ -149,7 +169,12 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                       paddingBottom: 0,
                       width: 'auto',
                       borderRadius: 18,
-                      color: isRouteSelected(`/app/${app.id}`) ? 'secondary.main' : 'grey.900',
+                      color: isRouteSelected(`/app/${app.id}`) ? 'secondary.main' : 'grey.800',
+                      '&:hover': {
+                        color: isRouteSelected(`/app/${app.id}`)
+                          ? 'secondary.main'
+                          : 'primary.main',
+                      },
                     }}
                   >
                     <ListItemIcon
@@ -166,7 +191,6 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                         variant="h3"
                         sx={{
                           fontWeight: 500,
-                          color: 'grey.800',
                         }}
                       >
                         {app.name}
