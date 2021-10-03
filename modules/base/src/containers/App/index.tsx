@@ -1,4 +1,4 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Skeleton } from '@mui/material';
 import SheetContainer from '~/containers/Sheet';
 import useApp from '~/hooks/useApp';
 
@@ -26,7 +26,7 @@ export default function App({ appId }: { appId: number }) {
           height: (theme) => theme.headerBarHeight + 1,
         }}
       >
-        <Typography variant="h1">{app?.name}</Typography>
+        <Typography variant="h1">{app ? app.name : <Skeleton width={120} />}</Typography>
       </Box>
 
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
