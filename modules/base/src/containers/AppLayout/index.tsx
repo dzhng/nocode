@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback } from 'react';
+import { PropsWithChildren, ReactNode, useCallback } from 'react';
 import { Box } from '@mui/material';
 import useGlobalState from '~/hooks/useGlobalState';
 import Nav from '~/components/Nav';
@@ -24,3 +24,5 @@ export default function AppLayoutContainer({ children }: PropsWithChildren<any>)
     </Box>
   );
 }
+
+export const getLayout = (page: ReactNode) => <AppLayoutContainer>{page}</AppLayoutContainer>;

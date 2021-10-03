@@ -1,9 +1,10 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { createStyles, makeStyles } from '@mui/styles';
-import { Box, IconButton, Tooltip } from '@mui/material';
 import {
+  Box,
+  IconButton,
+  Tooltip,
   Typography,
   List,
   ListItem,
@@ -29,67 +30,7 @@ import Menu from './Menu';
 const NewWorkspaceValue = -1;
 const sidebarWidth = 250;
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    drawer: {
-      [theme.breakpoints.up('sm')]: {
-        width: sidebarWidth,
-        flexShrink: 0,
-      },
-    },
-    select: {
-      // width minus margin, subtract an extra 2 for the border
-      width: sidebarWidth - 10 * 2 - 2,
-      margin: 10,
-    },
-    createWorkspaceItem: {
-      color: theme.palette.primary.main,
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-      [theme.breakpoints.up('sm')]: {
-        display: 'none',
-      },
-    },
-    drawerPaper: {
-      width: sidebarWidth,
-    },
-    drawerContent: {
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    drawerContentFooter: {
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'flex-end',
-    },
-    profileMenu: {
-      display: 'flex',
-      alignItems: 'stretch',
-      padding: theme.spacing(1),
-
-      '& .MuiTypography-root': {
-        marginTop: 'auto',
-        marginBottom: 'auto',
-      },
-    },
-    title: {
-      padding: theme.spacing(1.5),
-      objectFit: 'contain',
-      width: 120,
-      height: 60,
-    },
-    divider: {
-      marginLeft: theme.spacing(2),
-      marginRight: theme.spacing(2),
-    },
-  }),
-);
-
 export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): void }) {
-  const classes = useStyles();
   const router = useRouter();
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
   const {
@@ -136,13 +77,30 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
 
   const drawer = useMemo(
     () => (
-      <div className={classes.drawerContent}>
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Link href="/" passHref>
-          <a style={{ lineHeight: 0 }}>
-            <Logo className={classes.title} />
-          </a>
+          <Box
+            component="a"
+            sx={{
+              lineHeight: 0,
+              '& img': {
+                padding: 1,
+                objectFit: 'contain',
+                width: 120,
+                height: 60,
+              },
+            }}
+          >
+            <Logo />
+          </Box>
         </Link>
-        <Divider className={classes.divider} />
+        <Divider sx={{ ml: 2, mr: 2 }} />
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2, mt: 2 }}>
           <Typography
@@ -219,9 +177,23 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
               ))}
         </List>
 
-        <div className={classes.drawerContentFooter}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}
+        >
           {isWorkspacesReady && workspaces ? (
-            <FormControl variant="outlined" className={classes.select}>
+            <FormControl
+              sx={{
+                // width minus margin, subtract an extra 2 for the border
+                width: sidebarWidth - 10 * 2 - 2,
+                margin: '10px',
+              }}
+              variant="outlined"
+            >
               <InputLabel>Workspace</InputLabel>
               <Select
                 label="Workspace"
@@ -234,29 +206,53 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                   </MenuItem>
                 ))}
                 <MenuItem value={NewWorkspaceValue}>
-                  <Typography variant="h5" className={classes.createWorkspaceItem}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: 'primary.main',
+                    }}
+                  >
                     <b>+ New Workspace</b>
                   </Typography>
                 </MenuItem>
               </Select>
             </FormControl>
           ) : (
-            <Skeleton variant="rectangular" height={45} className={classes.select} />
+            <Skeleton
+              variant="rectangular"
+              height={45}
+              sx={{
+                // copies styles from FormControl
+                width: sidebarWidth - 10 * 2 - 2,
+                margin: '10px',
+                borderRadius: 1,
+              }}
+            />
           )}
 
-          <Divider className={classes.divider} />
+          <Divider sx={{ ml: 2, mr: 2 }} />
 
-          <div className={classes.profileMenu}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'stretch',
+              padding: 1,
+
+              '& .MuiTypography-root': {
+                marginTop: 'auto',
+                marginBottom: 'auto',
+              },
+            }}
+          >
             <Menu />
             <Typography sx={{ textAlign: 'right' }} variant="h2">
               {userDetails?.displayName ?? ''}
             </Typography>
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     ),
     [
-      classes,
       apps,
       isLoadingApps,
       loadingAppSkeletons,
@@ -273,7 +269,13 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
   const container = isBrowser ? () => window.document.body : undefined;
 
   return (
-    <nav className={classes.drawer} aria-label="mailbox folders">
+    <Box
+      component="nav"
+      sx={{
+        width: sidebarWidth,
+        flexShrink: 0,
+      }}
+    >
       <CreateWorkspace
         open={isCreatingWorkspace}
         onClose={() => setIsCreatingWorkspace(false)}
@@ -282,14 +284,14 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
 
       <Hidden smUp implementation="css">
         <Drawer
+          sx={{
+            '& .MuiDrawer-paper': { width: sidebarWidth },
+          }}
           container={container}
           variant="temporary"
           anchor="left"
           open={isOpen}
           onClose={onClose}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}
@@ -299,8 +301,8 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
       </Hidden>
       <Hidden xsDown implementation="css">
         <Drawer
-          classes={{
-            paper: classes.drawerPaper,
+          sx={{
+            '& .MuiDrawer-paper': { width: sidebarWidth },
           }}
           variant="permanent"
           open
@@ -308,6 +310,6 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
           {drawer}
         </Drawer>
       </Hidden>
-    </nav>
+    </Box>
   );
 }

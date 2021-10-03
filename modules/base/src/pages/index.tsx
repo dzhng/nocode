@@ -1,6 +1,6 @@
-import { useEffect, ReactElement } from 'react';
+import { useEffect } from 'react';
 import PrivateRoute from '~/components/PrivateRoute';
-import AppLayout from '~/containers/AppLayout';
+import { getLayout } from '~/containers/AppLayout';
 import useGlobalState from '~/hooks/useGlobalState';
 import Home from '~/containers/Home';
 
@@ -18,6 +18,4 @@ export default function IndexPage() {
   );
 }
 
-IndexPage.getLayout = function getLayout(page: ReactElement) {
-  return <AppLayout>{page}</AppLayout>;
-};
+IndexPage.getLayout = getLayout;

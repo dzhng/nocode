@@ -1,7 +1,6 @@
-import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
 import PrivateRoute from '~/components/PrivateRoute';
-import AppLayout from '~/containers/AppLayout';
+import { getLayout } from '~/containers/AppLayout';
 import AppContainer from '~/containers/App';
 
 export default function AppPage() {
@@ -19,6 +18,4 @@ export default function AppPage() {
   );
 }
 
-AppPage.getLayout = function getLayout(page: ReactElement) {
-  return <AppLayout>{page}</AppLayout>;
-};
+AppPage.getLayout = getLayout;
