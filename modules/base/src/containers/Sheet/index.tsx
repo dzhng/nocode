@@ -53,9 +53,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
 
   // select the first sheet once it loads
   useEffect(() => {
-    if (!isLoadingSheets && sheets.length > 0) {
-      setSelectedSheet(sheets[0]);
-    }
+    setSelectedSheet(!isLoadingSheets && sheets.length > 0 ? sheets[0] : null);
   }, [isLoadingSheets, sheets]);
 
   const handleContextMenu = useCallback(
@@ -97,7 +95,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
   // show loading skeleton
   // TODO: calculate height
   const loadingSkeletons = [0, 1].map((key) => (
-    <Skeleton key={key} height={30} className={classes.tab} />
+    <Skeleton key={key} variant="rectangular" height={26} className={classes.tab} />
   ));
 
   return (
