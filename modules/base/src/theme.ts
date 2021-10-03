@@ -124,7 +124,7 @@ export default createTheme({
   },
 
   // custom
-  headerBarHeight: 60,
+  headerBarHeight: 50,
   transitionTime: '0.3s',
   dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
   borderColor: 'rgba(0,0,0,0.12)',

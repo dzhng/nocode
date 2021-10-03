@@ -101,6 +101,8 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
               lineHeight: 0,
               '& img': {
                 padding: 1,
+                paddingTop: 1.5,
+                paddingBottom: 1.5,
                 objectFit: 'contain',
                 width: 120,
                 height: (theme) => theme.headerBarHeight,
