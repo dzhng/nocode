@@ -1,8 +1,10 @@
 import { useCallback } from 'react';
-import { styled, Box } from '@mui/material';
+import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { ColumnType } from 'shared/schema';
+import { AddIcon } from '~/components/Icons';
 import { TableHeaderRow, TableCell } from './Table';
+import { NewColumnCellSize } from './const';
 import Cell from './Cell';
 
 interface PropTypes {
@@ -11,6 +13,7 @@ interface PropTypes {
   minWidth: number;
   changeColumnName(columnId: number, name: string): void;
   changeColumnWidth(columnId: number, width: number): void;
+  onAddColumn(): void;
 }
 
 const DividerWidth = 5;
@@ -32,6 +35,7 @@ export default function HeaderRow({
   minWidth,
   changeColumnName,
   changeColumnWidth,
+  onAddColumn,
 }: PropTypes) {
   const handleDrag = useCallback(
     (columnId: number, data: DraggableData) => {
@@ -77,6 +81,30 @@ export default function HeaderRow({
           </TableCell>
         </Box>
       ))}
+
+      <TableCell
+        sx={{
+          width: NewColumnCellSize,
+          height,
+          textAlign: 'center',
+
+          '& button': {
+            marginTop: '5px',
+          },
+
+          '& svg': {
+            width: 20,
+            height: 20,
+            color: 'primary.main',
+          },
+        }}
+      >
+        <Tooltip placement="bottom" title="Add new column">
+          <IconButton size="small" onClick={onAddColumn}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      </TableCell>
     </TableHeaderRow>
   );
 }

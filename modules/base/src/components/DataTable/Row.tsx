@@ -88,13 +88,7 @@ export default function Row({
           {columnIdx !== columns.length - 1 && <Divider />}
         </Fragment>
       ))}
-      <NewColumnButton role="button" onClick={onAddColumn}>
-        <Tooltip placement="top" title="Add new column">
-          <IconButton size="small">
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      </NewColumnButton>
+      <NewColumnButton />
     </TableRow>
   );
 }

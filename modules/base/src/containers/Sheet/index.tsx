@@ -18,6 +18,8 @@ const useStyles = makeStyles((theme) =>
     },
     tableContainer: {
       padding: theme.spacing(1),
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
       flexGrow: 1,
       overflow: 'scroll',
       ...theme.customMixins.scrollBar,

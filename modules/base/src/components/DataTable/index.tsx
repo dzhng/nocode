@@ -100,6 +100,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           minWidth={DefaultCellWidth}
           changeColumnName={changeColumnName}
           changeColumnWidth={changeColumnWidth}
+          onAddColumn={onAddColumn}
         />
       </TableHead>
 
