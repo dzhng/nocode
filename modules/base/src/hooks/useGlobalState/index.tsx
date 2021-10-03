@@ -1,9 +1,10 @@
 import { createContext, useContext, useState } from 'react';
-import { UserDetails, Workspace } from 'shared/schema';
+import { UserDetails, Workspace, App } from 'shared/schema';
 import { User } from '@supabase/supabase-js';
 
 import useAuth from './useAuth';
 import useWorkspaces from './useWorkspaces';
+import useWorkspaceApps from './useWorkspaceApps';
 
 export interface StateContextType {
   // UI
@@ -31,6 +32,12 @@ export interface StateContextType {
   createWorkspace(name: string): Promise<Workspace | undefined>;
   leaveWorkspace(): Promise<void>;
   deleteWorkspace(): Promise<void>;
+
+  // apps
+  queryForApps(): Promise<void>;
+  apps: App[];
+  isLoadingApps: boolean;
+  createApp(values: { name: string }): Promise<App>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);
@@ -38,14 +45,18 @@ export const StateContext = createContext<StateContextType>(null!);
 export function GlobalStateProvider(props: React.PropsWithChildren<{}>) {
   const [error, setError] = useState<Error | string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const authState = useAuth();
+  const workspacesState = useWorkspaces(authState);
+  const appState = useWorkspaceApps(authState, workspacesState.currentWorkspaceId);
 
   const contextValue: StateContextType = {
     error,
     setError,
     isNavOpen,
     setIsNavOpen,
-    ...useAuth(),
-    ...useWorkspaces(),
+    ...authState,
+    ...workspacesState,
+    ...appState,
   };
 
   return <StateContext.Provider value={contextValue}>{props.children}</StateContext.Provider>;

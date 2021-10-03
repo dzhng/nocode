@@ -227,7 +227,8 @@ export default function useSheet(sheetId?: number) {
 
   return {
     records,
-    isLoadingRecords: recordsQuery.isFetching,
+    isLoadingInitialRecords: !recordsQuery.isFetched,
+    isLoadingNextPage: recordsQuery.isFetchingNextPage,
     createRecord,
     editRecord,
     reorderRecord,

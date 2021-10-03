@@ -3,8 +3,10 @@ import clsx from 'clsx';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Menu, MenuItem, Skeleton } from '@mui/material';
 import { Sheet } from 'shared/schema';
-import useApp from '~/hooks/useApp';
+import useSheets from '~/hooks/useSheets';
 import DataTable from '~/components/DataTable';
+
+const TabHeight = 28;
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -15,19 +17,21 @@ const useStyles = makeStyles((theme) =>
       overflow: 'hidden',
     },
     tableContainer: {
+      padding: theme.spacing(1),
       flexGrow: 1,
       overflow: 'scroll',
       ...theme.customMixins.scrollBar,
     },
     tabContainer: {
+      padding: theme.spacing(1),
       flexShrink: 0,
-      height: 30,
       display: 'flex',
       flexDirection: 'row',
+      borderTop: theme.dividerBorder,
     },
     tab: {
       width: 100,
-      lineHeight: '28px',
+      lineHeight: `${TabHeight}px`,
       textAlign: 'center',
       background: '#DDD',
       margin: 2,
@@ -44,7 +48,7 @@ const useStyles = makeStyles((theme) =>
 
 export default function SheetContainer({ appId }: { appId: number }) {
   const classes = useStyles();
-  const { sheets, createSheet, deleteSheet, isLoadingSheets } = useApp(appId);
+  const { sheets, createSheet, deleteSheet, isLoadingSheets } = useSheets(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
   const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<null | { x: number; y: number; sheetId: number }>(
@@ -94,7 +98,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
 
   // show loading skeleton
   const loadingSkeletons = [0, 1].map((key) => (
-    <Skeleton key={key} variant="rectangular" height={26} className={classes.tab} />
+    <Skeleton key={key} variant="rectangular" height={TabHeight} className={classes.tab} />
   ));
 
   return (

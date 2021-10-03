@@ -1,37 +1,33 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { User } from '@supabase/supabase-js';
 import { Collections, App } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import useGlobalState from '~/hooks/useGlobalState';
 
-export default function useWorkspaceMembers(workspaceId?: number) {
-  const { user } = useGlobalState();
+export default function useWorkspaceApps(authState: { user?: User | null }, workspaceId?: number) {
+  const { user } = authState;
   const [apps, setApps] = useState<App[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
 
-  useEffect(() => {
-    const loadApps = async () => {
-      setIsLoadingApps(true);
+  const queryForApps = useCallback(async () => {
+    if (!user || !workspaceId) {
+      return Promise.reject('User is not authenticated');
+    }
 
-      const ret = await supabase
-        .from<App>(Collections.APPS)
-        .select('*')
-        .eq('workspaceId', workspaceId)
-        .eq('isDeleted', false);
+    setIsLoadingApps(true);
 
-      if (ret.error || !ret.data) {
-        setApps([]);
-        return;
-      }
+    const ret = await supabase
+      .from<App>(Collections.APPS)
+      .select('*')
+      .eq('workspaceId', workspaceId)
+      .eq('isDeleted', false);
 
-      setApps(ret.data);
-      setIsLoadingApps(false);
-    };
-
-    if (!workspaceId) {
+    if (ret.error || !ret.data) {
+      setApps([]);
       return;
     }
 
-    loadApps();
+    setApps(ret.data);
+    setIsLoadingApps(false);
   }, [workspaceId, user]);
 
   const createApp = useCallback(
@@ -61,6 +57,7 @@ export default function useWorkspaceMembers(workspaceId?: number) {
   );
 
   return {
+    queryForApps,
     apps,
     isLoadingApps,
     createApp,

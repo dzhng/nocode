@@ -1,5 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
-import { styled, Skeleton, Box } from '@mui/material';
+import { styled } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
@@ -35,7 +35,7 @@ const AddNewRow = styled('div')(({ theme }) => ({
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const {
-    isLoadingRecords,
+    isLoadingInitialRecords,
     isLoadingColumns,
     records,
     cellForRecord,
@@ -85,89 +85,70 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     [columns],
   );
 
-  const loadingSkeletons = [0, 1, 2].map((keyRow) => (
-    <Box key={keyRow} sx={{ display: 'flex', flexDirection: 'row' }}>
-      {[0, 1, 2, 3, 4].map((key) => (
-        <Skeleton
-          key={key}
-          variant="rectangular"
-          height={DefaultCellHeight}
-          sx={{ width: '19%', borderRadius: '5px', mb: '3px', mt: '3px', mr: '3px' }}
-        />
-      ))}
-    </Box>
-  ));
+  const isLoading = isLoadingInitialRecords || isLoadingColumns;
 
-  const isLoading = isLoadingRecords || isLoadingColumns;
+  if (isLoading) {
+    return <Table />;
+  }
 
   return (
     <Table>
-      {isLoading ? (
-        loadingSkeletons
-      ) : (
-        <>
-          <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
-            <Header
-              columns={columns}
-              height={DefaultCellHeight}
-              minWidth={DefaultCellWidth}
-              changeColumnName={changeColumnName}
-              changeColumnWidth={changeColumnWidth}
-            />
-          </TableHead>
+      <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
+        <Header
+          columns={columns}
+          height={DefaultCellHeight}
+          minWidth={DefaultCellWidth}
+          changeColumnName={changeColumnName}
+          changeColumnWidth={changeColumnWidth}
+        />
+      </TableHead>
 
-          <TableBody>
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {records.map((record, index) => (
-                      <Draggable
-                        key={record.id ?? -1}
-                        draggableId={String(record.id)}
-                        index={index}
+      <TableBody>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="droppable">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {records.map((record, index) => (
+                  <Draggable key={record.id ?? -1} draggableId={String(record.id)} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        style={provided.draggableProps.style}
                       >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            style={provided.draggableProps.style}
-                          >
-                            <Row
-                              isDragging={snapshot.isDragging}
-                              dragHandleProps={provided.dragHandleProps}
-                              columns={columns}
-                              minWidth={DefaultCellWidth}
-                              defaultHeight={DefaultCellHeight}
-                              dataForColumn={(columnId) =>
-                                record.id && cellForRecord(record.id, columnId)?.data
-                              }
-                              editRecord={(columnId, data) =>
-                                record.id && editRecord(record.id, columnId, data)
-                              }
-                              onAddColumn={onAddColumn}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
+                        <Row
+                          isDragging={snapshot.isDragging}
+                          dragHandleProps={provided.dragHandleProps}
+                          columns={columns}
+                          minWidth={DefaultCellWidth}
+                          defaultHeight={DefaultCellHeight}
+                          dataForColumn={(columnId) =>
+                            record.id && cellForRecord(record.id, columnId)?.data
+                          }
+                          editRecord={(columnId, data) =>
+                            record.id && editRecord(record.id, columnId, data)
+                          }
+                          onAddColumn={onAddColumn}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
 
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
-            <AddNewRow
-              onClick={onAddRow}
-              sx={{ width: totalRowWidth + SelectorCellSize + NewColumnCellSize + 2 }}
-            >
-              <AddIcon />
-              New record
-            </AddNewRow>
-          </TableBody>
-        </>
-      )}
+        <AddNewRow
+          onClick={onAddRow}
+          sx={{ width: totalRowWidth + SelectorCellSize + NewColumnCellSize + 2 }}
+        >
+          <AddIcon />
+          New record
+        </AddNewRow>
+      </TableBody>
     </Table>
   );
 }

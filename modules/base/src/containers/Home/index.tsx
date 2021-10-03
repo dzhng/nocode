@@ -23,7 +23,6 @@ import UserAvatar from '~/components/UserAvatar';
 import CardButton from '~/components/CardButton';
 import useGlobalState from '~/hooks/useGlobalState';
 import useWorkspaceMembers from '~/hooks/useWorkspaceMembers';
-import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import AppCard from './AppCard';
 import { AddMemberDialog } from './AddMemberMenuItem';
 import LeaveMenuItem from './LeaveMenuItem';
@@ -128,13 +127,14 @@ export default function Home() {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const {
+    apps,
+    isLoadingApps,
     currentWorkspace,
     isWorkspacesReady,
     leaveWorkspace,
     deleteWorkspace,
     setIsNavOpen,
   } = useGlobalState();
-  const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspace?.id);
   const { members, isAdmin, isLoadingMembers, inviteMembers, removeMembers } = useWorkspaceMembers(
     currentWorkspace?.id,
   );

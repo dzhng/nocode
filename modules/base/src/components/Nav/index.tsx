@@ -23,7 +23,6 @@ import {
 import { isBrowser } from 'shared/utils';
 import { Logo, AppIcon, PlainAddIcon } from '~/components/Icons';
 import useGlobalState from '~/hooks/useGlobalState';
-import useWorkspaceApps from '~/hooks/useWorkspaceApps';
 import CreateWorkspace from './CreateWorkspace';
 import Menu from './Menu';
 
@@ -34,13 +33,24 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
   const router = useRouter();
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
   const {
+    apps,
+    isLoadingApps,
+    queryForApps,
+    queryForWorkspaces,
     userDetails,
     workspaces,
     isWorkspacesReady,
     currentWorkspaceId,
     setCurrentWorkspaceId,
   } = useGlobalState();
-  const { apps, isLoadingApps } = useWorkspaceApps(currentWorkspaceId);
+
+  useEffect(() => {
+    queryForWorkspaces();
+  }, [queryForWorkspaces]);
+
+  useEffect(() => {
+    queryForApps();
+  }, [queryForApps]);
 
   useEffect(() => {
     router.prefetch('/app/create');
@@ -93,7 +103,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                 padding: 1,
                 objectFit: 'contain',
                 width: 120,
-                height: 60,
+                height: (theme) => theme.headerBarHeight,
               },
             }}
           >

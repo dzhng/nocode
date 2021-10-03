@@ -1,10 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
+import { User } from '@supabase/supabase-js';
 import { Collections, Workspace, Member, UserDetails } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import useAuth from '../useAuth';
 
-export default function useWorkspaces() {
-  const { user, userDetails, isAuthReady } = useAuth();
+export default function useWorkspaces(authState: {
+  user?: User | null;
+  userDetails?: UserDetails | null;
+  isAuthReady: boolean;
+}) {
+  const { user, userDetails, isAuthReady } = authState;
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [currentWorkspaceId, _setCurrentWorkspaceId] = useState<number | undefined>();
   const [isWorkspacesReady, setIsWorkspacesReady] = useState(false);
