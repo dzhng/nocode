@@ -122,7 +122,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
           </Typography>
         </Link>
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2, mt: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 2 }}>
           <Typography
             variant="h5"
             sx={{

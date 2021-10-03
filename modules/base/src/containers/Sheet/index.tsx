@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { makeStyles, createStyles } from '@mui/styles';
-import { Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, Skeleton } from '@mui/material';
 import { Sheet } from 'shared/schema';
 import useApp from '~/hooks/useApp';
 import DataTable from '~/components/DataTable';
@@ -94,25 +94,37 @@ export default function SheetContainer({ appId }: { appId: number }) {
     }
   }, [deleteSheet, contextMenu]);
 
+  // show loading skeleton
+  const loadingSkeletons = [0, 1].map((key) => (
+    <Skeleton key={key} height={30} className={classes.tab} />
+  ));
+
   return (
     <div className={classes.content} onContextMenu={preventContextMenu}>
       <div className={classes.tableContainer}>
         {selectedSheet && <DataTable sheet={selectedSheet} />}
       </div>
+
       <div className={classes.tabContainer}>
-        {sheets.map((sheet) => (
-          <div
-            key={sheet.id}
-            className={clsx(classes.tab, selectedSheet === sheet && 'selected')}
-            onClick={() => setSelectedSheet(sheet)}
-            onContextMenu={(e) => handleContextMenu(e, sheet.id ?? 0)}
-          >
-            {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
-          </div>
-        ))}
-        <div className={classes.tab} onClick={() => createSheet({ name: 'hello world' })}>
-          Create +
-        </div>
+        {isLoadingSheets ? (
+          loadingSkeletons
+        ) : (
+          <>
+            {sheets.map((sheet) => (
+              <div
+                key={sheet.id}
+                className={clsx(classes.tab, selectedSheet === sheet && 'selected')}
+                onClick={() => setSelectedSheet(sheet)}
+                onContextMenu={(e) => handleContextMenu(e, sheet.id ?? 0)}
+              >
+                {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
+              </div>
+            ))}
+            <div className={classes.tab} onClick={() => createSheet({ name: 'hello world' })}>
+              Create +
+            </div>
+          </>
+        )}
       </div>
 
       <Menu
