@@ -95,6 +95,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
   }, [deleteSheet, contextMenu]);
 
   // show loading skeleton
+  // TODO: calculate height
   const loadingSkeletons = [0, 1].map((key) => (
     <Skeleton key={key} height={30} className={classes.tab} />
   ));
