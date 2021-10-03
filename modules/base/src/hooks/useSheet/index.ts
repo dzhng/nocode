@@ -21,7 +21,7 @@ export default function useSheet(sheetId?: number) {
       'record.infiniteQuery',
       {
         sheetId: sheetId ?? -1,
-        limit: 10,
+        limit: 100,
       },
     ],
     {
