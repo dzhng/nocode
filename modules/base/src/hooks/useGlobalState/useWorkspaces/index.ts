@@ -64,7 +64,7 @@ export default function useWorkspaces(authState: {
   const createWorkspace = useCallback(
     async (name: string): Promise<Workspace | undefined> => {
       if (!user) {
-        return Promise.reject('User is not authenticated');
+        return Promise.reject('User is not authenticated: createWorkspace');
       }
 
       setIsWorkspacesReady(false);

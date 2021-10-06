@@ -8,7 +8,7 @@ import { AddIcon } from '~/components/Icons';
 import { Table, TableHead, TableBody } from './Table';
 import Header from './Header';
 import Row from './Row';
-import { SelectorCellSize, NewColumnCellSize, DefaultCellWidth, DefaultCellHeight } from './const';
+import { SelectorCellSize, DefaultCellWidth, DefaultCellHeight } from './const';
 
 const AddNewRow = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -92,7 +92,13 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
   }
 
   return (
-    <Table>
+    <Table
+      sx={{
+        padding: 1,
+        paddingLeft: 2,
+        paddingRight: 2,
+      }}
+    >
       <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
         <Header
           columns={columns}
@@ -121,6 +127,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                           isDragging={snapshot.isDragging}
                           dragHandleProps={provided.dragHandleProps}
                           columns={columns}
+                          index={index}
                           minWidth={DefaultCellWidth}
                           defaultHeight={DefaultCellHeight}
                           dataForColumn={(columnId) =>
@@ -142,10 +149,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           </Droppable>
         </DragDropContext>
 
-        <AddNewRow
-          onClick={onAddRow}
-          sx={{ width: totalRowWidth + SelectorCellSize + NewColumnCellSize + 2 }}
-        >
+        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + SelectorCellSize + 2 }}>
           <AddIcon />
           New record
         </AddNewRow>

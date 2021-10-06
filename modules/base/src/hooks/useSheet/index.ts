@@ -97,7 +97,7 @@ export default function useSheet(sheetId?: number) {
   const createRecord = useCallback(
     async (data: { [id: number]: CellType }, atEnd: boolean) => {
       if (!user || !sheetId) {
-        return Promise.reject('User is not authenticated');
+        return Promise.reject('User is not authenticated: createRecord');
       }
 
       if (!recordsQuery.isFetched) {
@@ -139,7 +139,7 @@ export default function useSheet(sheetId?: number) {
   const editRecord = useCallback(
     async (id: number, columnId: number, data: CellType) => {
       if (!user || !sheetId) {
-        return Promise.reject('User is not authenticated');
+        return Promise.reject('User is not authenticated: editRecord');
       }
 
       const localIndex = records.findIndex((rec) => rec.id === id);
@@ -155,7 +155,7 @@ export default function useSheet(sheetId?: number) {
   const reorderRecord = useCallback(
     async (sourceIndex: number, destinationIndex: number) => {
       if (!user || !sheetId) {
-        return Promise.reject('User is not authenticated');
+        return Promise.reject('User is not authenticated: reorderRecord');
       }
 
       const destinationRecord = records[destinationIndex];

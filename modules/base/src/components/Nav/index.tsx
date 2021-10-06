@@ -92,6 +92,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          backgroundColor: 'grey.100',
         }}
       >
         <Link href="/" passHref>
@@ -127,7 +128,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
               color: 'grey.700',
               fontWeight: 600,
               textDecoration: 'none',
-              '&:hover': { color: 'primary.main', borderRadius: 18, backgroundColor: 'grey.100' },
+              '&:hover': { color: 'primary.main', borderRadius: 18, backgroundColor: 'grey.200' },
             }}
           >
             Home

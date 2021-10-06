@@ -9,8 +9,9 @@ export default function useWorkspaceApps(authState: { user?: User | null }, work
   const [isLoadingApps, setIsLoadingApps] = useState(true);
 
   const queryForApps = useCallback(async () => {
-    if (!user || !workspaceId) {
-      return Promise.reject('User is not authenticated');
+    if (!workspaceId || !user) {
+      setApps([]);
+      return;
     }
 
     setIsLoadingApps(true);
@@ -33,7 +34,7 @@ export default function useWorkspaceApps(authState: { user?: User | null }, work
   const createApp = useCallback(
     async (values: { name: string }) => {
       if (!user || !workspaceId) {
-        return Promise.reject('User is not authenticated');
+        return Promise.reject('User is not authenticated: createApp');
       }
 
       // before adding, replace timestamp with server helper

@@ -8,10 +8,8 @@ export default function DragHandle({ ...props }: { [props: string]: any }) {
       {...props}
       sx={{
         color: 'grey.500',
-        width: SelectorCellSize,
         height: DefaultCellHeight,
         paddingTop: '10px',
-        paddingLeft: `${(SelectorCellSize - 20) / 2}px`,
 
         '&:hover': {
           color: 'primary.main',
