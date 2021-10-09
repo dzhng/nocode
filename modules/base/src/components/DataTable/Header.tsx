@@ -2,26 +2,24 @@ import { useCallback } from 'react';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { ColumnType } from 'shared/schema';
-import { AddIcon } from '~/components/Icons';
+import { AddIcon, ExpandIcon } from '~/components/Icons';
 import { TableHeaderRow, TableCell } from './Table';
-import { NewColumnCellSize } from './const';
-import Cell from './Cell';
+import { HeaderHeight, NewColumnCellSize } from './const';
+
+const HeaderDividerWidth = 2;
 
 interface PropTypes {
   columns: ColumnType[];
-  height: number;
   minWidth: number;
   changeColumnName(columnId: number, name: string): void;
   changeColumnWidth(columnId: number, width: number): void;
   onAddColumn(): void;
 }
 
-const DividerWidth = 5;
-
 const Divider = styled('span')(({ theme }) => ({
   position: 'absolute',
   display: 'inline-block',
-  width: DividerWidth,
+  width: HeaderDividerWidth,
   backgroundColor: theme.palette.grey[300],
   top: 12,
   height: 16,
@@ -29,9 +27,32 @@ const Divider = styled('span')(({ theme }) => ({
   cursor: 'col-resize',
 }));
 
+const ColumnName = styled('div')(({ theme }) => ({
+  paddingLeft: theme.spacing(1),
+  paddingRight: theme.spacing(1),
+  display: 'flex',
+  alignItems: 'center',
+
+  '& span': {
+    height: HeaderHeight,
+    lineHeight: `${HeaderHeight}px`,
+    flexGrow: 1,
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+  },
+  '& button': {
+    width: 25,
+    height: 25,
+  },
+  '& svg': {
+    width: 15,
+    height: 15,
+  },
+}));
+
 export default function HeaderRow({
   columns,
-  height,
   minWidth,
   changeColumnName,
   changeColumnWidth,
@@ -59,7 +80,7 @@ export default function HeaderRow({
           <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(column.id, data)}>
             <Divider
               sx={{
-                left: (column.tableMetadata?.width ?? minWidth) - DividerWidth,
+                left: (column.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
               }}
             />
           </DraggableCore>
@@ -67,17 +88,15 @@ export default function HeaderRow({
           <TableCell
             sx={{
               width: column.tableMetadata?.width ?? minWidth,
-              height,
+              height: HeaderHeight,
             }}
           >
-            <Cell
-              isHeader
-              defaultHeight={height}
-              column={column}
-              onChange={(newData) => {
-                changeColumnName(column.id, String(newData));
-              }}
-            />
+            <ColumnName>
+              <span>{column.name}</span>
+              <IconButton size="small">
+                <ExpandIcon />
+              </IconButton>
+            </ColumnName>
           </TableCell>
         </Box>
       ))}
@@ -85,7 +104,7 @@ export default function HeaderRow({
       <TableCell
         sx={{
           width: NewColumnCellSize,
-          height,
+          height: HeaderHeight,
           textAlign: 'center',
 
           '& button': {

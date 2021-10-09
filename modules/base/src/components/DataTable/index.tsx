@@ -102,7 +102,6 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
         <Header
           columns={columns}
-          height={DefaultCellHeight}
           minWidth={DefaultCellWidth}
           changeColumnName={changeColumnName}
           changeColumnWidth={changeColumnWidth}

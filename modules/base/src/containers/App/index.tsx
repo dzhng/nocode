@@ -18,14 +18,13 @@ import {
   ViewWeekOutlined as FieldsIcon,
   Share as ShareIcon,
   History as HistoryIcon,
-  Settings as SettingsIcon,
   TableRows as GridIcon,
   Apps as CardIcon,
   ViewAgendaOutlined as GroupIcon,
   InvertColorsOutlined as ColorIcon,
   Height as RowHeightIcon,
 } from '@mui/icons-material';
-import { AddIcon } from '~/components/Icons';
+import { AddIcon, SettingsIcon } from '~/components/Icons';
 import SheetContainer from '~/containers/Sheet';
 import useApp from '~/hooks/useApp';
 
