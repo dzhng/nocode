@@ -15,13 +15,14 @@ import {
   FilterList as FilterIcon,
   Search as SearchIcon,
   ImportExport as SortIcon,
-  PeopleAlt as PermissionIcon,
+  ViewWeekOutlined as FieldsIcon,
   Share as ShareIcon,
   History as HistoryIcon,
   Settings as SettingsIcon,
   TableRows as GridIcon,
   Apps as CardIcon,
   ViewAgendaOutlined as GroupIcon,
+  InvertColorsOutlined as ColorIcon,
   Height as RowHeightIcon,
 } from '@mui/icons-material';
 import { AddIcon } from '~/components/Icons';
@@ -139,12 +140,9 @@ export default function App({ appId }: { appId: number }) {
           <Divider sx={{ mr: 1, ml: 1 }} orientation="vertical" flexItem />
 
           <ToolbarButton color="inherit">
-            <PermissionIcon />
-            Permissions
+            <FieldsIcon />
+            Fields
           </ToolbarButton>
-
-          <Divider sx={{ mr: 1, ml: 1 }} orientation="vertical" flexItem />
-
           <ToolbarButton color="inherit">
             <FilterIcon />
             Filter
@@ -156,6 +154,10 @@ export default function App({ appId }: { appId: number }) {
           <ToolbarButton color="inherit">
             <GroupIcon />
             Group
+          </ToolbarButton>
+          <ToolbarButton color="inherit">
+            <ColorIcon />
+            Color
           </ToolbarButton>
 
           <Divider sx={{ mr: 1, ml: 1 }} orientation="vertical" flexItem />
