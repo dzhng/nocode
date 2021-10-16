@@ -7,11 +7,13 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
+import { Provider as ReduxProvider } from 'react-redux';
 
 import type { AppRouter } from '~/pages/api/trpc/[trpc]';
 import { transformer } from '~/utils/trpc';
 import { createEmotionCache } from '~/utils/emotion';
 import '~/utils/progress-indicator';
+import { store } from '~/store';
 import theme from '~/theme';
 import Head from '~/components/App/Head';
 import ErrorDialog from '~/components/ErrorDialog';
@@ -54,10 +56,12 @@ function App({ Component, pageProps, emotionCache = clientSideEmotionCache }: My
           variant="info"
         >
           <GlobalStateProvider>
-            <Head />
-            <CssBaseline />
-            <ErrorDialog />
-            {getLayout(<Component previousPage={previousPage} {...pageProps} />)}
+            <ReduxProvider store={store}>
+              <Head />
+              <CssBaseline />
+              <ErrorDialog />
+              {getLayout(<Component previousPage={previousPage} {...pageProps} />)}
+            </ReduxProvider>
           </GlobalStateProvider>
         </SnackbarProvider>
       </ThemeProvider>
