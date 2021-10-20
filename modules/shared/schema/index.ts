@@ -66,6 +66,7 @@ export const AppSchema = z.object({
   name: z.string(),
   workspaceId: z.number(),
   creatorId: z.string().uuid(),
+  order: z.number(),
   isDeleted: z.boolean(),
   createdAt: z.date(),
 });
@@ -101,7 +102,7 @@ export const CellTypeSchema = z
 export type CellType = z.infer<typeof CellTypeSchema>;
 
 /**
- * Column definitions
+ * Field definitions
  */
 
 export const SelectionMetaSchema = z.object({
@@ -111,12 +112,12 @@ export const SelectionMetaSchema = z.object({
 export type SelectionMeta = z.infer<typeof SelectionMetaSchema>;
 
 export const RelationMetaSchema = z.object({
-  // the column in the current table that serves as the key
-  keyColumnId: z.string(),
+  // the field in the current table that serves as the key
+  keyFieldId: z.string(),
 
   // point to the location of the relational data value
   valueSheetId: z.string(),
-  valueColumnId: z.string(),
+  valueFieldId: z.string(),
 });
 export type RelationMeta = z.infer<typeof RelationMetaSchema>;
 
@@ -126,7 +127,7 @@ export const TableMetaSchema = z.object({
 });
 export type TableMeta = z.infer<typeof TableMetaSchema>;
 
-export const ColumnTypeSchema = z.object({
+export const FieldTypeSchema = z.object({
   // id is not optional here since it should just be generated client side
   id: z.number(),
   name: z.string(),
@@ -135,7 +136,7 @@ export const ColumnTypeSchema = z.object({
   typeMetadata: SelectionMetaSchema.or(RelationMetaSchema).optional(),
   tableMetadata: TableMetaSchema.optional(),
 });
-export type ColumnType = z.infer<typeof ColumnTypeSchema>;
+export type FieldType = z.infer<typeof FieldTypeSchema>;
 
 /**
  * Row and Cell definitions
@@ -145,6 +146,13 @@ export const RecordSchema = z.object({
   id: z.number().optional(),
   sheetId: z.number(),
   order: z.number(),
+  cells: z.array(
+    z.object({
+      id: z.number(),
+      fieldId: z.number(),
+      data: CellTypeSchema.nullable(),
+    }),
+  ),
   createdAt: z.date(),
 });
 export type Record = z.infer<typeof RecordSchema>;
@@ -153,12 +161,10 @@ export type Record = z.infer<typeof RecordSchema>;
 export const CellSchema = z.object({
   id: z.number().optional(),
   recordId: z.number(),
-  columnId: z.number(),
+  fieldId: z.number(),
   dataString: z.string().nullable().optional(),
   dataNumber: z.number().nullable().optional(),
   dataJSON: CellTypeSchema.nullable().optional(),
-  createdAt: z.date(),
-  modifiedAt: z.date(),
 });
 export type Cell = z.infer<typeof CellSchema>;
 
@@ -167,7 +173,7 @@ export const SheetSchema = z.object({
   appId: z.number(),
   name: z.string(),
   order: z.number(),
-  columns: ColumnTypeSchema.array(),
+  fields: FieldTypeSchema.array(),
   isDeleted: z.boolean(),
   createdAt: z.date(),
 });
@@ -179,10 +185,10 @@ export type Sheet = z.infer<typeof SheetSchema>;
 export const CellChangeSchema = z.object({
   id: z.number().optional(),
   userId: z.string().uuid(),
-  appId: z.number(),
   sheetId: z.number(),
   recordId: z.number(),
-  columnId: z.number(),
+  fieldId: z.number(),
+  value: CellTypeSchema.nullable().optional(),
   modifiedAt: z.date(),
 });
 export type CellChange = z.infer<typeof CellChangeSchema>;
