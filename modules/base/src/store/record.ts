@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { forEach } from 'lodash';
+import { forEach, without } from 'lodash';
 import { Record } from 'shared/schema';
 
 export interface State {
@@ -19,7 +19,7 @@ export default createSlice({
   reducers: {
     setRecordsForSheet: (state, action: PayloadAction<{ sheetId: number; records: Record[] }>) => {
       const sorted = action.payload.records.sort((a, b) => a.order - b.order);
-      const ids = sorted.map((record) => record.id ?? -1);
+      const ids = sorted.map((record) => Number(record.id));
 
       state.recordsBySheet[action.payload.sheetId] = ids;
 
@@ -32,11 +32,17 @@ export default createSlice({
 
       // next, insert new records
       sorted.forEach((record) => {
-        state.records[record.id ?? -1] = record;
+        state.records[Number(record.id)] = record;
       });
     },
+    createRecord: (state, action: PayloadAction<{ record: Record; index: number }>) => {
+      const { id, sheetId } = action.payload.record;
+
+      state.recordsBySheet[sheetId].splice(action.payload.index, 0, Number(id));
+      state.records[Number(id)] = action.payload.record;
+    },
     updateRecord: (state, action: PayloadAction<{ record: Record }>) => {
-      state.records[action.payload.record.id ?? -1] = action.payload.record;
+      state.records[Number(action.payload.record.id)] = action.payload.record;
     },
     reorderRecord: (
       state,
@@ -45,6 +51,12 @@ export default createSlice({
       const recordIds = state.recordsBySheet[action.payload.sheetId];
       const [sourceRecordId] = recordIds.splice(action.payload.sourceIndex, 1);
       recordIds.splice(action.payload.destinationIndex, 0, sourceRecordId);
+    },
+    deleteRecord: (state, action: PayloadAction<{ record: Record }>) => {
+      const { id, sheetId } = action.payload.record;
+
+      state.recordsBySheet[sheetId] = without(state.recordsBySheet[sheetId], Number(id));
+      delete state.records[Number(id)];
     },
   },
 });

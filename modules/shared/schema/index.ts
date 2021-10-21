@@ -10,7 +10,7 @@ export enum Collections {
   SHEETS = 'sheets',
   RECORDS = 'records',
   CELLS = 'cells',
-  CELL_CHANGE = 'cellchange',
+  RECORD_CHANGE = 'recordchange',
 }
 
 /**
@@ -148,11 +148,10 @@ export const RecordSchema = z.object({
   order: z.number(),
   cells: z
     .array(
-      z.object({
-        id: z.number(),
-        fieldId: z.number(),
-        data: CellTypeSchema.nullable(),
-      }),
+      z.tuple([
+        z.number(), // fieldId
+        CellTypeSchema.nullable(), // field data
+      ]),
     )
     .optional(),
   createdAt: z.date(),
@@ -184,13 +183,17 @@ export type Sheet = z.infer<typeof SheetSchema>;
 /**
  * Track app / sheet / record / cell change timestamps
  */
-export const CellChangeSchema = z.object({
+export const ChangeTypeSchema = z.enum(['create', 'update', 'delete']);
+export type ChangeType = z.infer<typeof MemberRolesSchema>;
+
+export const RecordChangeSchema = z.object({
   id: z.number().optional(),
+  type: ChangeTypeSchema,
   userId: z.string().uuid(),
   sheetId: z.number(),
   recordId: z.number(),
-  fieldId: z.number(),
+  fieldId: z.number().optional(),
   value: CellTypeSchema.nullable().optional(),
   modifiedAt: z.date(),
 });
-export type CellChange = z.infer<typeof CellChangeSchema>;
+export type RecordChange = z.infer<typeof RecordChangeSchema>;

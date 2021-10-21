@@ -1,6 +1,6 @@
 import * as trpc from '@trpc/server';
+import { omit } from 'lodash';
 import { z } from 'zod';
-import { compact } from 'lodash';
 import {
   Collections,
   Sheet,
@@ -8,100 +8,47 @@ import {
   RecordSchema,
   Cell,
   CellTypeSchema,
-  CellChange,
+  RecordChange,
 } from 'shared/schema';
-import { CellDataSchema, CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
-import { dataFieldForCell, cellTypeForDataField } from '~/utils/record';
+import { dataFieldForCell } from '~/utils/record';
 import type { Context } from '~/pages/api/trpc/[trpc]';
 
 export default trpc
   .router<Context>()
-  .query('infiniteQuery', {
+  .query('downloadRecords', {
     input: z.object({
       sheetId: z.number(),
-      // maps to useInfiniteQuery on client side
-      limit: z.number().min(1).max(100).nullish(),
-      cursor: z.number().nullish(),
+      // put a ridiculously high limit since the point is to download all records, we accept that this call will be slow, db should be tuned for this
+      limit: z.number().min(1).max(1000000).nullish(),
     }),
     async resolve({ input }) {
-      const { sheetId, limit: _limit, cursor: _cursor } = input;
-      const limit = _limit ?? 100;
-      const cursor = _cursor ?? 0;
-
-      const { data: sheetData } = await supabase
-        .from<Sheet>(Collections.SHEETS)
-        .select('*')
-        .eq('id', sheetId)
-        .single();
-      if (!sheetData) {
-        throw new trpc.TRPCError({
-          code: 'NOT_FOUND',
-        });
-      }
+      const { sheetId, limit: _limit } = input;
+      const limit = _limit ?? 500000;
 
       const recordRet = await supabase
         .from<Record>(Collections.RECORDS)
         .select('*')
         .eq('sheetId', sheetId)
         .order('order', { ascending: true })
-        .range(cursor, cursor + limit - 1);
+        .limit(limit);
       if (recordRet.error || !recordRet.data) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
         });
       }
 
-      const recordIds = compact(recordRet.data.map((r) => r.id));
-      const cellRet = await supabase
-        .from<Cell>(Collections.CELLS)
-        .select('*')
-        .in('recordId', recordIds);
-      if (cellRet.error || !cellRet.data) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-        });
-      }
-
-      // transform cells into digestable CellData
-      const cellData = compact(
-        cellRet.data.map((cell) => {
-          const column = sheetData.columns.find((c) => c.id === cell.columnId);
-          if (!column) {
-            return null;
-          }
-
-          const cellType = cellTypeForDataField(column, cell);
-          if (!cellType) {
-            return null;
-          }
-
-          const data: CellData = {
-            recordId: cell.recordId,
-            columnId: cell.columnId,
-            data: cellType,
-            createdAt: cell.createdAt,
-            modifiedAt: cell.modifiedAt,
-          };
-
-          return data;
-        }),
-      );
-
       return {
         records: recordRet.data,
-        cells: cellData,
-        nextCursor: cursor + limit,
       };
     },
   })
   .mutation('create', {
     input: z.object({
       record: RecordSchema,
-      data: CellDataSchema.array().optional(),
     }),
     async resolve({ input, ctx }) {
-      const { record, data } = input;
+      const { record } = input;
 
       const { data: sheetData } = await supabase
         .from<Sheet>(Collections.SHEETS)
@@ -121,49 +68,62 @@ export default trpc
         });
       }
 
+      // record the change of the new record
+      const now = new Date();
+      const changes: RecordChange[] = [
+        {
+          type: 'create',
+          userId: ctx?.user.id ?? '',
+          sheetId: recordData[0].sheetId,
+          recordId: Number(recordData[0].id),
+          modifiedAt: now,
+        },
+      ];
+
       // insert the data into individual cell records
-      if (data) {
+      if (record.cells) {
         // build an array of cell objects from the data
         const cells: Cell[] = [];
-        data.forEach((value) => {
-          const column = sheetData.columns.find((c) => c.id === value.columnId);
-          if (!column) return;
 
-          const dataField = dataFieldForCell(column, value.data);
+        record.cells.forEach(([fieldId, data]) => {
+          const field = sheetData.fields.find((c) => c.id === fieldId);
+          if (!field) return;
+
+          const dataField = dataFieldForCell(field, data);
 
           cells.push({
             recordId: recordData[0].id ?? 0,
-            columnId: value.columnId,
-            createdAt: value.createdAt,
-            modifiedAt: value.modifiedAt,
+            fieldId: fieldId,
             ...dataField,
+          });
+
+          changes.push({
+            type: 'update',
+            userId: ctx?.user.id ?? '',
+            sheetId: recordData[0].sheetId,
+            recordId: Number(recordData[0].id),
+            fieldId: fieldId,
+            value: data,
+            modifiedAt: now,
           });
         });
 
         await supabase.from<Cell>(Collections.CELLS).insert(cells, { returning: 'minimal' });
       }
 
-      // insert change obj
-      await supabase.from<CellChange>(Collections.CELL_CHANGE).insert(
-        {
-          userId: ctx?.user.id,
-          appId: sheetData.appId,
-          sheetId: recordData[0].sheetId,
-          recordId: recordData[0].id,
-          modifiedAt: new Date(),
-        },
-        { returning: 'minimal' },
-      );
+      await supabase
+        .from<RecordChange>(Collections.RECORD_CHANGE)
+        .insert(changes, { returning: 'minimal' });
     },
   })
   .mutation('edit', {
     input: z.object({
       recordId: z.number(),
-      columnId: z.number(),
+      fieldId: z.number(),
       data: CellTypeSchema,
     }),
     async resolve({ input, ctx }) {
-      // fetch the sheet to get column info
+      // fetch the sheet to get field info
       const { data: recordData } = await supabase
         .from<Record & { sheet: Sheet }>(Collections.RECORDS)
         .select(
@@ -179,47 +139,68 @@ export default trpc
         });
       }
 
-      const column = recordData.sheet.columns.find((c) => c.id === input.columnId);
-      if (!column) {
+      const field = recordData.sheet.fields.find((c) => c.id === input.fieldId);
+      if (!field) {
         throw new trpc.TRPCError({
           code: 'NOT_FOUND',
         });
       }
 
+      // modify record
+      const newRecord: Record = omit(recordData, 'sheet');
+      newRecord.cells = [
+        ...(newRecord.cells?.filter(([fieldId]) => fieldId !== input.fieldId) ?? []),
+        [input.fieldId, input.data],
+      ];
+
+      const { error: recordError } = await supabase
+        .from<Record>(Collections.RECORDS)
+        .update(newRecord, { returning: 'minimal' })
+        .eq('id', input.recordId);
+
+      if (recordError) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: recordError.message,
+        });
+      }
+
+      // upsert cell
       const now = new Date();
-      const dataField = dataFieldForCell(column, input.data);
-      const { error } = await supabase
+      const dataField = dataFieldForCell(field, input.data);
+      const { error: cellError } = await supabase
         .from<Cell>(Collections.CELLS)
         .upsert(
           {
             recordId: input.recordId,
-            columnId: input.columnId,
-            modifiedAt: now,
+            fieldId: input.fieldId,
             ...dataField,
           },
           { onConflict: 'recordId,columnId', returning: 'minimal' },
         )
-        .match({ recordId: input.recordId, columnId: input.columnId });
+        .match({ recordId: input.recordId, columnId: input.fieldId });
 
-      if (error) {
+      if (cellError) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: error.message,
+          message: cellError.message,
         });
       }
 
       // insert change obj
-      await supabase.from<CellChange>(Collections.CELL_CHANGE).insert(
-        {
-          userId: ctx?.user.id,
-          appId: recordData.sheet.appId,
-          sheetId: recordData.sheetId,
-          recordId: recordData.id,
-          columnId: input.columnId,
-          modifiedAt: now,
-        },
-        { returning: 'minimal' },
-      );
+      const change: RecordChange = {
+        type: 'update',
+        userId: ctx?.user.id ?? '',
+        sheetId: recordData.sheetId,
+        recordId: Number(recordData.id),
+        fieldId: input.fieldId,
+        value: input.data,
+        modifiedAt: now,
+      };
+
+      await supabase
+        .from<RecordChange>(Collections.RECORD_CHANGE)
+        .insert(change, { returning: 'minimal' });
     },
   })
   .mutation('delete', {
@@ -227,44 +208,29 @@ export default trpc
       recordId: z.number(),
     }),
     async resolve({ input, ctx }) {
-      // fetch the sheet to get column info
-      const { data: recordData } = await supabase
-        .from<Record & { sheet: Sheet }>(Collections.RECORDS)
-        .select(
-          ` *,
-            sheet:sheetId (*) 
-          `,
-        )
-        .eq('id', input.recordId)
-        .single();
-      if (!recordData) {
-        throw new trpc.TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-        });
-      }
-
       // NOTE: cells should be auto deleted because of postgres cascade
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from<Record>(Collections.RECORDS)
-        .delete({ returning: 'minimal' })
+        .delete()
         .eq('id', input.recordId);
 
-      if (error) {
+      if (error || !data) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
         });
       }
 
       // insert change obj
-      await supabase.from<CellChange>(Collections.CELL_CHANGE).insert(
-        {
-          userId: ctx?.user.id,
-          appId: recordData.sheet.appId,
-          sheetId: recordData.sheetId,
-          recordId: recordData.id,
-          modifiedAt: new Date(),
-        },
-        { returning: 'minimal' },
-      );
+      const change: RecordChange = {
+        type: 'delete',
+        userId: ctx?.user.id ?? '',
+        sheetId: data[0].sheetId,
+        recordId: Number(data[0].id),
+        modifiedAt: new Date(),
+      };
+
+      await supabase
+        .from<RecordChange>(Collections.RECORD_CHANGE)
+        .insert(change, { returning: 'minimal' });
     },
   });
