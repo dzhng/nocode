@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { forEach, without, flatten } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
 import { CellData } from 'shared/schema/cell';
@@ -12,16 +12,13 @@ const OrderNumberSpacing = 5000;
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
-  const [records, setRecords] = useState<Record[]>([]);
-  // all cells, seperated by recordIds
-  const [cells, setCells] = useState<{ [recordId: number]: CellData[] | undefined }>({});
 
   const recordsQuery = trpc.useInfiniteQuery(
     [
       'record.infiniteQuery',
       {
         sheetId: sheetId ?? -1,
-        limit: 100,
+        limit: 500000, // set super high limit to basically just query all records
       },
     ],
     {
@@ -226,7 +223,6 @@ export default function useSheet(sheetId?: number) {
   );
 
   return {
-    records,
     isLoadingInitialRecords: !recordsQuery.isFetched,
     isLoadingNextPage: recordsQuery.isFetchingNextPage,
     createRecord,

@@ -20,5 +20,11 @@ export default createSlice({
         ...action.payload.sheets,
       ];
     },
+    addSheet: (state, action: PayloadAction<{ sheet: Sheet }>) => {
+      state.sheets.push(action.payload.sheet);
+    },
+    removeSheet: (state, action: PayloadAction<{ sheetId: number }>) => {
+      state.sheets = state.sheets.filter((sheet) => sheet.id !== action.payload.sheetId);
+    },
   },
 });

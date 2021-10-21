@@ -1,40 +1,34 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Collections, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
+import sheetStore from '~/store/sheet';
 
 export default function useSheets(appId?: number) {
   const { user } = useGlobalState();
-  const [sheets, setSheets] = useState<Sheet[]>([]);
   const [isLoadingSheets, setIsLoadingSheets] = useState(true);
 
-  // NOTE: excluding columns field for sheets (too big)
-  // columns should be queried via useSheet
-  useEffect(() => {
-    const loadSheets = async () => {
-      setIsLoadingSheets(true);
-
-      const ret = await supabase
-        .from<Sheet>(Collections.SHEETS)
-        .select('id, name, appId, order, createdAt')
-        .eq('appId', appId)
-        .eq('isDeleted', false)
-        .order('order', { ascending: true });
-
-      if (ret.error || !ret.data) {
-        setSheets([]);
-        return;
-      }
-
-      setSheets(ret.data);
-      setIsLoadingSheets(false);
-    };
-
-    if (!appId) {
+  const loadSheets = useCallback(async () => {
+    if (!user || !appId) {
       return;
     }
 
-    loadSheets();
+    setIsLoadingSheets(true);
+
+    const ret = await supabase
+      .from<Sheet>(Collections.SHEETS)
+      .select('*')
+      .eq('appId', appId)
+      .eq('isDeleted', false)
+      .order('order', { ascending: true });
+
+    if (ret.error || !ret.data) {
+      sheetStore.actions.setSheetsForApp({ appId, sheets: [] });
+      return;
+    }
+
+    sheetStore.actions.setSheetsForApp({ appId, sheets: ret.data });
+    setIsLoadingSheets(false);
   }, [appId, user]);
 
   const createSheet = useCallback(
@@ -48,7 +42,7 @@ export default function useSheets(appId?: number) {
         appId,
         name: values.name,
         order: 5000,
-        columns: [],
+        fields: [],
         isDeleted: false,
         createdAt: new Date(),
       };
@@ -61,11 +55,11 @@ export default function useSheets(appId?: number) {
 
       // add new sheet to end of sheets list
       const newSheet = ret.data[0];
-      setSheets([...sheets, newSheet]);
+      sheetStore.actions.addSheet({ sheet: newSheet });
 
       return newSheet;
     },
-    [user, appId, sheets],
+    [user, appId],
   );
 
   const deleteSheet = useCallback(
@@ -83,17 +77,13 @@ export default function useSheets(appId?: number) {
         return Promise.reject('Error deleting sheet');
       }
 
-      // remove deleted sheet
-      const sheetsClone = [...sheets];
-      const idx = sheetsClone.findIndex((s) => s.id === sheetId);
-      sheetsClone.splice(idx, 1);
-      setSheets(sheetsClone);
+      sheetStore.actions.removeSheet({ sheetId });
     },
-    [user, appId, sheets],
+    [user, appId],
   );
 
   return {
-    sheets,
+    loadSheets,
     isLoadingSheets,
     createSheet,
     deleteSheet,

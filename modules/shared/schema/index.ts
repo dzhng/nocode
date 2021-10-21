@@ -146,13 +146,15 @@ export const RecordSchema = z.object({
   id: z.number().optional(),
   sheetId: z.number(),
   order: z.number(),
-  cells: z.array(
-    z.object({
-      id: z.number(),
-      fieldId: z.number(),
-      data: CellTypeSchema.nullable(),
-    }),
-  ),
+  cells: z
+    .array(
+      z.object({
+        id: z.number(),
+        fieldId: z.number(),
+        data: CellTypeSchema.nullable(),
+      }),
+    )
+    .optional(),
   createdAt: z.date(),
 });
 export type Record = z.infer<typeof RecordSchema>;

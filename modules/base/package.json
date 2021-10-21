@@ -23,7 +23,6 @@
     "formik": "^2.2.9",
     "formik-material-ui": "^3.0.1",
     "framer-motion": "^3.2.2-rc.1",
-    "immer": "^9.0.6",
     "isomorphic-unfetch": "^3.1.0",
     "lodash": "^4.17.21",
     "next": "^11.0.1",
