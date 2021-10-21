@@ -13,18 +13,14 @@ const OrderNumberSpacing = 5000;
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
 
-  const recordsQuery = trpc.useInfiniteQuery(
-    [
-      'record.infiniteQuery',
-      {
-        sheetId: sheetId ?? -1,
-        limit: 500000, // set super high limit to basically just query all records
-      },
-    ],
+  const recordsQuery = trpc.useQuery([
+    'record.downloadRecords',
     {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      sheetId: sheetId ?? -1,
+      // set super high limit to basically just query all records
+      limit: 500000,
     },
-  );
+  ]);
 
   useEffect(() => {
     if (recordsQuery.data) {
