@@ -35,33 +35,30 @@ const AddNewRow = styled('div')(({ theme }) => ({
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const {
-    isLoadingInitialRecords,
-    isLoadingColumns,
+    isLoadingRecords,
     records,
-    cellForRecord,
+    cellDataForRecord,
     editRecord,
     createRecord,
     reorderRecord,
-    columns,
-    generateColumnId,
-    addColumn,
-    changeColumnName,
-    changeColumnWidth,
+    generateFieldId,
+    addField,
+    changeField,
   } = useSheet(sheet.id);
   const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
-  const onAddColumn = useCallback(() => {
-    addColumn(
+  const onAddField = useCallback(() => {
+    addField(
       {
-        id: generateColumnId(),
+        id: generateFieldId(),
         name: 'test',
         type: DataTypes.Text,
       },
-      columns.length,
+      sheet.fields.length,
     );
-  }, [addColumn, generateColumnId, columns.length]);
+  }, [addField, generateFieldId, sheet]);
 
-  const onAddRow = useCallback(() => createRecord({}, true), [createRecord]);
+  const onAddRow = useCallback(() => createRecord({}, records.length), [createRecord, records]);
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -77,17 +74,15 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
 
   const totalRowWidth = useMemo(
     () =>
-      columns.reduce(
-        (sum, column) =>
-          sum + (column?.tableMetadata?.width ? column.tableMetadata.width : DefaultCellWidth),
+      sheet.fields.reduce(
+        (sum, field) =>
+          sum + (field?.tableMetadata?.width ? field.tableMetadata.width : DefaultCellWidth),
         0,
       ),
-    [columns],
+    [sheet],
   );
 
-  const isLoading = isLoadingInitialRecords || isLoadingColumns;
-
-  if (isLoading) {
+  if (isLoadingRecords) {
     return <Table />;
   }
 
@@ -101,11 +96,10 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     >
       <TableHead sx={{ marginLeft: `${SelectorCellSize}px` }}>
         <Header
-          columns={columns}
+          fields={sheet.fields}
           minWidth={DefaultCellWidth}
-          changeColumnName={changeColumnName}
-          changeColumnWidth={changeColumnWidth}
-          onAddColumn={onAddColumn}
+          changeField={changeField}
+          onAddField={onAddField}
         />
       </TableHead>
 
@@ -125,17 +119,14 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                         <Row
                           isDragging={snapshot.isDragging}
                           dragHandleProps={provided.dragHandleProps}
-                          columns={columns}
+                          fields={sheet.fields}
                           index={index}
                           minWidth={DefaultCellWidth}
                           defaultHeight={DefaultCellHeight}
-                          dataForColumn={(columnId) =>
-                            record.id && cellForRecord(record.id, columnId)?.data
+                          dataForField={(fieldId) => cellDataForRecord(record, fieldId)}
+                          editRecord={(fieldId, data) =>
+                            editRecord(Number(record.id), fieldId, data)
                           }
-                          editRecord={(columnId, data) =>
-                            record.id && editRecord(record.id, columnId, data)
-                          }
-                          onAddColumn={onAddColumn}
                         />
                       </div>
                     )}

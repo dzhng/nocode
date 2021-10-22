@@ -46,7 +46,7 @@ export default function Menu() {
           </MenuItem>
         )}
         <MenuItem onClick={() => setAboutOpen(true)}>About</MenuItem>
-        {userDetails && <MenuItem onClick={handleSignOut}>Logout</MenuItem>}
+        <MenuItem onClick={handleSignOut}>Logout</MenuItem>
       </MenuContainer>
       <AboutDialog
         open={aboutOpen}

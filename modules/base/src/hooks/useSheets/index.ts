@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Collections, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
@@ -30,6 +30,10 @@ export default function useSheets(appId?: number) {
     sheetStore.actions.setSheetsForApp({ appId, sheets: ret.data });
     setIsLoadingSheets(false);
   }, [appId, user]);
+
+  useEffect(() => {
+    loadSheets();
+  }, [loadSheets]);
 
   const createSheet = useCallback(
     async (values: { name: string }) => {
@@ -83,7 +87,6 @@ export default function useSheets(appId?: number) {
   );
 
   return {
-    loadSheets,
     isLoadingSheets,
     createSheet,
     deleteSheet,

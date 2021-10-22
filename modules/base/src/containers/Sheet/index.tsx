@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Menu, MenuItem, Skeleton } from '@mui/material';
 import { Sheet } from 'shared/schema';
+import { useAppSelector } from '~/store';
 import useSheets from '~/hooks/useSheets';
 import DataTable from '~/components/DataTable';
 
@@ -47,7 +48,8 @@ const useStyles = makeStyles((theme) =>
 
 export default function SheetContainer({ appId }: { appId: number }) {
   const classes = useStyles();
-  const { sheets, createSheet, deleteSheet, isLoadingSheets } = useSheets(appId);
+  const sheets = useAppSelector((state) => state.sheet.sheets.filter((s) => s.appId === appId));
+  const { createSheet, deleteSheet, isLoadingSheets } = useSheets(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
   const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<null | { x: number; y: number; sheetId: number }>(

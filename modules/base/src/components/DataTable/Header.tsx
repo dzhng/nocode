@@ -1,19 +1,18 @@
 import { useCallback } from 'react';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
-import { ColumnType } from 'shared/schema';
+import { FieldType } from 'shared/schema';
 import { AddIcon, ExpandIcon } from '~/components/Icons';
 import { TableHeaderRow, TableCell } from './Table';
-import { HeaderHeight, NewColumnCellSize } from './const';
+import { HeaderHeight, NewFieldCellSize } from './const';
 
 const HeaderDividerWidth = 2;
 
 interface PropTypes {
-  columns: ColumnType[];
+  fields: FieldType[];
   minWidth: number;
-  changeColumnName(columnId: number, name: string): void;
-  changeColumnWidth(columnId: number, width: number): void;
-  onAddColumn(): void;
+  changeField(fieldId: number, data: Partial<FieldType>): void;
+  onAddField(): void;
 }
 
 const Divider = styled('span')(({ theme }) => ({
@@ -27,7 +26,7 @@ const Divider = styled('span')(({ theme }) => ({
   cursor: 'col-resize',
 }));
 
-const ColumnName = styled('div')(({ theme }) => ({
+const FieldName = styled('div')(({ theme }) => ({
   paddingLeft: theme.spacing(1),
   paddingRight: theme.spacing(1),
   display: 'flex',
@@ -51,59 +50,53 @@ const ColumnName = styled('div')(({ theme }) => ({
   },
 }));
 
-export default function HeaderRow({
-  columns,
-  minWidth,
-  changeColumnName,
-  changeColumnWidth,
-  onAddColumn,
-}: PropTypes) {
+export default function HeaderRow({ fields, minWidth, changeField, onAddField }: PropTypes) {
   const handleDrag = useCallback(
-    (columnId: number, data: DraggableData) => {
+    (fieldId: number, data: DraggableData) => {
       const { deltaX } = data;
-      const column = columns.find((c) => c.id === columnId);
+      const field = fields.find((c) => c.id === fieldId);
       const newWidth = Math.max(
         minWidth,
-        (column?.tableMetadata?.width ?? minWidth) + Math.floor(deltaX),
+        (field?.tableMetadata?.width ?? minWidth) + Math.floor(deltaX),
       );
-      changeColumnWidth(columnId, newWidth);
+      changeField(fieldId, { tableMetadata: { width: newWidth } });
     },
-    [changeColumnWidth, columns, minWidth],
+    [changeField, fields, minWidth],
   );
 
   return (
     <TableHeaderRow>
-      {columns.map((column) => (
-        <Box sx={{ position: 'relative' }} key={column.id}>
+      {fields.map((field) => (
+        <Box sx={{ position: 'relative' }} key={field.id}>
           {/* Have divider ahead and positioned behind via margin
           so that dragging won't change it's position */}
-          <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(column.id, data)}>
+          <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(field.id, data)}>
             <Divider
               sx={{
-                left: (column.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
+                left: (field.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
               }}
             />
           </DraggableCore>
 
           <TableCell
             sx={{
-              width: column.tableMetadata?.width ?? minWidth,
+              width: field.tableMetadata?.width ?? minWidth,
               height: HeaderHeight,
             }}
           >
-            <ColumnName>
-              <span>{column.name}</span>
+            <FieldName>
+              <span>{field.name}</span>
               <IconButton size="small">
                 <ExpandIcon />
               </IconButton>
-            </ColumnName>
+            </FieldName>
           </TableCell>
         </Box>
       ))}
 
       <TableCell
         sx={{
-          width: NewColumnCellSize,
+          width: NewFieldCellSize,
           height: HeaderHeight,
           textAlign: 'center',
 
@@ -118,8 +111,8 @@ export default function HeaderRow({
           },
         }}
       >
-        <Tooltip placement="bottom" title="Add new column">
-          <IconButton size="small" onClick={onAddColumn}>
+        <Tooltip placement="bottom" title="Add new field">
+          <IconButton size="small" onClick={onAddField}>
             <AddIcon />
           </IconButton>
         </Tooltip>

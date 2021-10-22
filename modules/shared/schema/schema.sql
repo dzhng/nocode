@@ -75,7 +75,7 @@ create table public.records (
   "sheetId"       bigint references public.sheets on delete cascade not null,
   "order"         bigint not null, 
   "cells"        jsonb not null,
-  "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null,
+  "createdAt"     timestamp with time zone default timezone('utc'::text, now()) not null
 );
 comment on table public.records is 'A record contains a set of cells';
 

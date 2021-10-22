@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { styled, Box } from '@mui/material';
-import { ColumnType, CellType } from 'shared/schema';
+import { FieldType, CellType } from 'shared/schema';
 import Cell from './Cell';
 import DragHandle from './DragHandle';
 import { TableRow, TableCell } from './Table';
@@ -9,13 +9,12 @@ import { SelectorCellSize } from './const';
 interface PropTypes {
   isDragging?: boolean;
   dragHandleProps?: any;
-  columns: ColumnType[];
+  fields: FieldType[];
   index: number;
   minWidth: number;
   defaultHeight: number;
-  dataForColumn(columnId: number): CellType | undefined;
-  editRecord(columnId: number, data: CellType): void;
-  onAddColumn(): void;
+  dataForField(fieldId: number): CellType | undefined;
+  editRecord(fieldId: number, data: CellType): void;
 }
 
 const SelectorCell = styled('div')(() => ({
@@ -35,13 +34,12 @@ const Divider = styled('span')(({ theme }) => ({
 export default function Row({
   isDragging,
   dragHandleProps,
-  columns,
+  fields,
   index,
   minWidth,
   defaultHeight,
-  dataForColumn,
+  dataForField,
   editRecord,
-  onAddColumn,
 }: PropTypes) {
   return (
     <TableRow>
@@ -68,28 +66,28 @@ export default function Row({
       </SelectorCell>
       <Divider />
 
-      {columns.map((column, columnIdx) => (
-        <Fragment key={column.id}>
+      {fields.map((field, fieldIdx) => (
+        <Fragment key={field.id}>
           <TableCell
             sx={{
               minHeight: defaultHeight,
-              width: column.tableMetadata?.width ?? minWidth,
-              borderTopRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
-              borderBottomRightRadius: columnIdx === columns.length - 1 ? 5 : 0,
+              width: field.tableMetadata?.width ?? minWidth,
+              borderTopRightRadius: fieldIdx === fields.length - 1 ? 5 : 0,
+              borderBottomRightRadius: fieldIdx === fields.length - 1 ? 5 : 0,
             }}
           >
             <Cell
-              column={column}
+              field={field}
               defaultHeight={defaultHeight}
-              data={dataForColumn(column.id)}
+              data={dataForField(field.id)}
               onChange={(newData) => {
                 if (newData !== undefined) {
-                  editRecord(column.id, newData);
+                  editRecord(field.id, newData);
                 }
               }}
             />
           </TableCell>
-          {columnIdx !== columns.length - 1 && <Divider />}
+          {fieldIdx !== fields.length - 1 && <Divider />}
         </Fragment>
       ))}
     </TableRow>
