@@ -4,10 +4,11 @@ import { debounce } from 'lodash';
 import { Collections, FieldType, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import { trpc } from '~/utils/trpc';
-import { useAppSelector } from '~/store';
+import { useAppSelector, useAppDispatch } from '~/store';
 import sheetStore from '~/store/sheet';
 
 export default function useFields(sheetId?: number) {
+  const dispatch = useAppDispatch();
   const sheet = useAppSelector((state) => (sheetId ? state.sheet.sheets[sheetId] : undefined));
 
   const updateFieldMutation = trpc.useMutation('sheet.updateField');
@@ -36,7 +37,7 @@ export default function useFields(sheetId?: number) {
       const newFields = [...sheet.fields];
       newFields.splice(index, 0, field);
 
-      sheetStore.actions.updateFields({ sheetId, fields: newFields });
+      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
 
       const { error } = await supabase
         .from<Sheet>(Collections.SHEETS)
@@ -47,7 +48,7 @@ export default function useFields(sheetId?: number) {
         console.error('Error updating fields');
       }
     },
-    [sheet, sheetId],
+    [sheet, sheetId, dispatch],
   );
 
   const removeField = useCallback(
@@ -59,7 +60,7 @@ export default function useFields(sheetId?: number) {
       const newFields = [...sheet.fields];
       newFields.splice(index, 1);
 
-      sheetStore.actions.updateFields({ sheetId, fields: newFields });
+      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
 
       const { error } = await supabase
         .from<Sheet>(Collections.SHEETS)
@@ -70,7 +71,7 @@ export default function useFields(sheetId?: number) {
         console.error('Error updating fields');
       }
     },
-    [sheet, sheetId],
+    [sheet, sheetId, dispatch],
   );
 
   const changeField = useCallback(
@@ -90,10 +91,10 @@ export default function useFields(sheetId?: number) {
         Object.assign(field, data);
       });
 
-      sheetStore.actions.updateFields({ sheetId, fields: newFields });
+      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
       debouncedFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, debouncedFieldsUpdate],
+    [sheet, sheetId, debouncedFieldsUpdate, dispatch],
   );
 
   return {

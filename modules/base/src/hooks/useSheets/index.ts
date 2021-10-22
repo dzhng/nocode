@@ -2,10 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Collections, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
+import { OrderNumberSpacing } from '~/const';
+import { useAppSelector, useAppDispatch } from '~/store';
 import sheetStore from '~/store/sheet';
 
 export default function useSheets(appId?: number) {
   const { user } = useGlobalState();
+  const dispatch = useAppDispatch();
+  const sheets = useAppSelector((state) => state.sheet.sheets.filter((s) => s.appId === appId));
   const [isLoadingSheets, setIsLoadingSheets] = useState(true);
 
   const loadSheets = useCallback(async () => {
@@ -23,13 +27,13 @@ export default function useSheets(appId?: number) {
       .order('order', { ascending: true });
 
     if (ret.error || !ret.data) {
-      sheetStore.actions.setSheetsForApp({ appId, sheets: [] });
+      dispatch(sheetStore.actions.setSheetsForApp({ appId, sheets: [] }));
       return;
     }
 
-    sheetStore.actions.setSheetsForApp({ appId, sheets: ret.data });
+    dispatch(sheetStore.actions.setSheetsForApp({ appId, sheets: ret.data }));
     setIsLoadingSheets(false);
-  }, [appId, user]);
+  }, [appId, user, dispatch]);
 
   useEffect(() => {
     loadSheets();
@@ -41,11 +45,13 @@ export default function useSheets(appId?: number) {
         return Promise.reject('User is not authenticated');
       }
 
+      const order = sheets.length > 0 ? sheets[sheets.length - 1].order + OrderNumberSpacing : 0;
+
       // before adding, replace timestamp with server helper
       const data: Sheet = {
         appId,
         name: values.name,
-        order: 5000,
+        order,
         fields: [],
         isDeleted: false,
         createdAt: new Date(),
@@ -59,11 +65,11 @@ export default function useSheets(appId?: number) {
 
       // add new sheet to end of sheets list
       const newSheet = ret.data[0];
-      sheetStore.actions.addSheet({ sheet: newSheet });
+      dispatch(sheetStore.actions.addSheet({ sheet: newSheet }));
 
       return newSheet;
     },
-    [user, appId],
+    [user, appId, sheets, dispatch],
   );
 
   const deleteSheet = useCallback(
@@ -81,12 +87,13 @@ export default function useSheets(appId?: number) {
         return Promise.reject('Error deleting sheet');
       }
 
-      sheetStore.actions.removeSheet({ sheetId });
+      dispatch(sheetStore.actions.removeSheet({ sheetId }));
     },
-    [user, appId],
+    [user, appId, dispatch],
   );
 
   return {
+    sheets,
     isLoadingSheets,
     createSheet,
     deleteSheet,

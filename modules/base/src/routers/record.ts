@@ -35,6 +35,7 @@ export default trpc
       if (recordRet.error || !recordRet.data) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
+          message: recordRet.error.message,
         });
       }
 
@@ -44,17 +45,17 @@ export default trpc
         .select('*')
         .eq('sheetId', sheetId)
         .order('id', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
       if (changeRet.error || !changeRet.data) {
         throw new trpc.TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
+          message: changeRet.error.message,
         });
       }
 
       return {
         records: recordRet.data,
-        latestChange: changeRet.data,
+        latestChange: changeRet.data.length > 0 ? changeRet.data[0] : undefined,
       };
     },
   })

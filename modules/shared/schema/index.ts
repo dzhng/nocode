@@ -144,6 +144,7 @@ export type FieldType = z.infer<typeof FieldTypeSchema>;
 
 export const RecordSchema = z.object({
   id: z.number().optional(),
+  slug: z.string().uuid(),
   sheetId: z.number(),
   order: z.number(),
   cells: z

@@ -3,9 +3,9 @@ import { forEach, without } from 'lodash';
 import { Record, CellType } from 'shared/schema';
 
 export interface State {
-  // key is sheetId, value is array of sorted reocrdIds
-  recordsBySheet: { [sheetId: number]: number[] };
-  records: { [recordId: number]: Record };
+  // key is sheetId, value is array of sorted record slugs
+  recordsBySheet: { [sheetId: number]: string[] };
+  records: { [slug: string]: Record };
 }
 
 const initialState: State = {
@@ -19,33 +19,33 @@ export default createSlice({
   reducers: {
     setRecordsForSheet: (state, action: PayloadAction<{ sheetId: number; records: Record[] }>) => {
       const sorted = action.payload.records.sort((a, b) => a.order - b.order);
-      const ids = sorted.map((record) => Number(record.id));
+      const slugs = sorted.map((record) => record.slug);
 
-      state.recordsBySheet[action.payload.sheetId] = ids;
+      state.recordsBySheet[action.payload.sheetId] = slugs;
 
       // first, scan through all records and delete the ones with same sheetId, since we are going to override all records with the new records
       forEach(state.records, (value, key) => {
         if (value.sheetId === action.payload.sheetId) {
-          delete state.records[Number(key)];
+          delete state.records[key];
         }
       });
 
       // next, insert new records
       sorted.forEach((record) => {
-        state.records[Number(record.id)] = record;
+        state.records[record.slug] = record;
       });
     },
     createRecord: (state, action: PayloadAction<{ record: Record; index: number }>) => {
-      const { id, sheetId } = action.payload.record;
+      const { slug, sheetId } = action.payload.record;
 
-      state.recordsBySheet[sheetId].splice(action.payload.index, 0, Number(id));
-      state.records[Number(id)] = action.payload.record;
+      state.recordsBySheet[sheetId].splice(action.payload.index, 0, slug);
+      state.records[slug] = action.payload.record;
     },
     updateRecordData: (
       state,
-      action: PayloadAction<{ recordId: number; fieldId: number; data: CellType }>,
+      action: PayloadAction<{ slug: string; fieldId: number; data: CellType }>,
     ) => {
-      const record = state.records[Number(action.payload.recordId)];
+      const record = state.records[action.payload.slug];
       record.cells = [
         ...(record.cells?.filter(([id]) => id !== action.payload.fieldId) ?? []),
         [action.payload.fieldId, action.payload.data],
@@ -60,10 +60,10 @@ export default createSlice({
       recordIds.splice(action.payload.destinationIndex, 0, sourceRecordId);
     },
     deleteRecord: (state, action: PayloadAction<{ record: Record }>) => {
-      const { id, sheetId } = action.payload.record;
+      const { slug, sheetId } = action.payload.record;
 
-      state.recordsBySheet[sheetId] = without(state.recordsBySheet[sheetId], Number(id));
-      delete state.records[Number(id)];
+      state.recordsBySheet[sheetId] = without(state.recordsBySheet[sheetId], slug);
+      delete state.records[slug];
     },
   },
 });

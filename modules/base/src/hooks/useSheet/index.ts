@@ -1,22 +1,24 @@
 import { useEffect, useCallback } from 'react';
 import { forEach } from 'lodash';
+import { v1 as uuid } from 'uuid';
 import { Collections, Record, CellType } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
 import recordStore from '~/store/record';
 import sheetStore from '~/store/sheet';
-import { useAppSelector } from '~/store';
+import { useAppSelector, useAppDispatch } from '~/store';
+import { OrderNumberSpacing } from '~/const';
 import useFields from './fields';
-
-// the amount of space given between each new order number
-const OrderNumberSpacing = 5000;
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
+  const dispatch = useAppDispatch();
   const recordsMap = useAppSelector((state) => state.record.records);
   const records = useAppSelector((state) =>
-    state.record.recordsBySheet[Number(sheetId)].map((id) => recordsMap[id]),
+    state.record.recordsBySheet[Number(sheetId)]
+      ? state.record.recordsBySheet[Number(sheetId)].map((id) => recordsMap[id])
+      : [],
   );
 
   const recordsQuery = trpc.useQuery([
@@ -30,23 +32,29 @@ export default function useSheet(sheetId?: number) {
 
   useEffect(() => {
     if (recordsQuery.data && sheetId) {
-      recordStore.actions.setRecordsForSheet({ sheetId, records: recordsQuery.data.records });
-      sheetStore.actions.setLatestChangeForSheet({
-        sheetId,
-        change: recordsQuery.data.latestChange,
-      });
+      dispatch(
+        recordStore.actions.setRecordsForSheet({ sheetId, records: recordsQuery.data.records }),
+      );
+
+      recordsQuery.data.latestChange &&
+        dispatch(
+          sheetStore.actions.setLatestChangeForSheet({
+            sheetId,
+            change: recordsQuery.data.latestChange,
+          }),
+        );
     }
-  }, [recordsQuery.data, sheetId]);
+  }, [recordsQuery.data, sheetId, dispatch]);
 
   const createRecordMutation = trpc.useMutation('record.create', {
     onMutate: ({ record, index }) => {
       // optimistic insert
-      recordStore.actions.createRecord({ record, index });
+      dispatch(recordStore.actions.createRecord({ record, index }));
     },
     onError: (error, { record }) => {
       console.error('Error creating record', error);
       // undo optimistic insert
-      recordStore.actions.deleteRecord({ record });
+      dispatch(recordStore.actions.deleteRecord({ record }));
     },
   });
 
@@ -56,15 +64,17 @@ export default function useSheet(sheetId?: number) {
       const cellData = currentRecord.cells?.find(([id]) => id === fieldId);
       const oldData = cellData ? cellData[1] : null;
 
-      recordStore.actions.updateRecordData({ recordId, fieldId, data });
+      dispatch(recordStore.actions.updateRecordData({ recordId, fieldId, data }));
 
       // return an update object for undoing optimistic update in case
       return { recordId, fieldId, data: oldData };
     },
     onError: (error, _, context) => {
       console.error('Error editing record', error);
-      recordStore.actions.updateRecordData(
-        context as { recordId: number; fieldId: number; data: CellType },
+      dispatch(
+        recordStore.actions.updateRecordData(
+          context as { recordId: number; fieldId: number; data: CellType },
+        ),
       );
     },
   });
@@ -93,6 +103,7 @@ export default function useSheet(sheetId?: number) {
       });
 
       const record: Record = {
+        slug: uuid(),
         sheetId,
         order,
         cells: cellData,
@@ -121,8 +132,11 @@ export default function useSheet(sheetId?: number) {
         return Promise.reject('User is not authenticated: reorderRecord');
       }
 
+      dispatch(recordStore.actions.reorderRecord({ sheetId, sourceIndex, destinationIndex }));
+
+      // calculate new order numbers for saving to server
       const destinationRecord = records[destinationIndex];
-      const sourceRecord = records[sourceIndex];
+      const sourceRecord = { ...records[sourceIndex] };
       if (!(sourceRecord && destinationRecord)) {
         return Promise.reject('Invalid records');
       }
@@ -156,8 +170,6 @@ export default function useSheet(sheetId?: number) {
         lastOrderNum = record.order;
       }
 
-      recordStore.actions.reorderRecord({ sheetId, sourceIndex, destinationIndex });
-
       // save new order number for all records that changed
       await Promise.all(
         recordsChanged.map(async (record) => {
@@ -173,7 +185,7 @@ export default function useSheet(sheetId?: number) {
         }),
       );
     },
-    [user, sheetId, records],
+    [user, sheetId, records, dispatch],
   );
 
   const cellDataForRecord = useCallback((record: Record, fieldId: number): CellType => {
