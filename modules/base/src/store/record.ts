@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { forEach, without } from 'lodash';
-import { Record } from 'shared/schema';
+import { Record, CellType } from 'shared/schema';
 
 export interface State {
   // key is sheetId, value is array of sorted reocrdIds
@@ -41,8 +41,15 @@ export default createSlice({
       state.recordsBySheet[sheetId].splice(action.payload.index, 0, Number(id));
       state.records[Number(id)] = action.payload.record;
     },
-    updateRecord: (state, action: PayloadAction<{ record: Record }>) => {
-      state.records[Number(action.payload.record.id)] = action.payload.record;
+    updateRecordData: (
+      state,
+      action: PayloadAction<{ recordId: number; fieldId: number; data: CellType }>,
+    ) => {
+      const record = state.records[Number(action.payload.recordId)];
+      record.cells = [
+        ...(record.cells?.filter(([id]) => id !== action.payload.fieldId) ?? []),
+        [action.payload.fieldId, action.payload.data],
+      ];
     },
     reorderRecord: (
       state,

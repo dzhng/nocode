@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { forEach, without } from 'lodash';
+import { forEach } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
@@ -7,15 +7,16 @@ import { trpc } from '~/utils/trpc';
 import recordStore from '~/store/record';
 import sheetStore from '~/store/sheet';
 import { useAppSelector } from '~/store';
-import useColumns from './columns';
+import useFields from './fields';
 
 // the amount of space given between each new order number
 const OrderNumberSpacing = 5000;
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
+  const recordsMap = useAppSelector((state) => state.record.records);
   const records = useAppSelector((state) =>
-    state.record.recordsBySheet[Number(sheetId)].map((id) => state.record.records[id]),
+    state.record.recordsBySheet[Number(sheetId)].map((id) => recordsMap[id]),
   );
 
   const recordsQuery = trpc.useQuery([
@@ -38,51 +39,33 @@ export default function useSheet(sheetId?: number) {
   }, [recordsQuery.data, sheetId]);
 
   const createRecordMutation = trpc.useMutation('record.create', {
-    onMutate: ({ record, data }) => {
-      const recordsClone = [...records, record];
-      recordsClone.sort((a, b) => a.order - b.order);
-      setRecords(recordsClone);
-
-      if (data) {
-        const cellsClone = { ...cells, [record.id ?? 0]: data };
-        setCells(cellsClone);
-      }
+    onMutate: ({ record, index }) => {
+      // optimistic insert
+      recordStore.actions.createRecord({ record, index });
     },
-    onError: (error, { record, data }) => {
+    onError: (error, { record }) => {
       console.error('Error creating record', error);
-      // undo the optimistic insert
-      const recordsClone = [...records];
-      const insertedIndex = recordsClone.findIndex((r) => r.id === record.id);
-      if (insertedIndex !== -1) {
-        recordsClone.splice(insertedIndex, 1);
-        setRecords(recordsClone);
-      }
-
-      if (data) {
-        const cellsClone = { ...cells };
-        delete cellsClone[record.id ?? 0];
-        setCells(cellsClone);
-      }
+      // undo optimistic insert
+      recordStore.actions.deleteRecord({ record });
     },
   });
 
   const editRecordMutation = trpc.useMutation('record.edit', {
-    onMutate: ({ recordId, columnId, data }) => {
-      const recordCells = cells[recordId];
-      const currentCells = recordCells ? [...recordCells] : [];
-      const cell = currentCells.find((c) => c.columnId === columnId);
-      if (cell) {
-        const cellsClone = {
-          ...cells,
-          [recordId]: [...without(currentCells, cell), { ...cell, data, modifiedAt: new Date() }],
-        };
-        setCells(cellsClone);
-        return cells;
-      }
+    onMutate: ({ recordId, fieldId, data }) => {
+      const currentRecord = recordsMap[recordId];
+      const cellData = currentRecord.cells?.find(([id]) => id === fieldId);
+      const oldData = cellData ? cellData[1] : null;
+
+      recordStore.actions.updateRecordData({ recordId, fieldId, data });
+
+      // return an update object for undoing optimistic update in case
+      return { recordId, fieldId, data: oldData };
     },
     onError: (error, _, context) => {
       console.error('Error editing record', error);
-      setCells(context as { [id: string]: CellData[] });
+      recordStore.actions.updateRecordData(
+        context as { recordId: number; fieldId: number; data: CellType },
+      );
     },
   });
 
@@ -103,45 +86,33 @@ export default function useSheet(sheetId?: number) {
           ? records[records.length - 1].order + OrderNumberSpacing
           : records[index].order - OrderNumberSpacing;
 
-      // before adding, replace timestamp with server helper
-      const now = new Date();
+      // create the data object
+      const cellData: [fieldId: number, data: CellType][] = [];
+      forEach(data, (value, key) => {
+        cellData.push([Number(key), value]);
+      });
+
       const record: Record = {
         sheetId,
         order,
-        createdAt: now,
+        cells: cellData,
+        createdAt: new Date(),
       };
 
-      // create the data object
-      const cellData: CellData[] = [];
-      forEach(data, (value, key) => {
-        const ret: CellData = {
-          columnId: Number(key),
-          data: value,
-          createdAt: now,
-          modifiedAt: now,
-        };
-        cellData.push(ret);
-      });
-
-      createRecordMutation.mutate({ record, data: cellData });
+      createRecordMutation.mutate({ record, index });
     },
     [user, sheetId, records, createRecordMutation, recordsQuery],
   );
 
   const editRecord = useCallback(
-    async (id: number, columnId: number, data: CellType) => {
+    async (id: number, fieldId: number, data: CellType) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated: editRecord');
       }
 
-      const localIndex = records.findIndex((rec) => rec.id === id);
-      if (localIndex === -1) {
-        return Promise.reject('Invalid record');
-      }
-
-      editRecordMutation.mutate({ recordId: id, columnId, data });
+      editRecordMutation.mutate({ recordId: id, fieldId, data });
     },
-    [user, sheetId, records, editRecordMutation],
+    [user, sheetId, editRecordMutation],
   );
 
   const reorderRecord = useCallback(
@@ -185,7 +156,7 @@ export default function useSheet(sheetId?: number) {
         lastOrderNum = record.order;
       }
 
-      setRecords(newRecords);
+      recordStore.actions.reorderRecord({ sheetId, sourceIndex, destinationIndex });
 
       // save new order number for all records that changed
       await Promise.all(
@@ -205,13 +176,13 @@ export default function useSheet(sheetId?: number) {
     [user, sheetId, records],
   );
 
-  const cellDataForRecord = useCallback((record: Record, columnId: number): CellType => {
+  const cellDataForRecord = useCallback((record: Record, fieldId: number): CellType => {
     const recordCells = record.cells;
     if (!recordCells) {
       return null;
     }
 
-    const data = recordCells.find(([id]) => id === columnId);
+    const data = recordCells.find(([id]) => id === fieldId);
     return data ? data[1] : null;
   }, []);
 
@@ -222,6 +193,6 @@ export default function useSheet(sheetId?: number) {
     editRecord,
     reorderRecord,
     cellDataForRecord,
-    ...useColumns(sheetId),
+    ...useFields(sheetId),
   };
 }

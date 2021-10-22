@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Sheet, RecordChange } from 'shared/schema';
+import { Sheet, RecordChange, FieldType } from 'shared/schema';
 
 export interface State {
   sheets: Sheet[];
@@ -34,6 +34,9 @@ export default createSlice({
       action: PayloadAction<{ sheetId: number; change: RecordChange }>,
     ) => {
       state.latestChange[action.payload.sheetId] = action.payload.change;
+    },
+    updateFields: (state, action: PayloadAction<{ sheetId: number; fields: FieldType[] }>) => {
+      state.sheets[action.payload.sheetId].fields = action.payload.fields;
     },
   },
 });

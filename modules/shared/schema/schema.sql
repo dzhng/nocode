@@ -1,6 +1,6 @@
 -- Custom types
 create type public.member_roles as enum ('owner', 'member', 'deleted');
-create type public.change_type as enum ('create', 'update', 'delete');
+create type public.change_type as enum ('create', 'update', 'field', 'delete');
 
 -- WORKSPACE
 create table public.workspaces (

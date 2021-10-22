@@ -61,6 +61,7 @@ export default trpc
   .mutation('create', {
     input: z.object({
       record: RecordSchema,
+      index: z.number(),
     }),
     async resolve({ input, ctx }) {
       const { record } = input;
@@ -191,9 +192,9 @@ export default trpc
             fieldId: input.fieldId,
             ...dataField,
           },
-          { onConflict: 'recordId,columnId', returning: 'minimal' },
+          { onConflict: 'recordId,fieldId', returning: 'minimal' },
         )
-        .match({ recordId: input.recordId, columnId: input.fieldId });
+        .match({ recordId: input.recordId, fieldId: input.fieldId });
 
       if (cellError) {
         throw new trpc.TRPCError({

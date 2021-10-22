@@ -183,7 +183,7 @@ export type Sheet = z.infer<typeof SheetSchema>;
 /**
  * Track app / sheet / record / cell change timestamps
  */
-export const ChangeTypeSchema = z.enum(['create', 'update', 'delete']);
+export const ChangeTypeSchema = z.enum(['create', 'update', 'field', 'delete']);
 export type ChangeType = z.infer<typeof MemberRolesSchema>;
 
 export const RecordChangeSchema = z.object({
@@ -191,9 +191,9 @@ export const RecordChangeSchema = z.object({
   type: ChangeTypeSchema,
   userId: z.string().uuid(),
   sheetId: z.number(),
-  recordId: z.number(),
+  recordId: z.number().optional(),
   fieldId: z.number().optional(),
-  value: CellTypeSchema.nullable().optional(),
+  value: CellTypeSchema.nullable().or(FieldTypeSchema.array()).optional(),
   modifiedAt: z.date(),
 });
 export type RecordChange = z.infer<typeof RecordChangeSchema>;
