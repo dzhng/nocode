@@ -38,8 +38,23 @@ export default trpc
         });
       }
 
+      // get latest changeId and return
+      const changeRet = await supabase
+        .from<RecordChange>(Collections.RECORD_CHANGE)
+        .select('*')
+        .eq('sheetId', sheetId)
+        .order('id', { ascending: false })
+        .limit(1)
+        .single();
+      if (changeRet.error || !changeRet.data) {
+        throw new trpc.TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
       return {
         records: recordRet.data,
+        latestChange: changeRet.data,
       };
     },
   })

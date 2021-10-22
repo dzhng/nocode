@@ -1,19 +1,19 @@
 import { formatRelativeDate } from 'shared/utils';
-import { DataTypes, CellType, ColumnType } from 'shared/schema';
+import { DataTypes, CellType, FieldType } from 'shared/schema';
 
 import { TextCellInput, NumberCellInput } from './CellInput';
 
 interface PropTypes {
-  column: ColumnType;
+  field: FieldType;
   defaultHeight: number;
   data?: CellType;
   isHeader?: boolean;
   onChange(data?: CellType): void;
 }
 
-export default function Cell({ column, defaultHeight, data, isHeader, onChange }: PropTypes) {
+export default function Cell({ field, defaultHeight, data, isHeader, onChange }: PropTypes) {
   const getCellComponent = (): JSX.Element => {
-    if (column.type === DataTypes.Text) {
+    if (field.type === DataTypes.Text) {
       // should show empty string for empty text cell, or else React may recycle old values
       return (
         <TextCellInput
@@ -22,9 +22,9 @@ export default function Cell({ column, defaultHeight, data, isHeader, onChange }
           defaultHeight={defaultHeight}
         />
       );
-    } else if (column.type === DataTypes.Image) {
+    } else if (field.type === DataTypes.Image) {
       return <span>Image</span>; // TODO
-    } else if (column.type === DataTypes.Number) {
+    } else if (field.type === DataTypes.Number) {
       return (
         <NumberCellInput
           value={data === undefined ? undefined : Number(data)}
@@ -32,17 +32,17 @@ export default function Cell({ column, defaultHeight, data, isHeader, onChange }
           defaultHeight={defaultHeight}
         />
       );
-    } else if (column.type === DataTypes.File) {
+    } else if (field.type === DataTypes.File) {
       return <span>File</span>; // TODO
-    } else if (column.type === DataTypes.Date) {
+    } else if (field.type === DataTypes.Date) {
       return <span>{data instanceof Date ? formatRelativeDate(data) : ''}</span>;
-    } else if (column.type === DataTypes.Location) {
+    } else if (field.type === DataTypes.Location) {
       return (
         <TextCellInput value={String(data)} onChange={onChange} defaultHeight={defaultHeight} />
       );
-    } else if (column.type === DataTypes.Selection) {
+    } else if (field.type === DataTypes.Selection) {
       return <span></span>;
-    } else if (column.type === DataTypes.Relation) {
+    } else if (field.type === DataTypes.Relation) {
       return <span>Relational</span>;
     } else {
       return <span>Unknown Data Type</span>;
@@ -50,7 +50,7 @@ export default function Cell({ column, defaultHeight, data, isHeader, onChange }
   };
 
   return isHeader ? (
-    <TextCellInput value={column.name} onChange={onChange} defaultHeight={defaultHeight} isHeader />
+    <TextCellInput value={field.name} onChange={onChange} defaultHeight={defaultHeight} isHeader />
   ) : (
     getCellComponent()
   );

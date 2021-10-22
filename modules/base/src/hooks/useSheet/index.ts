@@ -1,10 +1,12 @@
 import { useEffect, useCallback } from 'react';
-import { forEach, without, flatten } from 'lodash';
+import { forEach, without } from 'lodash';
 import { Collections, Record, CellType } from 'shared/schema';
-import { CellData } from 'shared/schema/cell';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
+import recordStore from '~/store/record';
+import sheetStore from '~/store/sheet';
+import { useAppSelector } from '~/store';
 import useColumns from './columns';
 
 // the amount of space given between each new order number
@@ -12,6 +14,9 @@ const OrderNumberSpacing = 5000;
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
+  const records = useAppSelector((state) =>
+    state.record.recordsBySheet[Number(sheetId)].map((id) => state.record.records[id]),
+  );
 
   const recordsQuery = trpc.useQuery([
     'record.downloadRecords',
@@ -23,20 +28,14 @@ export default function useSheet(sheetId?: number) {
   ]);
 
   useEffect(() => {
-    if (recordsQuery.data) {
-      setRecords(flatten(recordsQuery.data.pages.map((p) => p.records)));
-
-      const allCells = flatten(recordsQuery.data.pages.map((p) => p.cells));
-      const cellsMap = allCells.reduce((map, value) => {
-        if (!value.recordId) return map;
-        const cells = map[value.recordId];
-        map[value.recordId] = cells ? [...cells, value] : [value];
-        return map;
-      }, {} as { [id: string]: CellData[] });
-
-      setCells(cellsMap);
+    if (recordsQuery.data && sheetId) {
+      recordStore.actions.setRecordsForSheet({ sheetId, records: recordsQuery.data.records });
+      sheetStore.actions.setLatestChangeForSheet({
+        sheetId,
+        change: recordsQuery.data.latestChange,
+      });
     }
-  }, [recordsQuery.data]);
+  }, [recordsQuery.data, sheetId]);
 
   const createRecordMutation = trpc.useMutation('record.create', {
     onMutate: ({ record, data }) => {
@@ -88,7 +87,7 @@ export default function useSheet(sheetId?: number) {
   });
 
   const createRecord = useCallback(
-    async (data: { [id: number]: CellType }, atEnd: boolean) => {
+    async (data: { [id: number]: CellType }, index: number) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated: createRecord');
       }
@@ -100,9 +99,9 @@ export default function useSheet(sheetId?: number) {
       const order =
         records.length === 0
           ? 0
-          : atEnd
+          : index === records.length
           ? records[records.length - 1].order + OrderNumberSpacing
-          : records[0].order - OrderNumberSpacing;
+          : records[index].order - OrderNumberSpacing;
 
       // before adding, replace timestamp with server helper
       const now = new Date();
@@ -206,25 +205,23 @@ export default function useSheet(sheetId?: number) {
     [user, sheetId, records],
   );
 
-  const cellForRecord = useCallback(
-    (recordId: number, columnId: number) => {
-      const recordCells = cells[recordId];
-      if (!recordCells) {
-        return undefined;
-      }
+  const cellDataForRecord = useCallback((record: Record, columnId: number): CellType => {
+    const recordCells = record.cells;
+    if (!recordCells) {
+      return null;
+    }
 
-      return recordCells.find((c) => c.columnId === columnId);
-    },
-    [cells],
-  );
+    const data = recordCells.find(([id]) => id === columnId);
+    return data ? data[1] : null;
+  }, []);
 
   return {
-    isLoadingInitialRecords: !recordsQuery.isFetched,
-    isLoadingNextPage: recordsQuery.isFetchingNextPage,
+    records,
+    isLoadingRecords: !recordsQuery.isFetched,
     createRecord,
     editRecord,
     reorderRecord,
-    cellForRecord,
+    cellDataForRecord,
     ...useColumns(sheetId),
   };
 }

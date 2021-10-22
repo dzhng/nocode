@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Sheet } from 'shared/schema';
+import { Sheet, RecordChange } from 'shared/schema';
 
 export interface State {
   sheets: Sheet[];
+  // maps the id of latest change record to the sheet id, used to compare if the sheet is out of date from server record
+  latestChange: { [sheetId: number]: RecordChange };
 }
 
 const initialState: State = {
   sheets: [],
+  latestChange: {},
 };
 
 export default createSlice({
@@ -25,6 +28,12 @@ export default createSlice({
     },
     removeSheet: (state, action: PayloadAction<{ sheetId: number }>) => {
       state.sheets = state.sheets.filter((sheet) => sheet.id !== action.payload.sheetId);
+    },
+    setLatestChangeForSheet: (
+      state,
+      action: PayloadAction<{ sheetId: number; change: RecordChange }>,
+    ) => {
+      state.latestChange[action.payload.sheetId] = action.payload.change;
     },
   },
 });
