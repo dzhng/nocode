@@ -10,7 +10,7 @@ export enum Collections {
   SHEETS = 'sheets',
   RECORDS = 'records',
   CELLS = 'cells',
-  RECORD_CHANGE = 'recordchange',
+  OPERATIONS = 'operations',
 }
 
 /**
@@ -142,19 +142,17 @@ export type FieldType = z.infer<typeof FieldTypeSchema>;
  * Row and Cell definitions
  */
 
+export const CellDataTupleSchema = z.tuple([
+  z.number(), // fieldId
+  CellTypeSchema.nullable(), // field data
+]);
+
 export const RecordSchema = z.object({
   id: z.number().optional(),
   slug: z.string().uuid(),
   sheetId: z.number(),
   order: z.number(),
-  cells: z
-    .array(
-      z.tuple([
-        z.number(), // fieldId
-        CellTypeSchema.nullable(), // field data
-      ]),
-    )
-    .optional(),
+  cells: z.array(CellDataTupleSchema).optional(),
   createdAt: z.date(),
 });
 export type Record = z.infer<typeof RecordSchema>;
@@ -176,25 +174,34 @@ export const SheetSchema = z.object({
   name: z.string(),
   order: z.number(),
   fields: FieldTypeSchema.array(),
+  metadata: z.object({}).optional(),
   isDeleted: z.boolean(),
   createdAt: z.date(),
 });
 export type Sheet = z.infer<typeof SheetSchema>;
 
 /**
- * Track app / sheet / record / cell change timestamps
+ * Track changes in the sheet for syncing
  */
-export const ChangeTypeSchema = z.enum(['create', 'update', 'field', 'delete']);
-export type ChangeType = z.infer<typeof MemberRolesSchema>;
+export const OperationTypeSchema = z.enum([
+  'create_record',
+  'update_record',
+  'update_field',
+  'delete_record',
+]);
+export type OperationType = z.infer<typeof MemberRolesSchema>;
 
-export const RecordChangeSchema = z.object({
+export const OperationSchema = z.object({
   id: z.number().optional(),
-  type: ChangeTypeSchema,
+  type: OperationTypeSchema,
   userId: z.string().uuid(),
   sheetId: z.number(),
-  recordId: z.number().optional(),
-  fieldId: z.number().optional(),
-  value: CellTypeSchema.nullable().or(FieldTypeSchema.array()).optional(),
   modifiedAt: z.date(),
+
+  // used for everything except field type
+  slug: z.string().uuid().optional(),
+
+  // store creation or update values here
+  value: CellDataTupleSchema.or(FieldTypeSchema.array()).or(RecordSchema).optional(),
 });
-export type RecordChange = z.infer<typeof RecordChangeSchema>;
+export type Operation = z.infer<typeof OperationSchema>;

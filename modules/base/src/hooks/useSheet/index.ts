@@ -36,11 +36,11 @@ export default function useSheet(sheetId?: number) {
         recordStore.actions.setRecordsForSheet({ sheetId, records: recordsQuery.data.records }),
       );
 
-      recordsQuery.data.latestChange &&
+      recordsQuery.data.latestOp &&
         dispatch(
-          sheetStore.actions.setLatestChangeForSheet({
+          sheetStore.actions.setLatestOpForSheet({
             sheetId,
-            change: recordsQuery.data.latestChange,
+            operation: recordsQuery.data.latestOp,
           }),
         );
     }
@@ -116,7 +116,7 @@ export default function useSheet(sheetId?: number) {
   );
 
   const editRecord = useCallback(
-    async (id: number, fieldId: number, data: CellType) => {
+    async (slug: string, fieldId: number, data: CellType) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated: editRecord');
       }

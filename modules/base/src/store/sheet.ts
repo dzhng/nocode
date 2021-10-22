@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { forEach } from 'lodash';
-import { Sheet, RecordChange, FieldType } from 'shared/schema';
+import { Sheet, Operation, FieldType } from 'shared/schema';
 
 export interface State {
   sheets: { [sheetId: number]: Sheet };
   // maps the id of latest change record to the sheet id, used to compare if the sheet is out of date from server record
-  latestChange: { [sheetId: number]: RecordChange };
+  latestOp: { [sheetId: number]: Operation };
 }
 
 const initialState: State = {
   sheets: [],
-  latestChange: {},
+  latestOp: {},
 };
 
 export default createSlice({
@@ -33,11 +33,11 @@ export default createSlice({
     removeSheet: (state, action: PayloadAction<{ sheetId: number }>) => {
       delete state.sheets[action.payload.sheetId];
     },
-    setLatestChangeForSheet: (
+    setLatestOpForSheet: (
       state,
-      action: PayloadAction<{ sheetId: number; change: RecordChange }>,
+      action: PayloadAction<{ sheetId: number; operation: Operation }>,
     ) => {
-      state.latestChange[action.payload.sheetId] = action.payload.change;
+      state.latestOp[action.payload.sheetId] = action.payload.operation;
     },
     updateFields: (state, action: PayloadAction<{ sheetId: number; fields: FieldType[] }>) => {
       state.sheets[action.payload.sheetId].fields = action.payload.fields;
