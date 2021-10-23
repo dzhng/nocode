@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { forEach } from 'lodash';
 import { Sheet, Operation, FieldType } from 'shared/schema';
 
 export interface State {
@@ -9,7 +8,7 @@ export interface State {
 }
 
 const initialState: State = {
-  sheets: [],
+  sheets: {},
   latestOp: {},
 };
 
@@ -19,13 +18,16 @@ export default createSlice({
   reducers: {
     setSheetsForApp: (state, action: PayloadAction<{ appId: number; sheets: Sheet[] }>) => {
       // override all sheets with given appId
-      forEach(state.sheets, (value, key) => {
+      Object.keys(state.sheets).forEach((key) => {
+        const value = state.sheets[Number(key)];
         if (value.appId === action.payload.appId) {
           delete state.sheets[Number(key)];
         }
       });
 
-      action.payload.sheets.forEach((sheet) => (state.sheets[Number(sheet.id)] = sheet));
+      action.payload.sheets.forEach((sheet) => {
+        state.sheets[Number(sheet.id)] = sheet;
+      });
     },
     addSheet: (state, action: PayloadAction<{ sheet: Sheet }>) => {
       state.sheets[Number(action.payload.sheet.id)] = action.payload.sheet;
