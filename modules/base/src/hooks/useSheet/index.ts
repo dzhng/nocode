@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { forEach } from 'lodash';
 import { v1 as uuid } from 'uuid';
-import { Collections, Record, CellType } from 'shared/schema';
+import { Collections, Operation, Record, CellType } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
@@ -9,11 +9,13 @@ import recordStore from '~/store/record';
 import sheetStore from '~/store/sheet';
 import { useAppSelector, useAppDispatch } from '~/store';
 import { OrderNumberSpacing } from '~/const';
+import useOperationQueue from '~/hooks/useOperationQueue';
 import useFields from './fields';
 
 export default function useSheet(sheetId?: number) {
   const { user } = useGlobalState();
   const dispatch = useAppDispatch();
+  const { queueOperation } = useOperationQueue();
   const recordsMap = useAppSelector((state) => state.record.records);
   const records = useAppSelector((state) =>
     state.record.recordsBySheet[Number(sheetId)]
@@ -46,39 +48,6 @@ export default function useSheet(sheetId?: number) {
     }
   }, [recordsQuery.data, sheetId, dispatch]);
 
-  const createRecordMutation = trpc.useMutation('record.create', {
-    onMutate: ({ record, index }) => {
-      // optimistic insert
-      dispatch(recordStore.actions.createRecord({ record, index }));
-    },
-    onError: (error, { record }) => {
-      console.error('Error creating record', error);
-      // undo optimistic insert
-      dispatch(recordStore.actions.deleteRecord({ record }));
-    },
-  });
-
-  const editRecordMutation = trpc.useMutation('record.edit', {
-    onMutate: ({ recordId, fieldId, data }) => {
-      const currentRecord = recordsMap[recordId];
-      const cellData = currentRecord.cells?.find(([id]) => id === fieldId);
-      const oldData = cellData ? cellData[1] : null;
-
-      dispatch(recordStore.actions.updateRecordData({ recordId, fieldId, data }));
-
-      // return an update object for undoing optimistic update in case
-      return { recordId, fieldId, data: oldData };
-    },
-    onError: (error, _, context) => {
-      console.error('Error editing record', error);
-      dispatch(
-        recordStore.actions.updateRecordData(
-          context as { recordId: number; fieldId: number; data: CellType },
-        ),
-      );
-    },
-  });
-
   const createRecord = useCallback(
     async (data: { [id: number]: CellType }, index: number) => {
       if (!user || !sheetId) {
@@ -110,9 +79,17 @@ export default function useSheet(sheetId?: number) {
         createdAt: new Date(),
       };
 
-      createRecordMutation.mutate({ record, index });
+      const operation: Partial<Operation> = {
+        type: 'create_record',
+        sheetId,
+        slug: record.slug,
+        value: record,
+      };
+
+      dispatch(recordStore.actions.createRecord({ record, index }));
+      queueOperation(operation);
     },
-    [user, sheetId, records, createRecordMutation, recordsQuery],
+    [user, sheetId, records, recordsQuery, dispatch, queueOperation],
   );
 
   const editRecord = useCallback(
@@ -121,9 +98,17 @@ export default function useSheet(sheetId?: number) {
         return Promise.reject('User is not authenticated: editRecord');
       }
 
-      editRecordMutation.mutate({ recordId: id, fieldId, data });
+      const operation: Partial<Operation> = {
+        type: 'update_record',
+        sheetId,
+        slug,
+        value: [fieldId, data],
+      };
+
+      dispatch(recordStore.actions.updateRecordData({ slug, fieldId, data }));
+      queueOperation(operation);
     },
-    [user, sheetId, editRecordMutation],
+    [user, sheetId, dispatch, queueOperation],
   );
 
   const reorderRecord = useCallback(

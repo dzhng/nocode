@@ -129,7 +129,7 @@ export type TableMeta = z.infer<typeof TableMetaSchema>;
 
 export const FieldTypeSchema = z.object({
   // id is not optional here since it should just be generated client side
-  id: z.number(),
+  id: z.string().uuid(),
   name: z.string(),
   type: DataTypesSchema,
   defaultValue: CellTypeSchema.optional(),

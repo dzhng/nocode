@@ -1,32 +1,33 @@
 import { useCallback, useMemo } from 'react';
+import { v1 as uuid } from 'uuid';
 import produce from 'immer';
 import { debounce } from 'lodash';
-import { Collections, FieldType, Sheet } from 'shared/schema';
-import supabase from '~/utils/supabase';
-import { trpc } from '~/utils/trpc';
+import { FieldType, Operation } from 'shared/schema';
+import useOperationQueue from '~/hooks/useOperationQueue';
 import { useAppSelector, useAppDispatch } from '~/store';
 import sheetStore from '~/store/sheet';
 
 export default function useFields(sheetId?: number) {
   const dispatch = useAppDispatch();
+  const { queueOperation } = useOperationQueue();
   const sheet = useAppSelector((state) => (sheetId ? state.sheet.sheets[sheetId] : undefined));
-
-  const updateFieldMutation = trpc.useMutation('sheet.updateField');
 
   const debouncedFieldsUpdate = useMemo(
     () =>
       debounce((sheetId: number, fields: FieldType[]) => {
-        updateFieldMutation.mutate({ sheetId, fields });
+        const operation: Partial<Operation> = {
+          type: 'update_field',
+          sheetId,
+          value: fields,
+        };
+
+        queueOperation(operation);
       }, 500),
-    [updateFieldMutation],
+    [queueOperation],
   );
 
   // generate a new field ID client side that doesn't conflict with existing fields
-  const generateFieldId = useCallback(() => {
-    const fields = sheet ? sheet.fields : [];
-    const largestId = Math.max(0, ...fields.map((c) => c.id));
-    return largestId + 1;
-  }, [sheet]);
+  const generateFieldId = useCallback(uuid, []);
 
   const addField = useCallback(
     async (field: FieldType, index: number) => {
@@ -38,17 +39,9 @@ export default function useFields(sheetId?: number) {
       newFields.splice(index, 0, field);
 
       dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
-
-      const { error } = await supabase
-        .from<Sheet>(Collections.SHEETS)
-        .update({ fields: newFields }, { returning: 'minimal' })
-        .eq('id', sheetId);
-
-      if (error) {
-        console.error('Error updating fields');
-      }
+      debouncedFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, dispatch],
+    [sheet, sheetId, dispatch, debouncedFieldsUpdate],
   );
 
   const removeField = useCallback(
@@ -61,21 +54,13 @@ export default function useFields(sheetId?: number) {
       newFields.splice(index, 1);
 
       dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
-
-      const { error } = await supabase
-        .from<Sheet>(Collections.SHEETS)
-        .update({ fields: newFields }, { returning: 'minimal' })
-        .eq('id', sheetId);
-
-      if (error) {
-        console.error('Error updating fields');
-      }
+      debouncedFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, dispatch],
+    [sheet, sheetId, dispatch, debouncedFieldsUpdate],
   );
 
   const changeField = useCallback(
-    async (fieldId: number, data: Partial<FieldType>) => {
+    async (fieldId: string, data: Partial<FieldType>) => {
       if (!sheet || !sheetId) {
         return;
       }

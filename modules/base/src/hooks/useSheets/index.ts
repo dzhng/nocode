@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { values } from 'lodash';
 import { Collections, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
@@ -9,7 +10,9 @@ import sheetStore from '~/store/sheet';
 export default function useSheets(appId?: number) {
   const { user } = useGlobalState();
   const dispatch = useAppDispatch();
-  const sheets = useAppSelector((state) => state.sheet.sheets.filter((s) => s.appId === appId));
+  const sheets = useAppSelector((state) =>
+    values(state.sheet.sheets).filter((s) => s.appId === appId),
+  );
   const [isLoadingSheets, setIsLoadingSheets] = useState(true);
 
   const loadSheets = useCallback(async () => {

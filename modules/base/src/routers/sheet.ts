@@ -54,10 +54,7 @@ async function processOperation(operation: Partial<Operation>, userId: string) {
     .insert(operationRecord, { returning: 'minimal' });
 
   if (operationError) {
-    throw new trpc.TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: operationError.message,
-    });
+    throw new Error(operationError.message);
   }
 }
 
@@ -66,10 +63,21 @@ export default trpc.router<Context>().mutation('processOperations', {
     operations: z.array(OperationSchema.partial()),
   }),
   async resolve({ input, ctx }) {
+    const errors = [];
+
     // use for loop since we want to process one at a time, awaiting for each
     for (let i = 0; i < input.operations.length; i++) {
       const operation = input.operations[i];
-      await processOperation(operation, String(ctx?.user.id));
+      try {
+        await processOperation(operation, String(ctx?.user.id));
+      } catch (e) {
+        errors.push({ index: i, error: e.messag });
+      }
     }
+
+    return {
+      success: errors.length === 0,
+      errors,
+    };
   },
 });
