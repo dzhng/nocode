@@ -54,10 +54,18 @@ export default function SheetContainer({ appId }: { appId: number }) {
     null,
   );
 
-  // select the first sheet once it loads
+  const showLoading = isLoadingSheets && sheets.length === 0;
+
+  // select the first sheet once it loads if none is selected
   useEffect(() => {
-    setSelectedSheet(!isLoadingSheets && sheets.length > 0 ? sheets[0] : null);
-  }, [isLoadingSheets, sheets]);
+    if (sheets.length > 0) {
+      if (sheets.findIndex((s) => s === selectedSheet) === -1) {
+        setSelectedSheet(sheets[0]);
+      }
+    } else {
+      setSelectedSheet(null);
+    }
+  }, [selectedSheet, sheets]);
 
   const handleContextMenu = useCallback(
     (e: MouseEvent<HTMLDivElement>, sheetId: number) => {
@@ -107,7 +115,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
       </div>
 
       <div className={classes.tabContainer}>
-        {isLoadingSheets ? (
+        {showLoading ? (
           loadingSkeletons
         ) : (
           <>

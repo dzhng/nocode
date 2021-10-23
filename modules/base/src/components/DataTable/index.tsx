@@ -35,7 +35,6 @@ const AddNewRow = styled('div')(({ theme }) => ({
 
 export default function DataTable({ sheet }: { sheet: Sheet }) {
   const {
-    isLoadingRecords,
     records,
     cellDataForRecord,
     editRecord,
@@ -81,10 +80,6 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
       ),
     [sheet],
   );
-
-  if (isLoadingRecords) {
-    return <Table />;
-  }
 
   return (
     <Table
