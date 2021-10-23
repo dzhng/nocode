@@ -17,7 +17,7 @@ export default function Cell({ field, defaultHeight, data, isHeader, onChange }:
       // should show empty string for empty text cell, or else React may recycle old values
       return (
         <TextCellInput
-          value={data === undefined ? '' : String(data)}
+          value={data === undefined || data === null ? '' : String(data)}
           onChange={onChange}
           defaultHeight={defaultHeight}
         />

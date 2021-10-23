@@ -8,6 +8,10 @@ export const store = configureStore({
     [sheetSlice.name]: sheetSlice.reducer,
     [recordSlice.name]: recordSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 type RootState = ReturnType<typeof store.getState>;
