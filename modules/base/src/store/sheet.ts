@@ -41,8 +41,8 @@ export default createSlice({
     ) => {
       state.latestOp[action.payload.sheetId] = action.payload.operation;
     },
-    updateFields: (state, action: PayloadAction<{ sheetId: number; fields: FieldType[] }>) => {
-      state.sheets[action.payload.sheetId].fields = action.payload.fields;
+    updateSheet: (state, action: PayloadAction<{ sheetId: number; data: Partial<Sheet> }>) => {
+      Object.assign(state.sheets[action.payload.sheetId], action.payload.data);
     },
   },
 });

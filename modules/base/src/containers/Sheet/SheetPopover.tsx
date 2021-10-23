@@ -1,15 +1,23 @@
 import { Box, Popover, TextField, Divider, Button } from '@mui/material';
 import { Sheet } from 'shared/schema';
+import {
+  DeleteOutline as DeleteIcon,
+  ContentCopyOutlined as DuplicateIcon,
+} from '@mui/icons-material';
+
+const ButtonIconSx = { width: 15, height: 15, mr: 0.5 };
 
 export default function SheetPopover({
   sheet,
   anchorEl,
+  onNameChange,
   onClose,
   onDuplicate,
   onDelete,
 }: {
   sheet?: Sheet | null;
   anchorEl?: Element | null;
+  onNameChange(name: string): void;
   onClose(): void;
   onDuplicate(): void;
   onDelete(): void;
@@ -33,7 +41,14 @@ export default function SheetPopover({
           padding: 2,
         }}
       >
-        <TextField autoFocus fullWidth value={sheet?.name} label="Sheet name" size="small" />
+        <TextField
+          autoFocus
+          fullWidth
+          value={sheet?.name}
+          label="Sheet name"
+          size="small"
+          onChange={(e) => onNameChange(e.target.value)}
+        />
         <Divider sx={{ mt: 1, mb: 1 }} />
         <Box
           sx={{
@@ -45,9 +60,11 @@ export default function SheetPopover({
           }}
         >
           <Button variant="outlined" color="primary" onClick={onDuplicate}>
+            <DuplicateIcon sx={ButtonIconSx} />
             Duplicate
           </Button>
           <Button variant="outlined" color="error" onClick={onDelete}>
+            <DeleteIcon sx={ButtonIconSx} />
             Delete
           </Button>
         </Box>

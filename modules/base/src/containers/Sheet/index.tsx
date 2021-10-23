@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, MouseEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo, MouseEvent } from 'react';
+import { debounce } from 'lodash';
 import { styled } from '@mui/styles';
 import { Box, Skeleton } from '@mui/material';
 import { Sheet } from 'shared/schema';
@@ -31,7 +32,7 @@ const Tab = styled('div')(({ theme }) => ({
 }));
 
 export default function SheetContainer({ appId }: { appId: number }) {
-  const { sheets, createSheet, deleteSheet, isLoadingSheets } = useSheets(appId);
+  const { sheets, createSheet, deleteSheet, updateSheetName, isLoadingSheets } = useSheets(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
   const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
 
@@ -40,6 +41,14 @@ export default function SheetContainer({ appId }: { appId: number }) {
   const [popoverSheet, setPopoverSheet] = useState<Sheet | null>(null);
 
   const showLoading = isLoadingSheets && sheets.length === 0;
+
+  const debouncedNameUpdate = useMemo(
+    () =>
+      debounce((sheetId: number, name: string) => {
+        updateSheetName(sheetId, name);
+      }, 500),
+    [updateSheetName],
+  );
 
   // select the first sheet once it loads if none is selected
   useEffect(() => {
@@ -79,6 +88,13 @@ export default function SheetContainer({ appId }: { appId: number }) {
   const handleDuplicate = useCallback(async () => {
     // TODO
   }, []);
+
+  const handleNameChange = useCallback(
+    async (newName) => {
+      debouncedNameUpdate(Number(popoverSheet?.id), newName);
+    },
+    [popoverSheet, debouncedNameUpdate],
+  );
 
   // show loading skeleton
   const loadingSkeletons = [0, 1].map((key) => (
@@ -138,6 +154,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
       <SheetPopover
         sheet={popoverSheet}
         anchorEl={anchorEl}
+        onNameChange={handleNameChange}
         onClose={handleClose}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}

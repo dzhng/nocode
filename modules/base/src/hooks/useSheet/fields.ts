@@ -1,7 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { v1 as uuid } from 'uuid';
 import produce from 'immer';
-import { debounce } from 'lodash';
 import { FieldType, Operation } from 'shared/schema';
 import useOperationQueue from '~/hooks/useOperationQueue';
 import { useAppSelector, useAppDispatch } from '~/store';
@@ -12,17 +11,16 @@ export default function useFields(sheetId?: number) {
   const { queueOperation } = useOperationQueue();
   const sheet = useAppSelector((state) => (sheetId ? state.sheet.sheets[sheetId] : undefined));
 
-  const debouncedFieldsUpdate = useMemo(
-    () =>
-      debounce((sheetId: number, fields: FieldType[]) => {
-        const operation: Partial<Operation> = {
-          type: 'update_field',
-          sheetId,
-          value: fields,
-        };
+  const queueFieldsUpdate = useCallback(
+    (sheetId: number, fields: FieldType[]) => {
+      const operation: Partial<Operation> = {
+        type: 'update_field',
+        sheetId,
+        value: fields,
+      };
 
-        queueOperation(operation);
-      }, 500),
+      queueOperation(operation);
+    },
     [queueOperation],
   );
 
@@ -38,10 +36,10 @@ export default function useFields(sheetId?: number) {
       const newFields = [...sheet.fields];
       newFields.splice(index, 0, field);
 
-      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
-      debouncedFieldsUpdate(sheetId, newFields);
+      dispatch(sheetStore.actions.updateSheet({ sheetId, data: { fields: newFields } }));
+      queueFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, dispatch, debouncedFieldsUpdate],
+    [sheet, sheetId, dispatch, queueFieldsUpdate],
   );
 
   const removeField = useCallback(
@@ -53,10 +51,10 @@ export default function useFields(sheetId?: number) {
       const newFields = [...sheet.fields];
       newFields.splice(index, 1);
 
-      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
-      debouncedFieldsUpdate(sheetId, newFields);
+      dispatch(sheetStore.actions.updateSheet({ sheetId, data: { fields: newFields } }));
+      queueFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, dispatch, debouncedFieldsUpdate],
+    [sheet, sheetId, dispatch, queueFieldsUpdate],
   );
 
   const changeField = useCallback(
@@ -76,10 +74,10 @@ export default function useFields(sheetId?: number) {
         Object.assign(field, data);
       });
 
-      dispatch(sheetStore.actions.updateFields({ sheetId, fields: newFields }));
-      debouncedFieldsUpdate(sheetId, newFields);
+      dispatch(sheetStore.actions.updateSheet({ sheetId, data: { fields: newFields } }));
+      queueFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, debouncedFieldsUpdate, dispatch],
+    [sheet, sheetId, queueFieldsUpdate, dispatch],
   );
 
   return {

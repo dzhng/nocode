@@ -95,10 +95,31 @@ export default function useSheets(appId?: number) {
     [user, appId, dispatch],
   );
 
+  const updateSheetName = useCallback(
+    async (sheetId: number, name: string) => {
+      if (!user || !appId) {
+        return Promise.reject('User is not authenticated');
+      }
+
+      const { error } = await supabase
+        .from<Sheet>(Collections.SHEETS)
+        .update({ name }, { returning: 'minimal' })
+        .eq('id', sheetId);
+      if (error) {
+        console.error('Error deleting sheet', error);
+        return Promise.reject('Error deleting sheet');
+      }
+
+      dispatch(sheetStore.actions.updateSheet({ sheetId, data: { name } }));
+    },
+    [appId, dispatch, user],
+  );
+
   return {
     sheets,
     isLoadingSheets,
     createSheet,
     deleteSheet,
+    updateSheetName,
   };
 }

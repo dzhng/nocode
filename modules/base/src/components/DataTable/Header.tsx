@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { debounce } from 'lodash';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { FieldType } from 'shared/schema';
@@ -51,6 +52,14 @@ const FieldName = styled('div')(({ theme }) => ({
 }));
 
 export default function HeaderRow({ fields, minWidth, changeField, onAddField }: PropTypes) {
+  const debouncedChangeField = useMemo(
+    () =>
+      debounce((fieldId: string, data: Partial<FieldType>) => {
+        changeField(fieldId, data);
+      }, 500),
+    [changeField],
+  );
+
   const handleDrag = useCallback(
     (fieldId: string, data: DraggableData) => {
       const { deltaX } = data;
@@ -59,9 +68,9 @@ export default function HeaderRow({ fields, minWidth, changeField, onAddField }:
         minWidth,
         (field?.tableMetadata?.width ?? minWidth) + Math.floor(deltaX),
       );
-      changeField(fieldId, { tableMetadata: { width: newWidth } });
+      debouncedChangeField(fieldId, { tableMetadata: { width: newWidth } });
     },
-    [changeField, fields, minWidth],
+    [debouncedChangeField, fields, minWidth],
   );
 
   return (
