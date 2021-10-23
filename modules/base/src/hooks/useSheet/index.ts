@@ -120,47 +120,52 @@ export default function useSheet(sheetId?: number) {
 
       // calculate new order numbers for saving to server
       const destinationRecord = records[destinationIndex];
-      const sourceRecord = { ...records[sourceIndex] };
-      if (!(sourceRecord && destinationRecord)) {
+      const sourceRecord = records[sourceIndex];
+      if (!destinationRecord || !sourceIndex) {
         return Promise.reject('Invalid records');
       }
 
-      sourceRecord.order =
+      const newOrder =
         destinationIndex === 0
           ? destinationRecord.order - OrderNumberSpacing
           : destinationRecord.order; // order number the same because we want to properly reconcile by iterating through all records
 
-      const newRecords = [...records];
-      newRecords.splice(sourceIndex, 1);
-      newRecords.splice(destinationIndex, 0, sourceRecord);
+      const orderNumbers: [string, number][] = records.map((record) => [
+        record.slug,
+        record.slug === sourceRecord.slug ? newOrder : record.order,
+      ]);
+      const [sourceTuple] = orderNumbers.splice(sourceIndex, 1);
+      orderNumbers.splice(destinationIndex, 0, sourceTuple);
 
       // run through all records again, and look for instances where record order number is the same
-      let lastOrderNum: number = newRecords[0].order;
-      const recordsChanged: Record[] = [sourceRecord];
-      for (let i = 1; i < newRecords.length; i++) {
-        const record = newRecords[i];
+      let lastOrderNum: number = orderNumbers[0][1];
+      const recordsChanged: [string, number][] =
+        destinationIndex === 0 ? [[sourceRecord.slug, newOrder]] : [];
 
-        if (record.order <= lastOrderNum) {
-          const nextRecord = newRecords[i + 1];
-          if (!nextRecord) {
-            record.order = lastOrderNum + OrderNumberSpacing;
-          } else if (nextRecord.order > lastOrderNum + 1) {
-            record.order = Math.floor(lastOrderNum + (nextRecord.order - lastOrderNum) / 2);
+      for (let i = 1; i < orderNumbers.length; i++) {
+        let [slug, order] = orderNumbers[i];
+
+        if (order <= lastOrderNum) {
+          const next = orderNumbers[i + 1];
+          if (!next) {
+            order = lastOrderNum + OrderNumberSpacing;
+          } else if (next[1] > lastOrderNum + 1) {
+            order = Math.floor(lastOrderNum + (next[1] - lastOrderNum) / 2);
           } else {
-            record.order = lastOrderNum + 1;
+            order = lastOrderNum + 1;
           }
-          recordsChanged.push(record);
+          recordsChanged.push([slug, order]);
         }
-        lastOrderNum = record.order;
+        lastOrderNum = order;
       }
 
       // save new order number for all records that changed
-      recordsChanged.map(async (record) => {
+      recordsChanged.map(async ([slug, order]) => {
         const operation: Partial<Operation> = {
           type: 'update_record',
           sheetId,
-          slug: record.slug,
-          value: { order: record.order },
+          slug: slug,
+          value: { order: order },
         };
 
         queueOperation(operation);
