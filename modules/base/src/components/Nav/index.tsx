@@ -233,6 +233,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                 margin: '10px',
               }}
               variant="outlined"
+              size="small"
             >
               <InputLabel>Workspace</InputLabel>
               <Select
@@ -260,7 +261,7 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
           ) : (
             <Skeleton
               variant="rectangular"
-              height={45}
+              height={37}
               sx={{
                 // copies styles from FormControl
                 width: sidebarWidth - 10 * 2 - 2,

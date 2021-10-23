@@ -107,7 +107,7 @@ export default function SheetContainer({ appId }: { appId: number }) {
         height: `${TabHeight}px`,
         width: 100,
         margin: '2px',
-        borderRadius: (theme) => `${theme.shape.borderRadius}px`,
+        borderRadius: 1,
       }}
     />
   ));
