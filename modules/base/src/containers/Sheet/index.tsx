@@ -1,58 +1,43 @@
 import { useState, useEffect, useCallback, MouseEvent } from 'react';
-import clsx from 'clsx';
-import { makeStyles, createStyles } from '@mui/styles';
-import { Menu, MenuItem, Skeleton } from '@mui/material';
+import { styled } from '@mui/styles';
+import { Box, Skeleton } from '@mui/material';
 import { Sheet } from 'shared/schema';
 import useSheets from '~/hooks/useSheets';
 import DataTable from '~/components/DataTable';
+import SheetPopover from './SheetPopover';
 
 const TabHeight = 28;
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-    },
-    tableContainer: {
-      flexGrow: 1,
-      overflow: 'scroll',
-      ...theme.customMixins.scrollBar,
-    },
-    tabContainer: {
-      padding: theme.spacing(1),
-      flexShrink: 0,
-      display: 'flex',
-      flexDirection: 'row',
-      borderTop: theme.dividerBorder,
-    },
-    tab: {
-      width: 100,
-      lineHeight: `${TabHeight}px`,
-      textAlign: 'center',
-      background: '#DDD',
-      margin: 2,
-      borderRadius: theme.shape.borderRadius,
-      flexShrink: 0,
-      cursor: 'pointer',
+const TableContainer = styled('div')(({ theme }) => ({
+  flexGrow: 1,
+  overflow: 'scroll',
+  ...theme.customMixins.scrollBar,
+}));
 
-      '&.selected': {
-        background: '#CCC',
-      },
-    },
-  }),
-);
+const Tab = styled('div')(({ theme }) => ({
+  minWidth: 100,
+  lineHeight: `${TabHeight}px`,
+  textAlign: 'center',
+  background: '#DDD',
+  margin: '2px',
+  borderRadius: theme.shape.borderRadius,
+  flexShrink: 0,
+  cursor: 'pointer',
+  userSelect: 'none',
+
+  '&.selected': {
+    background: '#CCC',
+  },
+}));
 
 export default function SheetContainer({ appId }: { appId: number }) {
-  const classes = useStyles();
   const { sheets, createSheet, deleteSheet, isLoadingSheets } = useSheets(appId);
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
   const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
-  const [contextMenu, setContextMenu] = useState<null | { x: number; y: number; sheetId: number }>(
-    null,
-  );
+
+  // for managing popover
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [popoverSheet, setPopoverSheet] = useState<Sheet | null>(null);
 
   const showLoading = isLoadingSheets && sheets.length === 0;
 
@@ -67,86 +52,96 @@ export default function SheetContainer({ appId }: { appId: number }) {
     }
   }, [selectedSheet, sheets]);
 
-  const handleContextMenu = useCallback(
-    (e: MouseEvent<HTMLDivElement>, sheetId: number) => {
-      e.preventDefault();
-      setContextMenu(
-        contextMenu === null
-          ? {
-              sheetId: sheetId,
-              x: e.clientX - 2,
-              y: e.clientY - 4,
-            }
-          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-            // Other native context menus might behave different.
-            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-            null,
-      );
-    },
-    [contextMenu],
-  );
+  const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>, sheet: Sheet) => {
+    e.preventDefault();
+    setAnchorEl(e.currentTarget);
+    setPopoverSheet(sheet);
+  }, []);
 
   const preventContextMenu = useCallback((e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
   }, []);
 
   const handleClose = useCallback(() => {
-    setContextMenu(null);
+    setPopoverSheet(null);
   }, []);
 
   const handleDelete = useCallback(async () => {
-    if (contextMenu) {
-      setDeletingSheetId(contextMenu.sheetId);
-      setContextMenu(null);
-      await deleteSheet(contextMenu.sheetId);
+    if (popoverSheet) {
+      setPopoverSheet(null);
+
+      setDeletingSheetId(Number(popoverSheet.id));
+      await deleteSheet(Number(popoverSheet.id));
       setDeletingSheetId(null);
     }
-  }, [deleteSheet, contextMenu]);
+  }, [deleteSheet, popoverSheet]);
+
+  const handleDuplicate = useCallback(async () => {
+    // TODO
+  }, []);
 
   // show loading skeleton
   const loadingSkeletons = [0, 1].map((key) => (
-    <Skeleton key={key} variant="rectangular" height={TabHeight} className={classes.tab} />
+    <Skeleton
+      key={key}
+      variant="rectangular"
+      sx={{
+        height: `${TabHeight}px`,
+        width: 100,
+        margin: '2px',
+        borderRadius: (theme) => `${theme.shape.borderRadius}px`,
+      }}
+    />
   ));
 
   return (
-    <div className={classes.content} onContextMenu={preventContextMenu}>
-      <div className={classes.tableContainer}>
-        {selectedSheet && <DataTable sheet={selectedSheet} />}
-      </div>
+    <Box
+      onContextMenu={preventContextMenu}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      <TableContainer>{selectedSheet && <DataTable sheet={selectedSheet} />}</TableContainer>
 
-      <div className={classes.tabContainer}>
+      <Box
+        sx={{
+          padding: 0.5,
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'row',
+          borderTop: (theme) => theme.dividerBorder,
+        }}
+      >
         {showLoading ? (
           loadingSkeletons
         ) : (
           <>
             {sheets.map((sheet) => (
-              <div
+              <Tab
                 key={sheet.id}
-                className={clsx(classes.tab, selectedSheet === sheet && 'selected')}
+                className={selectedSheet === sheet ? 'selected' : ''}
                 onClick={() => setSelectedSheet(sheet)}
-                onContextMenu={(e) => handleContextMenu(e, sheet.id ?? 0)}
+                onDoubleClick={(e) => handleContextMenu(e, sheet)}
+                onContextMenu={(e) => handleContextMenu(e, sheet)}
               >
                 {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
-              </div>
+              </Tab>
             ))}
-            <div className={classes.tab} onClick={() => createSheet({ name: 'hello world' })}>
-              Create +
-            </div>
+            <Tab onClick={() => createSheet({ name: 'hello world' })}>Create +</Tab>
           </>
         )}
-      </div>
+      </Box>
 
-      <Menu
-        open={contextMenu !== null}
+      <SheetPopover
+        sheet={popoverSheet}
+        anchorEl={anchorEl}
         onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null ? { top: contextMenu.y, left: contextMenu.x } : undefined
-        }
-      >
-        <MenuItem onClick={handleClose}>Rename</MenuItem>
-        <MenuItem onClick={handleDelete}>Delete</MenuItem>
-      </Menu>
-    </div>
+        onDuplicate={handleDuplicate}
+        onDelete={handleDelete}
+      />
+    </Box>
   );
 }
