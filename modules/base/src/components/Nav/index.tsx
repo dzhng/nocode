@@ -204,6 +204,9 @@ export default function Nav({ isOpen, onClose }: { isOpen: boolean; onClose(): v
                         variant="h3"
                         sx={{
                           fontWeight: 500,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
                       >
                         {app.name}

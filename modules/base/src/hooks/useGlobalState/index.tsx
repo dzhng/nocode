@@ -38,6 +38,7 @@ export interface StateContextType {
   apps: App[];
   isLoadingApps: boolean;
   createApp(values: { name: string }): Promise<App>;
+  updateAppName(appId: number, newName: string): Promise<void>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);

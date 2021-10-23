@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Collections, App } from 'shared/schema';
+import produce from 'immer';
 import supabase from '~/utils/supabase';
 import { OrderNumberSpacing } from '~/const';
 
@@ -61,10 +62,42 @@ export default function useWorkspaceApps(authState: { user?: User | null }, work
     [user, workspaceId, apps],
   );
 
+  const updateAppName = useCallback(
+    async (appId: number, newName: string) => {
+      if (!appId) {
+        return;
+      }
+
+      // optimistically set
+      const oldApps = apps;
+      setApps(
+        produce(apps, (draft) => {
+          const appIdx = draft.findIndex((a) => a.id === appId);
+          if (appIdx !== -1) {
+            draft[appIdx].name = newName;
+          }
+        }),
+      );
+
+      const ret = await supabase
+        .from<App>(Collections.APPS)
+        .update({ name: newName }, { returning: 'minimal' })
+        .eq('id', appId);
+      if (ret.error) {
+        console.error('Error updating app name', ret.error);
+        // undo optimistic update
+        setApps(oldApps);
+        return;
+      }
+    },
+    [apps],
+  );
+
   return {
     queryForApps,
     apps,
     isLoadingApps,
     createApp,
+    updateAppName,
   };
 }

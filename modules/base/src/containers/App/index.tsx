@@ -1,16 +1,5 @@
-import { useState } from 'react';
-import {
-  styled,
-  Typography,
-  Box,
-  Skeleton,
-  Button,
-  IconButton,
-  Tooltip,
-  Divider,
-  Select,
-  MenuItem,
-} from '@mui/material';
+import { useState, useCallback } from 'react';
+import { styled, Box, Button, IconButton, Tooltip, Divider, Select, MenuItem } from '@mui/material';
 import {
   FilterList as FilterIcon,
   Search as SearchIcon,
@@ -25,6 +14,7 @@ import {
   Height as RowHeightIcon,
 } from '@mui/icons-material';
 import { AddIcon, SettingsIcon } from '~/components/Icons';
+import EditableTitle from '~/components/EditableTitle';
 import SheetContainer from '~/containers/Sheet';
 import useApp from '~/hooks/useApp';
 
@@ -66,9 +56,11 @@ const ViewMenuSelect = styled(Select)(({ theme }) => ({
 }));
 
 export default function App({ appId }: { appId: number }) {
-  const app = useApp(appId);
+  const { app, updateName } = useApp(appId);
   const [viewSetting, setViewSetting] = useState<ViewType>('grid');
   const [heightSetting, setHeightSetting] = useState<HeightType>('dynamic');
+
+  const onTitleChange = useCallback(updateName, [updateName]);
 
   return (
     <Box
@@ -87,13 +79,23 @@ export default function App({ appId }: { appId: number }) {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingLeft: 2,
+          paddingLeft: 1,
           paddingRight: 1,
           borderBottom: (theme) => theme.dividerBorder,
           height: (theme) => theme.headerBarHeight + 1,
         }}
       >
-        <Typography variant="h1">{app ? app.name : <Skeleton width={120} />}</Typography>
+        <EditableTitle
+          variant="h2"
+          sx={{
+            width: '33%',
+            minWidth: 200,
+          }}
+          title={app?.name}
+          isLoading={!app}
+          validate={(title) => title.length < 140}
+          onChange={onTitleChange}
+        />
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
           <Tooltip title="History">
             <IconButton>
