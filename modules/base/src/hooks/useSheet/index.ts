@@ -160,7 +160,7 @@ export default function useSheet(sheetId?: number) {
       }
 
       // save new order number for all records that changed
-      recordsChanged.map(async ([slug, order]) => {
+      recordsChanged.forEach(async ([slug, order]) => {
         const operation: Partial<Operation> = {
           type: 'update_record',
           sheetId,
