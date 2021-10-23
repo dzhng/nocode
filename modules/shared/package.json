@@ -11,7 +11,8 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "test:dev": "jest --watch --runInBand --coverage --passWithNoTests",
-    "lint": "eslint . --ext ts,tsx --fix"
+    "check-types": "tsc --noemit",
+    "lint": "eslint . --ext ts,tsx --fix && npm run check-types"
   },
   "browserslist": {
     "production": [

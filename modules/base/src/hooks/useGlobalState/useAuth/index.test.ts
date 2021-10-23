@@ -44,7 +44,7 @@ describe('the useAuth hook', () => {
   it('should set a new user on signIn', async () => {
     const { result, waitForNextUpdate } = renderHook(() => useAuth());
     await waitForNextUpdate();
-    result.current.signIn();
+    //result.current.signInWithEmailAndPassword()
     await waitForNextUpdate();
     expect(result.current.user).toBe(mockUser);
   });

@@ -1,17 +1,17 @@
-import { ColumnType, CellType, DataTypes, SelectionMeta } from 'shared/schema';
+import { FieldType, CellType, DataTypes, SelectionMeta } from 'shared/schema';
 
-export function dataFieldForCell(column: ColumnType, data: CellType | null) {
+export function dataFieldForCell(field: FieldType, data: CellType | null) {
   if (
-    column.type === DataTypes.Text ||
-    (column.type === DataTypes.Selection &&
-      (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Text)
+    field.type === DataTypes.Text ||
+    (field.type === DataTypes.Selection &&
+      (field?.typeMetadata as SelectionMeta)?.type === DataTypes.Text)
   ) {
     return { dataString: data === null ? null : String(data) };
   } else if (
-    column.type === DataTypes.Number ||
-    column.type === DataTypes.Date ||
-    (column.type === DataTypes.Selection &&
-      (column?.typeMetadata as SelectionMeta)?.type === DataTypes.Number)
+    field.type === DataTypes.Number ||
+    field.type === DataTypes.Date ||
+    (field.type === DataTypes.Selection &&
+      (field?.typeMetadata as SelectionMeta)?.type === DataTypes.Number)
   ) {
     return { dataNumber: data === null ? null : Number(data) };
   } else {
@@ -20,10 +20,10 @@ export function dataFieldForCell(column: ColumnType, data: CellType | null) {
 }
 
 export function cellTypeForDataField(
-  column: ColumnType,
+  field: FieldType,
   data: { dataNumber?: number | null; dataString?: string | null; dataJSON?: CellType },
 ): CellType | undefined {
-  if (column.type === DataTypes.Date) {
+  if (field.type === DataTypes.Date) {
     return data.dataNumber && new Date(data.dataNumber);
   }
 

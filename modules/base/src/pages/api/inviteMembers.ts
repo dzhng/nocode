@@ -1,17 +1,22 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import assert from 'assert';
 import * as yup from 'yup';
 import { Collections, Member } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import { withAuth } from '~/utils/api';
 
 interface RequestBody {
   workspaceId: number;
   emails: string[];
 }
 
-export default withAuth(async (req, res, user) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(400).end();
+  }
+
+  const { user, error } = await supabase.auth.api.getUserByCookie(req);
+  if (error || !user) {
+    return null;
   }
 
   const body: RequestBody = req.body;
@@ -36,4 +41,4 @@ export default withAuth(async (req, res, user) => {
   // TODO
 
   return res.status(200).end();
-});
+};

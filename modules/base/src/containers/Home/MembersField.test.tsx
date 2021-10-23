@@ -20,8 +20,8 @@ describe('the MembersField component', () => {
 
   it('should submit with the correct name', async () => {
     const values: UserDetails[] = [
-      { id: '1', displayName: 'test1', email: '1' },
-      { id: '2', displayName: 'test2', email: '2' },
+      { id: '1', displayName: 'test1', email: '1', createdAt: new Date() },
+      { id: '2', displayName: 'test2', email: '2', createdAt: new Date() },
     ];
 
     render(<MembersField users={values} onChange={mockOnChange} />);

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import * as yup from 'yup';
 import { Typography, Button, CircularProgress, Paper } from '@mui/material';
-import { createStyles, makeStyles, Theme } from '@mui/styles';
+import { createStyles, makeStyles } from '@mui/styles';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import BackButton from '~/components/BackButton';
@@ -14,7 +14,7 @@ const initialValues = {
   name: '',
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     container: {
       height: '100vh',

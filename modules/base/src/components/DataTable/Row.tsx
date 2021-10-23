@@ -32,7 +32,7 @@ const Divider = styled('span')(({ theme }) => ({
 }));
 
 export default function Row({
-  isDragging,
+  // isDragging,
   dragHandleProps,
   fields,
   index,

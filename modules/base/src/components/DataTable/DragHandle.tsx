@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { DragHandle as DragHandleIcon } from '~/components/Icons';
-import { SelectorCellSize, DefaultCellHeight } from './const';
+import { DefaultCellHeight } from './const';
 
 export default function DragHandle({ ...props }: { [props: string]: any }) {
   return (

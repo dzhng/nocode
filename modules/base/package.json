@@ -54,7 +54,8 @@
     "start": "next start",
     "test": "jest --passWithNoTests",
     "test:dev": "jest --watch --runInBand --coverage --passWithNoTests",
-    "lint": "eslint src/**/*.{ts,tsx} --fix"
+    "check-types": "tsc --noemit",
+    "lint": "eslint src --ext ts,tsx --fix && npm run check-types"
   },
   "browserslist": {
     "production": [

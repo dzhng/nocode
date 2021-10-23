@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { styled } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
@@ -45,7 +45,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     addField,
     changeField,
   } = useSheet(sheet.id);
-  const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
+  //const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
   const onAddField = useCallback(() => {
     addField(
