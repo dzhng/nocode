@@ -13,8 +13,8 @@ interface PropTypes {
   index: number;
   minWidth: number;
   defaultHeight: number;
-  dataForField(fieldId: number): CellType | undefined;
-  editRecord(fieldId: number, data: CellType): void;
+  dataForField(fieldId: string): CellType | undefined;
+  editRecord(fieldId: string, data: CellType): void;
 }
 
 const SelectorCell = styled('div')(() => ({

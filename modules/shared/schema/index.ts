@@ -91,6 +91,7 @@ export const DataTypesSchema = z.nativeEnum(DataTypes);
 /**
  * Cell Data Definitions
  */
+
 export const CellTypeSchema = z
   .string()
   .or(z.number())
@@ -113,11 +114,11 @@ export type SelectionMeta = z.infer<typeof SelectionMetaSchema>;
 
 export const RelationMetaSchema = z.object({
   // the field in the current table that serves as the key
-  keyFieldId: z.string(),
+  keyFieldId: z.string().uuid(),
 
   // point to the location of the relational data value
   valueSheetId: z.string(),
-  valueFieldId: z.string(),
+  valueFieldId: z.string().uuid(),
 });
 export type RelationMeta = z.infer<typeof RelationMetaSchema>;
 
@@ -143,7 +144,7 @@ export type FieldType = z.infer<typeof FieldTypeSchema>;
  */
 
 export const CellDataTupleSchema = z.tuple([
-  z.number(), // fieldId
+  z.string().uuid(), // fieldId
   CellTypeSchema.nullable(), // field data
 ]);
 
@@ -161,7 +162,7 @@ export type Record = z.infer<typeof RecordSchema>;
 export const CellSchema = z.object({
   id: z.number().optional(),
   recordId: z.number(),
-  fieldId: z.number(),
+  fieldId: z.string().uuid(),
   dataString: z.string().nullable().optional(),
   dataNumber: z.number().nullable().optional(),
   dataJSON: CellTypeSchema.nullable().optional(),
@@ -183,9 +184,11 @@ export type Sheet = z.infer<typeof SheetSchema>;
 /**
  * Track changes in the sheet for syncing
  */
+
 export const OperationTypeSchema = z.enum([
   'create_record',
   'update_record',
+  'update_cell',
   'update_field',
   'delete_record',
 ]);
@@ -202,6 +205,6 @@ export const OperationSchema = z.object({
   slug: z.string().uuid().optional(),
 
   // store creation or update values here
-  value: CellDataTupleSchema.or(FieldTypeSchema.array()).or(RecordSchema).optional(),
+  value: CellDataTupleSchema.or(FieldTypeSchema.array()).or(RecordSchema.partial()).optional(),
 });
 export type Operation = z.infer<typeof OperationSchema>;

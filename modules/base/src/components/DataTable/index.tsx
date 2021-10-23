@@ -109,7 +109,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {records.map((record, index) => (
-                  <Draggable key={record.id ?? -1} draggableId={String(record.id)} index={index}>
+                  <Draggable key={record.slug} draggableId={record.slug} index={index}>
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
@@ -124,9 +124,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
                           minWidth={DefaultCellWidth}
                           defaultHeight={DefaultCellHeight}
                           dataForField={(fieldId) => cellDataForRecord(record, fieldId)}
-                          editRecord={(fieldId, data) =>
-                            editRecord(Number(record.id), fieldId, data)
-                          }
+                          editRecord={(fieldId, data) => editRecord(record.slug, fieldId, data)}
                         />
                       </div>
                     )}

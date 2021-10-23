@@ -7,7 +7,7 @@ import { dataFieldForCell } from '~/utils/record';
 export default async function updateCell(
   sheetId: number,
   slug: string,
-  fieldId: number,
+  fieldId: string,
   data: CellType,
 ) {
   // fetch the sheet to get field info

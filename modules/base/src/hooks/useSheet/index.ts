@@ -1,8 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { forEach } from 'lodash';
 import { v1 as uuid } from 'uuid';
-import { Collections, Operation, Record, CellType } from 'shared/schema';
-import supabase from '~/utils/supabase';
+import { Operation, Record, CellType } from 'shared/schema';
 import useGlobalState from '~/hooks/useGlobalState';
 import { trpc } from '~/utils/trpc';
 import recordStore from '~/store/record';
@@ -66,9 +65,9 @@ export default function useSheet(sheetId?: number) {
           : records[index].order - OrderNumberSpacing;
 
       // create the data object
-      const cellData: [fieldId: number, data: CellType][] = [];
+      const cellData: [fieldId: string, data: CellType][] = [];
       forEach(data, (value, key) => {
-        cellData.push([Number(key), value]);
+        cellData.push([key, value]);
       });
 
       const record: Record = {
@@ -93,13 +92,13 @@ export default function useSheet(sheetId?: number) {
   );
 
   const editRecord = useCallback(
-    async (slug: string, fieldId: number, data: CellType) => {
+    async (slug: string, fieldId: string, data: CellType) => {
       if (!user || !sheetId) {
         return Promise.reject('User is not authenticated: editRecord');
       }
 
       const operation: Partial<Operation> = {
-        type: 'update_record',
+        type: 'update_cell',
         sheetId,
         slug,
         value: [fieldId, data],
@@ -156,24 +155,21 @@ export default function useSheet(sheetId?: number) {
       }
 
       // save new order number for all records that changed
-      await Promise.all(
-        recordsChanged.map(async (record) => {
-          return supabase
-            .from<Record>(Collections.RECORDS)
-            .update({
-              order: record.order,
-            })
-            .eq('id', record.id)
-            .then(null, (e) => {
-              console.error('Error editing record', e);
-            });
-        }),
-      );
+      recordsChanged.map(async (record) => {
+        const operation: Partial<Operation> = {
+          type: 'update_record',
+          sheetId,
+          slug: record.slug,
+          value: { order: record.order },
+        };
+
+        queueOperation(operation);
+      });
     },
-    [user, sheetId, records, dispatch],
+    [user, sheetId, records, dispatch, queueOperation],
   );
 
-  const cellDataForRecord = useCallback((record: Record, fieldId: number): CellType => {
+  const cellDataForRecord = useCallback((record: Record, fieldId: string): CellType => {
     const recordCells = record.cells;
     if (!recordCells) {
       return null;

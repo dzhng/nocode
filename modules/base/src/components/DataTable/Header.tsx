@@ -11,7 +11,7 @@ const HeaderDividerWidth = 2;
 interface PropTypes {
   fields: FieldType[];
   minWidth: number;
-  changeField(fieldId: number, data: Partial<FieldType>): void;
+  changeField(fieldId: string, data: Partial<FieldType>): void;
   onAddField(): void;
 }
 
@@ -52,7 +52,7 @@ const FieldName = styled('div')(({ theme }) => ({
 
 export default function HeaderRow({ fields, minWidth, changeField, onAddField }: PropTypes) {
   const handleDrag = useCallback(
-    (fieldId: number, data: DraggableData) => {
+    (fieldId: string, data: DraggableData) => {
       const { deltaX } = data;
       const field = fields.find((c) => c.id === fieldId);
       const newWidth = Math.max(

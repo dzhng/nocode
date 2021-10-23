@@ -13,6 +13,7 @@ import type { Context } from '~/pages/api/trpc/[trpc]';
 
 import updateField from './operations/updateField';
 import createRecord from './operations/createRecord';
+import updateRecord from './operations/updateRecord';
 import updateCell from './operations/updateCell';
 import deleteRecord from './operations/deleteRecord';
 
@@ -27,9 +28,12 @@ async function processOperation(operation: Partial<Operation>, userId: string) {
   }
 
   // make sure there is a value for each operation
-  if (operation.type === 'update_record') {
+  if (operation.type === 'update_cell') {
     const [fieldId, data] = CellDataTupleSchema.parse(operation.value);
     await updateCell(operation.sheetId, String(operation.slug), fieldId, data);
+  } else if (operation.type === 'update_record') {
+    const data = RecordSchema.partial().parse(operation.value);
+    await updateRecord(data);
   } else if (operation.type === 'create_record') {
     const data = RecordSchema.parse(operation.value);
     await createRecord(data);

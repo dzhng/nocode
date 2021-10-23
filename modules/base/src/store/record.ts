@@ -43,7 +43,7 @@ export default createSlice({
     },
     updateRecordData: (
       state,
-      action: PayloadAction<{ slug: string; fieldId: number; data: CellType }>,
+      action: PayloadAction<{ slug: string; fieldId: string; data: CellType }>,
     ) => {
       const record = state.records[action.payload.slug];
       record.cells = [
