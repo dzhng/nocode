@@ -44,10 +44,11 @@ export default function SheetPopover({
         <TextField
           autoFocus
           fullWidth
-          value={sheet?.name}
+          value={sheet?.name ?? ''}
           label="Sheet name"
           size="small"
           onChange={(e) => onNameChange(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && onClose()}
         />
         <Divider sx={{ mt: 1, mb: 1 }} />
         <Box

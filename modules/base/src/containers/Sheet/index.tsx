@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useMemo, MouseEvent } from 'react';
-import { debounce } from 'lodash';
+import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import { styled } from '@mui/styles';
 import { Box, Skeleton } from '@mui/material';
-import { Sheet } from 'shared/schema';
 import useSheets from '~/hooks/useSheets';
 import DataTable from '~/components/DataTable';
+import { useAppSelector } from '~/store';
 import SheetPopover from './SheetPopover';
 
 const TabHeight = 28;
@@ -25,6 +24,8 @@ const Tab = styled('div')(({ theme }) => ({
   flexShrink: 0,
   cursor: 'pointer',
   userSelect: 'none',
+  paddingLeft: theme.spacing(1),
+  paddingRight: theme.spacing(1),
 
   '&.selected': {
     background: '#CCC',
@@ -33,38 +34,37 @@ const Tab = styled('div')(({ theme }) => ({
 
 export default function SheetContainer({ appId }: { appId: number }) {
   const { sheets, createSheet, deleteSheet, updateSheetName, isLoadingSheets } = useSheets(appId);
-  const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null);
+  const [selectedSheetId, setSelectedSheetId] = useState<number | null>(null);
   const [deletingSheetId, setDeletingSheetId] = useState<number | null>(null);
 
   // for managing popover
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const [popoverSheet, setPopoverSheet] = useState<Sheet | null>(null);
+  const [popoverSheetId, setPopoverSheetId] = useState<number | null>(null);
+
+  const selectedSheet = useAppSelector((state) =>
+    selectedSheetId ? state.sheet.sheets[selectedSheetId] : null,
+  );
+  const popoverSheet = useAppSelector((state) =>
+    popoverSheetId ? state.sheet.sheets[popoverSheetId] : null,
+  );
 
   const showLoading = isLoadingSheets && sheets.length === 0;
-
-  const debouncedNameUpdate = useMemo(
-    () =>
-      debounce((sheetId: number, name: string) => {
-        updateSheetName(sheetId, name);
-      }, 500),
-    [updateSheetName],
-  );
 
   // select the first sheet once it loads if none is selected
   useEffect(() => {
     if (sheets.length > 0) {
-      if (sheets.findIndex((s) => s === selectedSheet) === -1) {
-        setSelectedSheet(sheets[0]);
+      if (sheets.findIndex((s) => s.id === selectedSheetId) === -1) {
+        setSelectedSheetId(Number(sheets[0].id));
       }
     } else {
-      setSelectedSheet(null);
+      setSelectedSheetId(null);
     }
-  }, [selectedSheet, sheets]);
+  }, [selectedSheetId, sheets]);
 
-  const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>, sheet: Sheet) => {
+  const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>, sheetId: number) => {
     e.preventDefault();
     setAnchorEl(e.currentTarget);
-    setPopoverSheet(sheet);
+    setPopoverSheetId(sheetId);
   }, []);
 
   const preventContextMenu = useCallback((e: MouseEvent<HTMLDivElement>) => {
@@ -72,18 +72,18 @@ export default function SheetContainer({ appId }: { appId: number }) {
   }, []);
 
   const handleClose = useCallback(() => {
-    setPopoverSheet(null);
+    setPopoverSheetId(null);
   }, []);
 
   const handleDelete = useCallback(async () => {
-    if (popoverSheet) {
-      setPopoverSheet(null);
+    if (popoverSheetId) {
+      setPopoverSheetId(null);
 
-      setDeletingSheetId(Number(popoverSheet.id));
-      await deleteSheet(Number(popoverSheet.id));
+      setDeletingSheetId(popoverSheetId);
+      await deleteSheet(popoverSheetId);
       setDeletingSheetId(null);
     }
-  }, [deleteSheet, popoverSheet]);
+  }, [deleteSheet, popoverSheetId]);
 
   const handleDuplicate = useCallback(async () => {
     // TODO
@@ -91,9 +91,11 @@ export default function SheetContainer({ appId }: { appId: number }) {
 
   const handleNameChange = useCallback(
     async (newName) => {
-      debouncedNameUpdate(Number(popoverSheet?.id), newName);
+      if (popoverSheetId) {
+        updateSheetName(popoverSheetId, newName);
+      }
     },
-    [popoverSheet, debouncedNameUpdate],
+    [popoverSheetId, updateSheetName],
   );
 
   // show loading skeleton
@@ -138,10 +140,10 @@ export default function SheetContainer({ appId }: { appId: number }) {
             {sheets.map((sheet) => (
               <Tab
                 key={sheet.id}
-                className={selectedSheet === sheet ? 'selected' : ''}
-                onClick={() => setSelectedSheet(sheet)}
-                onDoubleClick={(e) => handleContextMenu(e, sheet)}
-                onContextMenu={(e) => handleContextMenu(e, sheet)}
+                className={selectedSheetId === sheet.id ? 'selected' : ''}
+                onClick={() => setSelectedSheetId(Number(sheet.id))}
+                onDoubleClick={(e) => handleContextMenu(e, Number(sheet.id))}
+                onContextMenu={(e) => handleContextMenu(e, Number(sheet.id))}
               >
                 {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
               </Tab>

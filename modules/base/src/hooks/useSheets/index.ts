@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { values } from 'lodash';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { values, debounce } from 'lodash';
 import { Collections, Sheet } from 'shared/schema';
 import supabase from '~/utils/supabase';
 import useGlobalState from '~/hooks/useGlobalState';
@@ -95,24 +95,30 @@ export default function useSheets(appId?: number) {
     [user, appId, dispatch],
   );
 
+  const debouncedNameUpdate = useMemo(
+    () =>
+      debounce(async (sheetId: number, name: string) => {
+        const { error } = await supabase
+          .from<Sheet>(Collections.SHEETS)
+          .update({ name }, { returning: 'minimal' })
+          .eq('id', sheetId);
+        if (error) {
+          console.error('Error updating sheet name', error);
+        }
+      }, 500),
+    [],
+  );
+
   const updateSheetName = useCallback(
     async (sheetId: number, name: string) => {
       if (!user || !appId) {
         return Promise.reject('User is not authenticated');
       }
 
-      const { error } = await supabase
-        .from<Sheet>(Collections.SHEETS)
-        .update({ name }, { returning: 'minimal' })
-        .eq('id', sheetId);
-      if (error) {
-        console.error('Error deleting sheet', error);
-        return Promise.reject('Error deleting sheet');
-      }
-
       dispatch(sheetStore.actions.updateSheet({ sheetId, data: { name } }));
+      debouncedNameUpdate(sheetId, name);
     },
-    [appId, dispatch, user],
+    [appId, dispatch, user, debouncedNameUpdate],
   );
 
   return {

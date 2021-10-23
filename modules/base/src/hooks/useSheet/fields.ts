@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { v1 as uuid } from 'uuid';
 import produce from 'immer';
+import { debounce } from 'lodash';
 import { FieldType, Operation } from 'shared/schema';
 import useOperationQueue from '~/hooks/useOperationQueue';
 import { useAppSelector, useAppDispatch } from '~/store';
@@ -23,6 +24,10 @@ export default function useFields(sheetId?: number) {
     },
     [queueOperation],
   );
+
+  const debouncedFieldsUpdate = useMemo(() => debounce(queueFieldsUpdate, 500), [
+    queueFieldsUpdate,
+  ]);
 
   // generate a new field ID client side that doesn't conflict with existing fields
   const generateFieldId = useCallback(uuid, []);
@@ -58,7 +63,7 @@ export default function useFields(sheetId?: number) {
   );
 
   const changeField = useCallback(
-    async (fieldId: string, data: Partial<FieldType>) => {
+    async (fieldId: string, data: Partial<FieldType>, debounce: boolean = true) => {
       if (!sheet || !sheetId) {
         return;
       }
@@ -75,9 +80,9 @@ export default function useFields(sheetId?: number) {
       });
 
       dispatch(sheetStore.actions.updateSheet({ sheetId, data: { fields: newFields } }));
-      queueFieldsUpdate(sheetId, newFields);
+      debounce ? debouncedFieldsUpdate(sheetId, newFields) : queueFieldsUpdate(sheetId, newFields);
     },
-    [sheet, sheetId, queueFieldsUpdate, dispatch],
+    [sheet, sheetId, debouncedFieldsUpdate, queueFieldsUpdate, dispatch],
   );
 
   return {
