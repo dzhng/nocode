@@ -86,7 +86,7 @@ export default function FieldPopover({
           </Button>
           <Button color="error" onClick={onDelete}>
             <DeleteIcon sx={ButtonIconSx} />
-            Delete
+            Remove Field
           </Button>
         </Box>
       </Box>
