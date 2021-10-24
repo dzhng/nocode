@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useState, useCallback, MouseEvent } from 'react';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { FieldType } from 'shared/schema';
 import { AddIcon, ExpandIcon } from '~/components/Icons';
 import { TableHeaderRow, TableCell } from './Table';
 import { HeaderHeight, NewFieldCellSize } from './const';
+import FieldPopover from './FieldPopover';
 
 const HeaderDividerWidth = 2;
 
@@ -12,6 +13,7 @@ interface PropTypes {
   fields: FieldType[];
   minWidth: number;
   changeField(fieldId: string, data: Partial<FieldType>): void;
+  removeField(fieldId: string): void;
   onAddField(): void;
 }
 
@@ -50,7 +52,18 @@ const FieldName = styled('div')(({ theme }) => ({
   },
 }));
 
-export default function HeaderRow({ fields, minWidth, changeField, onAddField }: PropTypes) {
+export default function HeaderRow({
+  fields,
+  minWidth,
+  changeField,
+  removeField,
+  onAddField,
+}: PropTypes) {
+  // for managing popover
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [popoverFieldId, setPopoverFieldId] = useState<string | null>(null);
+  const popoverField = fields?.find((f) => f.id === popoverFieldId);
+
   const handleDrag = useCallback(
     (fieldId: string, data: DraggableData) => {
       const { deltaX } = data;
@@ -64,59 +77,96 @@ export default function HeaderRow({ fields, minWidth, changeField, onAddField }:
     [changeField, fields, minWidth],
   );
 
+  const handleFieldPopover = useCallback((e: MouseEvent<HTMLButtonElement>, fieldId: string) => {
+    e.preventDefault();
+    setAnchorEl(e.currentTarget);
+    setPopoverFieldId(fieldId);
+  }, []);
+
+  const handleNameChange = useCallback(
+    (newName: string) => {
+      if (popoverFieldId) {
+        changeField(popoverFieldId, { name: newName });
+      }
+    },
+    [changeField, popoverFieldId],
+  );
+
+  const handleDelete = useCallback(() => {
+    if (popoverFieldId) {
+      removeField(popoverFieldId);
+    }
+  }, [removeField, popoverFieldId]);
+
+  const handleClose = useCallback(() => {
+    setPopoverFieldId(null);
+  }, []);
+
   return (
-    <TableHeaderRow>
-      {fields.map((field) => (
-        <Box sx={{ position: 'relative' }} key={field.id}>
-          {/* Have divider ahead and positioned behind via margin
+    <>
+      <TableHeaderRow>
+        {fields.map((field) => (
+          <Box sx={{ position: 'relative' }} key={field.id}>
+            {/* Have divider ahead and positioned behind via margin
           so that dragging won't change it's position */}
-          <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(field.id, data)}>
-            <Divider
+            <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(field.id, data)}>
+              <Divider
+                sx={{
+                  left: (field.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
+                }}
+              />
+            </DraggableCore>
+
+            <TableCell
               sx={{
-                left: (field.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
+                width: field.tableMetadata?.width ?? minWidth,
+                height: HeaderHeight,
               }}
-            />
-          </DraggableCore>
+            >
+              <FieldName>
+                <span>{field.name}</span>
+                <Tooltip placement="bottom" title="Edit field">
+                  <IconButton size="small" onClick={(e) => handleFieldPopover(e, field.id)}>
+                    <ExpandIcon />
+                  </IconButton>
+                </Tooltip>
+              </FieldName>
+            </TableCell>
+          </Box>
+        ))}
 
-          <TableCell
-            sx={{
-              width: field.tableMetadata?.width ?? minWidth,
-              height: HeaderHeight,
-            }}
-          >
-            <FieldName>
-              <span>{field.name}</span>
-              <IconButton size="small">
-                <ExpandIcon />
-              </IconButton>
-            </FieldName>
-          </TableCell>
-        </Box>
-      ))}
+        <TableCell
+          sx={{
+            width: NewFieldCellSize,
+            height: HeaderHeight,
+            textAlign: 'center',
 
-      <TableCell
-        sx={{
-          width: NewFieldCellSize,
-          height: HeaderHeight,
-          textAlign: 'center',
+            '& button': {
+              marginTop: '5px',
+            },
 
-          '& button': {
-            marginTop: '5px',
-          },
+            '& svg': {
+              width: 20,
+              height: 20,
+              color: 'primary.main',
+            },
+          }}
+        >
+          <Tooltip placement="bottom" title="Add new field">
+            <IconButton size="small" onClick={onAddField}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        </TableCell>
+      </TableHeaderRow>
 
-          '& svg': {
-            width: 20,
-            height: 20,
-            color: 'primary.main',
-          },
-        }}
-      >
-        <Tooltip placement="bottom" title="Add new field">
-          <IconButton size="small" onClick={onAddField}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      </TableCell>
-    </TableHeaderRow>
+      <FieldPopover
+        field={popoverField}
+        anchorEl={anchorEl}
+        onNameChange={handleNameChange}
+        onClose={handleClose}
+        onDelete={handleDelete}
+      />
+    </>
   );
 }

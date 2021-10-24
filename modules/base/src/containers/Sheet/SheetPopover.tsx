@@ -1,9 +1,6 @@
 import { Box, Popover, TextField, Divider, Button } from '@mui/material';
 import { Sheet } from 'shared/schema';
-import {
-  DeleteOutline as DeleteIcon,
-  ContentCopyOutlined as DuplicateIcon,
-} from '@mui/icons-material';
+import { DeleteIcon, DuplicateIcon } from '~/components/Icons';
 
 const ButtonIconSx = { width: 15, height: 15, mr: 0.5 };
 

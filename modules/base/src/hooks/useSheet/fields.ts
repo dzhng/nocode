@@ -48,9 +48,14 @@ export default function useFields(sheetId?: number) {
   );
 
   const removeField = useCallback(
-    async (index: number) => {
+    async (fieldId: string) => {
       if (!sheet || !sheetId) {
         return;
+      }
+
+      const index = sheet.fields.findIndex((f) => f.id === fieldId);
+      if (index === -1) {
+        throw new Error('Field not found');
       }
 
       const newFields = [...sheet.fields];

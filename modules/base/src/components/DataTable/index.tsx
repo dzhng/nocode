@@ -43,6 +43,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     generateFieldId,
     addField,
     changeField,
+    removeField,
   } = useSheet(sheet.id);
   //const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
@@ -94,6 +95,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           fields={sheet.fields}
           minWidth={DefaultCellWidth}
           changeField={changeField}
+          removeField={removeField}
           onAddField={onAddField}
         />
       </TableHead>

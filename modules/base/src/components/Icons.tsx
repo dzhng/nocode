@@ -10,6 +10,24 @@ import {
   RadioButtonUnchecked as UncheckedIcon,
   RadioButtonChecked as CheckedIcon,
   DragIndicatorOutlined as DragHandle,
+
+  // sheet icons
+  DeleteOutline as DeleteIcon,
+  ContentCopyOutlined as DuplicateIcon,
+  ChevronLeftOutlined as MoveLeftIcon,
+  ChevronRightOutlined as MoveRightIcon,
+  FilterList as FilterIcon,
+  HideSourceOutlined as HideIcon,
+  Search as SearchIcon,
+  ImportExport as SortIcon,
+  ViewWeekOutlined as FieldsIcon,
+  Share as ShareIcon,
+  History as HistoryIcon,
+  TableRows as GridIcon,
+  Apps as CardIcon,
+  ViewAgendaOutlined as GroupIcon,
+  InvertColorsOutlined as ColorIcon,
+  Height as RowHeightIcon,
 } from '@mui/icons-material';
 
 // re-export standardized icons so they are consistent
@@ -25,6 +43,22 @@ export {
   UncheckedIcon,
   CheckedIcon,
   DragHandle,
+  DeleteIcon,
+  DuplicateIcon,
+  MoveLeftIcon,
+  MoveRightIcon,
+  FilterIcon,
+  HideIcon,
+  SearchIcon,
+  SortIcon,
+  FieldsIcon,
+  ShareIcon,
+  HistoryIcon,
+  GridIcon,
+  CardIcon,
+  GroupIcon,
+  ColorIcon,
+  RowHeightIcon,
 };
 
 export const Logo = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (

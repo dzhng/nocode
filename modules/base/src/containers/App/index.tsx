@@ -1,19 +1,20 @@
 import { useState, useCallback } from 'react';
 import { styled, Box, Button, IconButton, Tooltip, Divider, Select, MenuItem } from '@mui/material';
 import {
-  FilterList as FilterIcon,
-  Search as SearchIcon,
-  ImportExport as SortIcon,
-  ViewWeekOutlined as FieldsIcon,
-  Share as ShareIcon,
-  History as HistoryIcon,
-  TableRows as GridIcon,
-  Apps as CardIcon,
-  ViewAgendaOutlined as GroupIcon,
-  InvertColorsOutlined as ColorIcon,
-  Height as RowHeightIcon,
-} from '@mui/icons-material';
-import { AddIcon, SettingsIcon } from '~/components/Icons';
+  AddIcon,
+  SettingsIcon,
+  FilterIcon,
+  SearchIcon,
+  SortIcon,
+  FieldsIcon,
+  ShareIcon,
+  HistoryIcon,
+  GridIcon,
+  CardIcon,
+  GroupIcon,
+  ColorIcon,
+  RowHeightIcon,
+} from '~/components/Icons';
 import EditableTitle from '~/components/EditableTitle';
 import SheetContainer from '~/containers/Sheet';
 import useApp from '~/hooks/useApp';
