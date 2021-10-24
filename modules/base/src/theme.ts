@@ -126,9 +126,9 @@ export default createTheme({
   // custom
   headerBarHeight: 50,
   transitionTime: '0.3s',
-  dividerBorder: '1px solid rgba(0, 0, 0, 0.12)',
-  borderColor: 'rgba(0,0,0,0.12)',
-  hoverColor: 'rgba(2, 136, 209, 0.10)',
+  dividerBorder: '1px solid rgb(225, 225, 225)',
+  borderColor: 'rgb(225, 225, 225)',
+  hoverColor: 'rgb(229, 243, 250)',
 
   customMixins: {
     modalPaper: {

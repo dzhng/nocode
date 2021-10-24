@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, MouseEvent } from 'react';
 import { styled } from '@mui/styles';
 import { Box, Skeleton } from '@mui/material';
 import useSheets from '~/hooks/useSheets';
+import { AddIcon } from '~/components/Icons';
 import DataTable from '~/components/DataTable';
 import { useAppSelector } from '~/store';
 import SheetPopover from './SheetPopover';
@@ -18,17 +19,44 @@ const Tab = styled('div')(({ theme }) => ({
   minWidth: 100,
   lineHeight: `${TabHeight}px`,
   textAlign: 'center',
-  background: '#DDD',
-  margin: '2px',
-  borderRadius: theme.shape.borderRadius,
   flexShrink: 0,
   cursor: 'pointer',
   userSelect: 'none',
+  backgroundColor: theme.palette.grey[50],
+  fontWeight: 500,
+  color: theme.palette.grey[800],
+
   paddingLeft: theme.spacing(1),
   paddingRight: theme.spacing(1),
+  marginLeft: '2px',
+  marginRight: '2px',
+  marginBottom: '2px',
+
+  // overlap it with the border from container to have the tab selected effect
+  marginTop: '-1px',
+
+  border: theme.dividerBorder,
+  borderBottomLeftRadius: theme.shape.borderRadius,
+  borderBottomRightRadius: theme.shape.borderRadius,
+
+  '&:hover': {
+    backgroundColor: theme.palette.grey[100],
+  },
 
   '&.selected': {
-    background: '#CCC',
+    backgroundColor: 'white',
+    borderTop: 'none',
+  },
+}));
+
+const CreateTab = styled(Tab)(({ theme }) => ({
+  minWidth: 40,
+  color: theme.palette.primary.main,
+
+  '&:hover': {
+    backgroundColor: theme.hoverColor,
+    borderColor: theme.palette.primary.light,
+    borderTopColor: theme.borderColor,
   },
 }));
 
@@ -127,10 +155,12 @@ export default function SheetContainer({ appId }: { appId: number }) {
       <Box
         sx={{
           padding: 0.5,
+          paddingTop: 0,
           flexShrink: 0,
           display: 'flex',
           flexDirection: 'row',
           borderTop: (theme) => theme.dividerBorder,
+          backgroundColor: 'grey.200',
         }}
       >
         {showLoading ? (
@@ -148,7 +178,9 @@ export default function SheetContainer({ appId }: { appId: number }) {
                 {deletingSheetId === sheet.id ? 'deleting...' : sheet.name}
               </Tab>
             ))}
-            <Tab onClick={() => createSheet({ name: 'hello world' })}>Create +</Tab>
+            <CreateTab onClick={() => createSheet({ name: 'hello world' })}>
+              <AddIcon sx={{ height: 15, width: 15, mb: '-2px' }} />
+            </CreateTab>
           </>
         )}
       </Box>
