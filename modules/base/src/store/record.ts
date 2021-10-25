@@ -70,7 +70,7 @@ export default createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(sheetStore.actions.updateSheet, (state, action) => {
-      // if updating fields, make sure all the records have the right fields cached
+      // if updating fields, make sure all the records have its fields cache pruned
       const { fields } = action.payload.data;
       if (fields) {
         const recordIds = state.recordsBySheet[action.payload.sheetId];
