@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { forEach, without } from 'lodash';
 import { Record, CellType } from 'shared/schema';
+import { pruneRecordCellData } from '~/utils/record';
+import sheetStore from './sheet';
 
 export interface State {
   // key is sheetId, value is array of sorted record slugs
@@ -65,5 +67,20 @@ export default createSlice({
       state.recordsBySheet[sheetId] = without(state.recordsBySheet[sheetId], slug);
       delete state.records[slug];
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(sheetStore.actions.updateSheet, (state, action) => {
+      // if updating fields, make sure all the records have the right fields cached
+      const { fields } = action.payload.data;
+      if (fields) {
+        const recordIds = state.recordsBySheet[action.payload.sheetId];
+        recordIds.forEach((id) => {
+          const { cells } = state.records[id];
+          if (cells) {
+            state.records[id].cells = pruneRecordCellData(fields, cells);
+          }
+        });
+      }
+    });
   },
 });

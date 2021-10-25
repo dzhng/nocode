@@ -1,8 +1,7 @@
 import * as trpc from '@trpc/server';
-import { omit } from 'lodash';
-import { Collections, Record, Sheet, Cell, CellType } from 'shared/schema';
+import { Collections, Record, Sheet, Cell, CellType, CellDataTuple } from 'shared/schema';
 import supabase from '~/utils/supabase';
-import { dataFieldForCell } from '~/utils/record';
+import { dataFieldForCell, pruneRecordCellData } from '~/utils/record';
 
 export default async function updateCell(
   sheetId: number,
@@ -34,12 +33,14 @@ export default async function updateCell(
   }
 
   // modify record
-  const newRecord: Record = omit(recordData, 'sheet');
-  newRecord.cells = [...(newRecord.cells?.filter(([id]) => id !== fieldId) ?? []), [fieldId, data]];
+  const cells: CellDataTuple[] = pruneRecordCellData(recordData.sheet.fields, [
+    ...(recordData.cells?.filter(([id]) => id !== fieldId) ?? []),
+    [fieldId, data],
+  ]);
 
   const { error: recordError } = await supabase
     .from<Record>(Collections.RECORDS)
-    .update(newRecord, { returning: 'minimal' })
+    .update({ cells }, { returning: 'minimal' })
     .match({ slug, sheetId });
 
   if (recordError) {

@@ -147,6 +147,7 @@ export const CellDataTupleSchema = z.tuple([
   z.string().uuid(), // fieldId
   CellTypeSchema.nullable(), // field data
 ]);
+export type CellDataTuple = z.infer<typeof CellDataTupleSchema>;
 
 export const RecordSchema = z.object({
   id: z.number().optional(),
