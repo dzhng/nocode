@@ -17,7 +17,7 @@ interface PropTypes {
   onFieldDragEnd?(fieldId: string): void;
   changeField(fieldId: string, data: Partial<FieldType>): void;
   removeField(fieldId: string): void;
-  reorderFields(sourceIndex: number, destinationIndex: number): void;
+  reorderField(sourceIndex: number, destinationIndex: number): void;
   onAddField(): void;
 }
 
