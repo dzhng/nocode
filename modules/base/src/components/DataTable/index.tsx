@@ -44,6 +44,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     addField,
     changeField,
     removeField,
+    reorderField,
   } = useSheet(sheet.id);
   const [isDraggingFields, setIsDraggingFields] = useState(false);
   //const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
@@ -99,6 +100,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           onFieldDragEnd={() => setIsDraggingFields(false)}
           changeField={changeField}
           removeField={removeField}
+          reorderField={reorderField}
           onAddField={onAddField}
         />
       </TableHead>

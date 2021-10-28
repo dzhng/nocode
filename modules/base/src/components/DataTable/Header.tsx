@@ -17,6 +17,7 @@ interface PropTypes {
   onFieldDragEnd?(fieldId: string): void;
   changeField(fieldId: string, data: Partial<FieldType>): void;
   removeField(fieldId: string): void;
+  reorderFields(sourceIndex: number, destinationIndex: number): void;
   onAddField(): void;
 }
 
@@ -62,6 +63,7 @@ export default function HeaderRow({
   onFieldDragEnd,
   changeField,
   removeField,
+  reorderField,
   onAddField,
 }: PropTypes) {
   // for managing popover
@@ -122,9 +124,9 @@ export default function HeaderRow({
       }
 
       onFieldDragEnd?.(result.draggableId);
-      //reorderRecord(source.index, destination.index);
+      reorderField(source.index, destination.index);
     },
-    [onFieldDragEnd],
+    [onFieldDragEnd, reorderField],
   );
 
   return (

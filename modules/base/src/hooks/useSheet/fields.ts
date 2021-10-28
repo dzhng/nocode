@@ -90,10 +90,27 @@ export default function useFields(sheetId?: number) {
     [sheet, sheetId, debouncedFieldsUpdate, queueFieldsUpdate, dispatch],
   );
 
+  const reorderField = useCallback(
+    async (sourceIndex: number, destinationIndex: number) => {
+      if (!sheet || !sheetId) {
+        return;
+      }
+
+      const newFields = [...sheet.fields];
+      const [removedField] = newFields.splice(sourceIndex, 1);
+      newFields.splice(destinationIndex, 0, removedField);
+
+      dispatch(sheetStore.actions.updateSheet({ sheetId, data: { fields: newFields } }));
+      queueFieldsUpdate(sheetId, newFields);
+    },
+    [sheet, sheetId, dispatch, queueFieldsUpdate],
+  );
+
   return {
     generateFieldId,
     addField,
     changeField,
     removeField,
+    reorderField,
   };
 }
