@@ -7,6 +7,7 @@ import {
   SortIcon,
   FilterIcon,
   HideIcon,
+  ConvertIcon,
 } from '~/components/Icons';
 
 const ButtonIconSx = { width: 15, height: 15, mr: 1 };
@@ -83,6 +84,10 @@ export default function FieldPopover({
           <Button color="primary">
             <HideIcon sx={ButtonIconSx} />
             Hide Field
+          </Button>
+          <Button color="primary">
+            <ConvertIcon sx={ButtonIconSx} />
+            Change Field Type
           </Button>
           <Button color="error" onClick={onDelete}>
             <DeleteIcon sx={ButtonIconSx} />

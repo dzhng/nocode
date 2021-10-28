@@ -59,7 +59,7 @@ export default function SheetPopover({
         >
           <Button variant="outlined" color="primary" onClick={onDuplicate}>
             <DuplicateIcon sx={ButtonIconSx} />
-            Duplicate
+            Make a copy
           </Button>
           <Button variant="outlined" color="error" onClick={onDelete}>
             <DeleteIcon sx={ButtonIconSx} />
