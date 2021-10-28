@@ -15,12 +15,20 @@ const ButtonIconSx = { width: 15, height: 15, mr: 1 };
 export default function FieldPopover({
   field,
   anchorEl,
+  canMoveLeft,
+  canMoveRight,
+  onMoveLeft,
+  onMoveRight,
   onNameChange,
   onClose,
   onDelete,
 }: {
   field?: FieldType | null;
   anchorEl?: Element | null;
+  canMoveLeft: boolean;
+  canMoveRight: boolean;
+  onMoveLeft(): void;
+  onMoveRight(): void;
   onNameChange(name: string): void;
   onClose(): void;
   onDelete(): void;
@@ -65,14 +73,19 @@ export default function FieldPopover({
             },
           }}
         >
-          <Button color="primary">
-            <MoveLeftIcon sx={ButtonIconSx} />
-            Move Left
-          </Button>
-          <Button color="primary">
-            <MoveRightIcon sx={ButtonIconSx} />
-            Move Right
-          </Button>
+          {canMoveLeft && (
+            <Button color="primary" onClick={onMoveLeft}>
+              <MoveLeftIcon sx={ButtonIconSx} />
+              Move Left
+            </Button>
+          )}
+          {canMoveRight && (
+            <Button color="primary" onClick={onMoveRight}>
+              <MoveRightIcon sx={ButtonIconSx} />
+              Move Right
+            </Button>
+          )}
+
           <Button color="primary">
             <SortIcon sx={ButtonIconSx} />
             Sort Field

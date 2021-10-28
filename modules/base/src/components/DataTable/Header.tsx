@@ -69,7 +69,8 @@ export default function HeaderRow({
   // for managing popover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [popoverFieldId, setPopoverFieldId] = useState<string | null>(null);
-  const popoverField = fields?.find((f) => f.id === popoverFieldId);
+  const popoverFieldIndex = fields?.findIndex((f) => f.id === popoverFieldId);
+  const popoverField: FieldType | undefined = fields?.[popoverFieldIndex];
 
   const handleDrag = useCallback(
     (fieldId: string, data: DraggableData) => {
@@ -214,6 +215,10 @@ export default function HeaderRow({
       <FieldPopover
         field={popoverField}
         anchorEl={anchorEl}
+        canMoveLeft={popoverFieldIndex !== 0}
+        canMoveRight={popoverFieldIndex < fields.length - 1}
+        onMoveLeft={() => reorderField(popoverFieldIndex, popoverFieldIndex - 1)}
+        onMoveRight={() => reorderField(popoverFieldIndex, popoverFieldIndex + 1)}
         onNameChange={handleNameChange}
         onClose={handleClose}
         onDelete={handleDelete}
