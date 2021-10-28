@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { styled } from '@mui/material';
 import { Sheet, DataTypes } from 'shared/schema';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
@@ -45,6 +45,7 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
     changeField,
     removeField,
   } = useSheet(sheet.id);
+  const [isDraggingFields, setIsDraggingFields] = useState(false);
   //const [selectedRecords, setSelectedRecords] = useState<number | null>(null);
 
   const onAddField = useCallback(() => {
@@ -94,6 +95,8 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
         <Header
           fields={sheet.fields}
           minWidth={DefaultCellWidth}
+          onFieldDragStart={() => setIsDraggingFields(true)}
+          onFieldDragEnd={() => setIsDraggingFields(false)}
           changeField={changeField}
           removeField={removeField}
           onAddField={onAddField}
@@ -107,14 +110,16 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {records.map((record, index) => (
                   <Draggable key={record.slug} draggableId={record.slug} index={index}>
-                    {(provided, snapshot) => (
+                    {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         style={provided.draggableProps.style}
                       >
                         <Row
-                          isDragging={snapshot.isDragging}
+                          sx={
+                            isDraggingFields ? { opacity: 0.5, pointerEvents: 'none' } : undefined
+                          }
                           dragHandleProps={provided.dragHandleProps}
                           fields={sheet.fields}
                           index={index}
@@ -134,7 +139,13 @@ export default function DataTable({ sheet }: { sheet: Sheet }) {
           </Droppable>
         </DragDropContext>
 
-        <AddNewRow onClick={onAddRow} sx={{ width: totalRowWidth + SelectorCellSize + 2 }}>
+        <AddNewRow
+          onClick={onAddRow}
+          sx={{
+            width: totalRowWidth + SelectorCellSize + 2,
+            visibility: isDraggingFields ? 'hidden' : 'visible',
+          }}
+        >
           <AddIcon />
           New record
         </AddNewRow>

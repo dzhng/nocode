@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { styled, Box } from '@mui/material';
+import { SxProps } from '@mui/system';
 import { FieldType, CellType } from 'shared/schema';
 import Cell from './Cell';
 import DragHandle from './DragHandle';
@@ -7,7 +8,7 @@ import { TableRow, TableCell } from './Table';
 import { SelectorCellSize } from './const';
 
 interface PropTypes {
-  isDragging?: boolean;
+  sx?: SxProps;
   dragHandleProps?: any;
   fields: FieldType[];
   index: number;
@@ -32,7 +33,7 @@ const Divider = styled('span')(({ theme }) => ({
 }));
 
 export default function Row({
-  // isDragging,
+  sx,
   dragHandleProps,
   fields,
   index,
@@ -42,7 +43,7 @@ export default function Row({
   editRecord,
 }: PropTypes) {
   return (
-    <TableRow>
+    <TableRow sx={sx}>
       <SelectorCell
         sx={{
           display: 'flex',
@@ -62,7 +63,7 @@ export default function Row({
         >
           {index + 1}
         </Box>
-        <DragHandle isDragging={false} {...dragHandleProps} />
+        <DragHandle {...dragHandleProps} />
       </SelectorCell>
       <Divider />
 

@@ -24,10 +24,9 @@ export const TableRow = styled('div')(({ theme }) => ({
   overflow: 'hidden',
   border: '1px solid #efefef',
   boxShadow: '0px 1px 2px 0px rgb(0 0 0 / 8%)',
-  backgroundColor: theme.palette.grey[100],
+  backgroundColor: 'white',
 
   '&:hover': {
-    backgroundColor: theme.hoverColor,
     boxShadow: `0px 1px 3px 0px ${theme.hoverColor}`,
     border: `1px solid ${theme.palette.primary.light}`,
 
@@ -41,6 +40,5 @@ export const TableCell = styled('div')(() => ({
   flexShrink: 0,
   flexGrow: 0,
   verticalAlign: 'inherit',
-  backgroundColor: '#FFF',
   overflow: 'hidden',
 }));
