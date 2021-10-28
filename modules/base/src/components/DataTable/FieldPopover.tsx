@@ -69,7 +69,6 @@ export default function FieldPopover({
             '> button': {
               textTransform: 'none',
               justifyContent: 'left',
-              mb: 1,
             },
           }}
         >
