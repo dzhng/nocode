@@ -2,23 +2,19 @@ import { useState, useCallback, MouseEvent } from 'react';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { FieldType } from 'shared/schema';
+import { FieldType, DataTypes } from 'shared/schema';
 import { AddIcon, ExpandIcon } from '~/components/Icons';
-import { TableHeaderRow, TableCell } from './Table';
-import { HeaderHeight, NewFieldCellSize } from './const';
+import useSheetContext from '../Context';
+import { TableHeaderRow, TableCell } from '../Table';
+import { HeaderHeight, NewFieldCellSize } from '../const';
 import FieldPopover from './FieldPopover';
 
 const HeaderDividerWidth = 2;
 
 interface PropTypes {
-  fields: FieldType[];
   minWidth: number;
   onFieldDragStart?(fieldId: string): void;
   onFieldDragEnd?(fieldId: string): void;
-  changeField(fieldId: string, data: Partial<FieldType>): void;
-  removeField(fieldId: string): void;
-  reorderField(sourceIndex: number, destinationIndex: number): void;
-  onAddField(): void;
 }
 
 const Divider = styled('span')(({ theme }) => ({
@@ -56,33 +52,26 @@ const FieldName = styled('div')(({ theme }) => ({
   },
 }));
 
-export default function HeaderRow({
-  fields,
-  minWidth,
-  onFieldDragStart,
-  onFieldDragEnd,
-  changeField,
-  removeField,
-  reorderField,
-  onAddField,
-}: PropTypes) {
+export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }: PropTypes) {
+  const { sheet, changeField, reorderField, addField, generateFieldId } = useSheetContext();
+
   // for managing popover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [popoverFieldId, setPopoverFieldId] = useState<string | null>(null);
-  const popoverFieldIndex = fields?.findIndex((f) => f.id === popoverFieldId);
-  const popoverField: FieldType | undefined = fields?.[popoverFieldIndex];
+  const popoverFieldIndex = sheet.fields?.findIndex((f) => f.id === popoverFieldId);
+  const popoverField: FieldType | undefined = sheet.fields?.[popoverFieldIndex];
 
   const handleDrag = useCallback(
     (fieldId: string, data: DraggableData) => {
       const { deltaX } = data;
-      const field = fields.find((c) => c.id === fieldId);
+      const field = sheet.fields.find((c) => c.id === fieldId);
       const newWidth = Math.max(
         minWidth,
         (field?.tableMetadata?.width ?? minWidth) + Math.floor(deltaX),
       );
       changeField(fieldId, { tableMetadata: { width: newWidth } });
     },
-    [changeField, fields, minWidth],
+    [changeField, sheet.fields, minWidth],
   );
 
   const handleFieldPopover = useCallback((e: MouseEvent<HTMLButtonElement>, fieldId: string) => {
@@ -91,24 +80,20 @@ export default function HeaderRow({
     setPopoverFieldId(fieldId);
   }, []);
 
-  const handleNameChange = useCallback(
-    (newName: string) => {
-      if (popoverFieldId) {
-        changeField(popoverFieldId, { name: newName });
-      }
-    },
-    [changeField, popoverFieldId],
-  );
-
-  const handleDelete = useCallback(() => {
-    if (popoverFieldId) {
-      removeField(popoverFieldId);
-    }
-  }, [removeField, popoverFieldId]);
-
   const handleClose = useCallback(() => {
     setPopoverFieldId(null);
   }, []);
+
+  const handleAddField = useCallback(() => {
+    addField(
+      {
+        id: generateFieldId(),
+        name: 'test',
+        type: DataTypes.Text,
+      },
+      sheet.fields.length,
+    );
+  }, [addField, generateFieldId, sheet]);
 
   const onDragStart = useCallback(
     (result: DropResult) => {
@@ -135,7 +120,7 @@ export default function HeaderRow({
       <Droppable direction="horizontal" droppableId="droppable">
         {(provided, snapshot) => (
           <TableHeaderRow {...provided.droppableProps} ref={provided.innerRef}>
-            {fields.map((field, index) => (
+            {sheet.fields.map((field, index) => (
               <Draggable key={field.id} draggableId={field.id} index={index}>
                 {(provided, snapshot) => (
                   <Box
@@ -201,7 +186,7 @@ export default function HeaderRow({
               }}
             >
               <Tooltip placement="bottom" title="Add new field">
-                <IconButton size="small" onClick={onAddField}>
+                <IconButton size="small" onClick={handleAddField}>
                   <AddIcon />
                 </IconButton>
               </Tooltip>
@@ -216,12 +201,10 @@ export default function HeaderRow({
         field={popoverField}
         anchorEl={anchorEl}
         canMoveLeft={popoverFieldIndex !== 0}
-        canMoveRight={popoverFieldIndex < fields.length - 1}
+        canMoveRight={popoverFieldIndex < sheet.fields.length - 1}
         onMoveLeft={() => reorderField(popoverFieldIndex, popoverFieldIndex - 1)}
         onMoveRight={() => reorderField(popoverFieldIndex, popoverFieldIndex + 1)}
-        onNameChange={handleNameChange}
         onClose={handleClose}
-        onDelete={handleDelete}
       />
     </DragDropContext>
   );

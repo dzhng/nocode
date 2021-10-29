@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Box, Popover, TextField, Divider, Button } from '@mui/material';
 import { FieldType } from 'shared/schema';
 import {
@@ -9,6 +10,7 @@ import {
   HideIcon,
   ConvertIcon,
 } from '~/components/Icons';
+import useSheetContext from '../Context';
 
 const ButtonIconSx = { width: 15, height: 15, mr: 1 };
 
@@ -19,9 +21,7 @@ export default function FieldPopover({
   canMoveRight,
   onMoveLeft,
   onMoveRight,
-  onNameChange,
   onClose,
-  onDelete,
 }: {
   field?: FieldType | null;
   anchorEl?: Element | null;
@@ -29,10 +29,25 @@ export default function FieldPopover({
   canMoveRight: boolean;
   onMoveLeft(): void;
   onMoveRight(): void;
-  onNameChange(name: string): void;
   onClose(): void;
-  onDelete(): void;
 }) {
+  const { changeField, removeField } = useSheetContext();
+
+  const handleNameChange = useCallback(
+    (newName: string) => {
+      if (field) {
+        changeField(field.id, { name: newName });
+      }
+    },
+    [changeField, field],
+  );
+
+  const handleDelete = useCallback(() => {
+    if (field) {
+      removeField(field.id);
+    }
+  }, [removeField, field]);
+
   return (
     <Popover
       open={!!field}
@@ -58,7 +73,7 @@ export default function FieldPopover({
           value={field?.name ?? ''}
           label="Field name"
           size="small"
-          onChange={(e) => onNameChange(e.target.value)}
+          onChange={(e) => handleNameChange(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && onClose()}
         />
         <Divider sx={{ mt: 1, mb: 1 }} />
@@ -101,7 +116,7 @@ export default function FieldPopover({
             <ConvertIcon sx={ButtonIconSx} />
             Change Field Type
           </Button>
-          <Button color="error" onClick={onDelete}>
+          <Button color="error" onClick={handleDelete}>
             <DeleteIcon sx={ButtonIconSx} />
             Remove Field
           </Button>
