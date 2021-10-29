@@ -34,10 +34,19 @@ export default function Menu() {
           )}
         </Tooltip>
       </IconButton>
+
       <MenuContainer
         open={menuOpen}
         onClose={() => setMenuOpen((state) => !state)}
         anchorEl={anchorRef.current}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
         data-testid="menu"
       >
         {userDetails?.displayName && (
@@ -48,6 +57,7 @@ export default function Menu() {
         <MenuItem onClick={() => setAboutOpen(true)}>About</MenuItem>
         <MenuItem onClick={handleSignOut}>Logout</MenuItem>
       </MenuContainer>
+
       <AboutDialog
         open={aboutOpen}
         onClose={() => {
