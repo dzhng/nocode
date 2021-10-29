@@ -2,12 +2,13 @@ import { useState, useCallback, MouseEvent } from 'react';
 import { styled, Box, Tooltip, IconButton } from '@mui/material';
 import { DraggableCore, DraggableData } from 'react-draggable';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { FieldType, DataTypes } from 'shared/schema';
+import { FieldType } from 'shared/schema';
 import { AddIcon, ExpandIcon } from '~/components/Icons';
 import useSheetContext from '../Context';
 import { TableHeaderRow, TableCell } from '../Table';
 import { HeaderHeight, NewFieldCellSize } from '../const';
 import FieldPopover from './FieldPopover';
+import AddPopover from './AddPopover';
 
 const HeaderDividerWidth = 2;
 
@@ -53,15 +54,18 @@ const FieldName = styled('div')(({ theme }) => ({
 }));
 
 export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }: PropTypes) {
-  const { sheet, changeField, reorderField, addField, generateFieldId } = useSheetContext();
+  const { sheet, changeField, reorderField } = useSheetContext();
 
-  // for managing popover
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  // for managing add popover
+  const [addAnchorEl, setAddAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  // for managing field popover
+  const [fieldAnchorEl, setFieldAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [popoverFieldId, setPopoverFieldId] = useState<string | null>(null);
   const popoverFieldIndex = sheet.fields?.findIndex((f) => f.id === popoverFieldId);
   const popoverField: FieldType | undefined = sheet.fields?.[popoverFieldIndex];
 
-  const handleDrag = useCallback(
+  const handleResizeDrag = useCallback(
     (fieldId: string, data: DraggableData) => {
       const { deltaX } = data;
       const field = sheet.fields.find((c) => c.id === fieldId);
@@ -76,24 +80,22 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
 
   const handleFieldPopover = useCallback((e: MouseEvent<HTMLButtonElement>, fieldId: string) => {
     e.preventDefault();
-    setAnchorEl(e.currentTarget);
+    setFieldAnchorEl(e.currentTarget);
     setPopoverFieldId(fieldId);
   }, []);
 
-  const handleClose = useCallback(() => {
+  const handleFieldClose = useCallback(() => {
     setPopoverFieldId(null);
   }, []);
 
-  const handleAddField = useCallback(() => {
-    addField(
-      {
-        id: generateFieldId(),
-        name: 'test',
-        type: DataTypes.Text,
-      },
-      sheet.fields.length,
-    );
-  }, [addField, generateFieldId, sheet]);
+  const handleAddPopover = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setAddAnchorEl(e.currentTarget);
+  }, []);
+
+  const handleAddClose = useCallback(() => {
+    setAddAnchorEl(null);
+  }, []);
 
   const onDragStart = useCallback(
     (result: DropResult) => {
@@ -138,7 +140,10 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
                   >
                     {/* Have divider ahead and positioned behind via margin
           so that dragging won't change it's position */}
-                    <DraggableCore grid={[25, 25]} onDrag={(_, data) => handleDrag(field.id, data)}>
+                    <DraggableCore
+                      grid={[25, 25]}
+                      onDrag={(_, data) => handleResizeDrag(field.id, data)}
+                    >
                       <Divider
                         sx={{
                           left: (field.tableMetadata?.width ?? minWidth) - HeaderDividerWidth / 2,
@@ -186,7 +191,7 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
               }}
             >
               <Tooltip placement="bottom" title="Add new field">
-                <IconButton size="small" onClick={handleAddField}>
+                <IconButton size="small" onClick={handleAddPopover}>
                   <AddIcon />
                 </IconButton>
               </Tooltip>
@@ -199,13 +204,15 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
 
       <FieldPopover
         field={popoverField}
-        anchorEl={anchorEl}
+        anchorEl={fieldAnchorEl}
         canMoveLeft={popoverFieldIndex !== 0}
         canMoveRight={popoverFieldIndex < sheet.fields.length - 1}
         onMoveLeft={() => reorderField(popoverFieldIndex, popoverFieldIndex - 1)}
         onMoveRight={() => reorderField(popoverFieldIndex, popoverFieldIndex + 1)}
-        onClose={handleClose}
+        onClose={handleFieldClose}
       />
+
+      <AddPopover anchorEl={addAnchorEl} onClose={handleAddClose} />
     </DragDropContext>
   );
 }
