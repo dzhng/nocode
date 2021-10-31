@@ -6,7 +6,7 @@ import { FieldType } from 'shared/schema';
 import { AddIcon, ExpandIcon } from '~/components/Icons';
 import useSheetContext from '../Context';
 import { TableHeaderRow, TableCell } from '../Table';
-import { HeaderHeight, NewFieldCellSize } from '../const';
+import { HeaderHeight, CellDragGrid, NewFieldCellSize, FieldNamePlaceholder } from '../const';
 import FieldPopover from './FieldPopover';
 import AddPopover from './AddPopover';
 
@@ -60,7 +60,9 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
   const [addAnchorEl, setAddAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   // for managing field popover
-  const [fieldAnchorEl, setFieldAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [fieldAnchorEl, setFieldAnchorEl] = useState<HTMLButtonElement | HTMLDivElement | null>(
+    null,
+  );
   const [popoverFieldId, setPopoverFieldId] = useState<string | null>(null);
   const popoverFieldIndex = sheet.fields?.findIndex((f) => f.id === popoverFieldId);
   const popoverField: FieldType | undefined = sheet.fields?.[popoverFieldIndex];
@@ -78,11 +80,14 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
     [changeField, sheet.fields, minWidth],
   );
 
-  const handleFieldPopover = useCallback((e: MouseEvent<HTMLButtonElement>, fieldId: string) => {
-    e.preventDefault();
-    setFieldAnchorEl(e.currentTarget);
-    setPopoverFieldId(fieldId);
-  }, []);
+  const handleFieldPopover = useCallback(
+    (e: MouseEvent<HTMLButtonElement | HTMLDivElement>, fieldId: string) => {
+      e.preventDefault();
+      setFieldAnchorEl(e.currentTarget);
+      setPopoverFieldId(fieldId);
+    },
+    [],
+  );
 
   const handleFieldClose = useCallback(() => {
     setPopoverFieldId(null);
@@ -141,7 +146,7 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
                     {/* Have divider ahead and positioned behind via margin
           so that dragging won't change it's position */}
                     <DraggableCore
-                      grid={[25, 25]}
+                      grid={[CellDragGrid, CellDragGrid]}
                       onDrag={(_, data) => handleResizeDrag(field.id, data)}
                     >
                       <Divider
@@ -158,8 +163,15 @@ export default function HeaderRow({ minWidth, onFieldDragStart, onFieldDragEnd }
                         height: HeaderHeight,
                       }}
                     >
-                      <FieldName {...provided.dragHandleProps}>
-                        <span>{field.name}</span>
+                      <FieldName
+                        {...provided.dragHandleProps}
+                        onDoubleClick={(e) => handleFieldPopover(e, field.id)}
+                        sx={{
+                          color: field.name ? 'inherit' : 'grey.500',
+                          fontWeight: field.name ? 'inherit' : 500,
+                        }}
+                      >
+                        <span>{field.name || FieldNamePlaceholder}</span>
                         <Tooltip placement="bottom" title="Edit field">
                           <IconButton size="small" onClick={(e) => handleFieldPopover(e, field.id)}>
                             <ExpandIcon />

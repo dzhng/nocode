@@ -10,6 +10,7 @@ import {
   DateTypeIcon,
   RelationTypeIcon,
 } from '~/components/Icons';
+import { FieldNamePlaceholder } from '../const';
 import useSheetContext from '../Context';
 
 export default function FieldPopover({
@@ -29,6 +30,7 @@ export default function FieldPopover({
   useEffect(() => {
     if (shouldOpen) {
       setName('');
+      setSelectedType(DataTypes.Text);
     }
   }, [shouldOpen]);
 
@@ -47,13 +49,13 @@ export default function FieldPopover({
       {
         id: generateFieldId(),
         name,
-        type: DataTypes.Text,
+        type: selectedType,
       },
       sheet.fields.length,
     );
 
     onClose();
-  }, [addField, name, generateFieldId, sheet, onClose]);
+  }, [addField, name, selectedType, generateFieldId, sheet, onClose]);
 
   return (
     <Popover
@@ -79,6 +81,7 @@ export default function FieldPopover({
           fullWidth
           value={name}
           label="Field name"
+          placeholder={FieldNamePlaceholder}
           size="small"
           onChange={(e) => handleNameChange(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleAddField()}
