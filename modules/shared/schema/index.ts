@@ -78,7 +78,6 @@ export enum DataTypes {
   Number = 'number',
   File = 'file',
   Date = 'date',
-  Location = 'location',
 
   // select from a list of predefined text or numbers
   Selection = 'selection',
@@ -106,6 +105,11 @@ export type CellType = z.infer<typeof CellTypeSchema>;
  * Field definitions
  */
 
+export const DateMetaSchema = z.object({
+  type: z.enum(['date', 'time', 'dateAndTime']),
+});
+export type DateMeta = z.infer<typeof SelectionMetaSchema>;
+
 export const SelectionMetaSchema = z.object({
   type: z.enum([DataTypes.Text, DataTypes.Number]),
   options: z.array(z.string()).or(z.array(z.number())),
@@ -117,8 +121,11 @@ export const RelationMetaSchema = z.object({
   keyFieldId: z.string().uuid(),
 
   // point to the location of the relational data value
-  valueSheetId: z.string(),
-  valueFieldId: z.string().uuid(),
+  valueSheetId: z.number(),
+  valueRecordId: z.number(),
+
+  // if fieldId is left undefined, the relation is to an entire record
+  valueFieldId: z.string().uuid().optional(),
 });
 export type RelationMeta = z.infer<typeof RelationMetaSchema>;
 

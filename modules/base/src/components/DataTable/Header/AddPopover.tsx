@@ -1,10 +1,16 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Box, Popover, TextField, Divider, Button } from '@mui/material';
+import { Box, Popover, TextField, Divider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { DataTypes } from 'shared/schema';
-import { SortIcon, FilterIcon, HideIcon, ConvertIcon } from '~/components/Icons';
+import {
+  TextTypeIcon,
+  NumberTypeIcon,
+  SelectionTypeIcon,
+  ImageTypeIcon,
+  FileTypeIcon,
+  DateTypeIcon,
+  RelationTypeIcon,
+} from '~/components/Icons';
 import useSheetContext from '../Context';
-
-const ButtonIconSx = { width: 15, height: 15, mr: 1 };
 
 export default function FieldPopover({
   anchorEl,
@@ -15,6 +21,8 @@ export default function FieldPopover({
 }) {
   const { sheet, addField, generateFieldId } = useSheetContext();
   const [name, setName] = useState('');
+  const [selectedType, setSelectedType] = useState<DataTypes>(DataTypes.Text);
+
   const shouldOpen = !!anchorEl;
 
   // reset name state everytime the popover opens
@@ -26,6 +34,12 @@ export default function FieldPopover({
 
   const handleNameChange = useCallback((newName: string) => {
     setName(newName);
+  }, []);
+
+  const handleTypeChange = useCallback((_, newType: DataTypes) => {
+    if (newType !== null) {
+      setSelectedType(newType);
+    }
   }, []);
 
   const handleAddField = useCallback(() => {
@@ -70,33 +84,55 @@ export default function FieldPopover({
           onKeyPress={(e) => e.key === 'Enter' && handleAddField()}
         />
         <Divider sx={{ mt: 1, mb: 1 }} />
-        <Box
+        <ToggleButtonGroup
+          fullWidth
+          size="small"
+          orientation="vertical"
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
             '> button': {
               textTransform: 'none',
               justifyContent: 'left',
+
+              '> svg': {
+                width: 15,
+                height: 15,
+                mr: 1,
+              },
             },
           }}
+          value={selectedType}
+          exclusive
+          onChange={handleTypeChange}
         >
-          <Button color="primary">
-            <SortIcon sx={ButtonIconSx} />
-            Sort Field
-          </Button>
-          <Button color="primary">
-            <FilterIcon sx={ButtonIconSx} />
-            Filter By Field
-          </Button>
-          <Button color="primary">
-            <HideIcon sx={ButtonIconSx} />
-            Hide Field
-          </Button>
-          <Button color="primary">
-            <ConvertIcon sx={ButtonIconSx} />
-            Change Field Type
-          </Button>
-        </Box>
+          <ToggleButton value={DataTypes.Text}>
+            <TextTypeIcon />
+            Text
+          </ToggleButton>
+          <ToggleButton value={DataTypes.Number}>
+            <NumberTypeIcon />
+            Number
+          </ToggleButton>
+          <ToggleButton value={DataTypes.Selection}>
+            <SelectionTypeIcon />
+            Selection
+          </ToggleButton>
+          <ToggleButton value={DataTypes.Image}>
+            <ImageTypeIcon />
+            Image
+          </ToggleButton>
+          <ToggleButton value={DataTypes.File}>
+            <FileTypeIcon />
+            File
+          </ToggleButton>
+          <ToggleButton value={DataTypes.Date}>
+            <DateTypeIcon />
+            Date and time
+          </ToggleButton>
+          <ToggleButton value={DataTypes.Relation}>
+            <RelationTypeIcon />
+            Lookup record
+          </ToggleButton>
+        </ToggleButtonGroup>
       </Box>
     </Popover>
   );

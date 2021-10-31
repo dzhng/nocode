@@ -29,6 +29,15 @@ import {
   ViewAgendaOutlined as GroupIcon,
   InvertColorsOutlined as ColorIcon,
   Height as RowHeightIcon,
+
+  // type icons
+  TextFieldsOutlined as TextTypeIcon,
+  LooksOneOutlined as NumberTypeIcon,
+  ArrowDropDownCircleOutlined as SelectionTypeIcon,
+  ImageOutlined as ImageTypeIcon,
+  FilePresentOutlined as FileTypeIcon,
+  CalendarTodayOutlined as DateTypeIcon,
+  ShortcutOutlined as RelationTypeIcon,
 } from '@mui/icons-material';
 
 // re-export standardized icons so they are consistent
@@ -61,6 +70,13 @@ export {
   GroupIcon,
   ColorIcon,
   RowHeightIcon,
+  TextTypeIcon,
+  NumberTypeIcon,
+  SelectionTypeIcon,
+  ImageTypeIcon,
+  FileTypeIcon,
+  DateTypeIcon,
+  RelationTypeIcon,
 };
 
 export const Logo = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
