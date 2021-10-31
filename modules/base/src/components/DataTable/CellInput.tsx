@@ -76,11 +76,11 @@ export function NumberCellInput({
   defaultHeight,
   onChange,
 }: {
-  value?: number;
+  value: number | null;
   defaultHeight: number;
-  onChange(input?: number): void;
+  onChange(input: number | null): void;
 }) {
-  const [trueValue, setTrueValue] = useState<number | undefined>();
+  const [trueValue, setTrueValue] = useState<number | null>(null);
   const classes = useStyles();
 
   // whenever value changes, set it to true value
@@ -91,7 +91,7 @@ export function NumberCellInput({
   const onValueChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const inputVal = e.target.value;
     if (inputVal === '') {
-      setTrueValue(undefined);
+      setTrueValue(null);
     } else {
       setTrueValue(Number(inputVal));
     }
@@ -116,7 +116,7 @@ export function NumberCellInput({
       className={classes.input}
       style={{ minHeight: defaultHeight }}
       type="number"
-      value={trueValue === undefined ? '' : trueValue}
+      value={trueValue === null ? '' : trueValue}
       onChange={onValueChange}
       onKeyPress={onKeyPress}
       onBlur={onBlur}

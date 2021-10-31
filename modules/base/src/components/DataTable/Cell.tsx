@@ -8,7 +8,7 @@ interface PropTypes {
   defaultHeight: number;
   data?: CellType;
   isHeader?: boolean;
-  onChange(data?: CellType): void;
+  onChange(data: CellType): void;
 }
 
 export default function Cell({ field, defaultHeight, data, isHeader, onChange }: PropTypes) {
@@ -27,7 +27,7 @@ export default function Cell({ field, defaultHeight, data, isHeader, onChange }:
     } else if (field.type === DataTypes.Number) {
       return (
         <NumberCellInput
-          value={data === undefined || data === null ? undefined : Number(data)}
+          value={data === undefined || data === null ? null : Number(data)}
           onChange={onChange}
           defaultHeight={defaultHeight}
         />

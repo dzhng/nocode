@@ -82,9 +82,7 @@ export default function Row({
               defaultHeight={defaultHeight}
               data={dataForField(field.id)}
               onChange={(newData) => {
-                if (newData !== undefined) {
-                  editRecord(field.id, newData);
-                }
+                editRecord(field.id, newData);
               }}
             />
           </TableCell>
