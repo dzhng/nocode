@@ -27,7 +27,7 @@ export default function Cell({ field, defaultHeight, data, isHeader, onChange }:
     } else if (field.type === DataTypes.Number) {
       return (
         <NumberCellInput
-          value={data === undefined ? undefined : Number(data)}
+          value={data === undefined || data === null ? undefined : Number(data)}
           onChange={onChange}
           defaultHeight={defaultHeight}
         />
@@ -36,10 +36,6 @@ export default function Cell({ field, defaultHeight, data, isHeader, onChange }:
       return <span>File</span>; // TODO
     } else if (field.type === DataTypes.Date) {
       return <span>{data instanceof Date ? formatRelativeDate(data) : ''}</span>;
-    } else if (field.type === DataTypes.Location) {
-      return (
-        <TextCellInput value={String(data)} onChange={onChange} defaultHeight={defaultHeight} />
-      );
     } else if (field.type === DataTypes.Selection) {
       return <span></span>;
     } else if (field.type === DataTypes.Relation) {

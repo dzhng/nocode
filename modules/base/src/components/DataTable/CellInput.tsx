@@ -116,7 +116,7 @@ export function NumberCellInput({
       className={classes.input}
       style={{ minHeight: defaultHeight }}
       type="number"
-      value={value === undefined ? '' : value}
+      value={trueValue === undefined ? '' : trueValue}
       onChange={onValueChange}
       onKeyPress={onKeyPress}
       onBlur={onBlur}
