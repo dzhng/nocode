@@ -184,7 +184,7 @@ export default function FieldPopover({
 
         <Divider sx={{ mt: 1, mb: 1 }} />
 
-        <Button fullWidth size="small" variant="outlined" onClick={handleAddField}>
+        <Button fullWidth size="small" variant="contained" onClick={handleAddField}>
           Add Field
         </Button>
       </Box>
