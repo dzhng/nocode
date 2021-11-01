@@ -79,8 +79,11 @@ export enum DataTypes {
   File = 'file',
   Date = 'date',
 
-  // select from a list of predefined text or numbers
+  // select one from a list of predefined text
   Selection = 'selection',
+
+  // add one or more predefined tags
+  Tag = 'tag',
 
   // map to value from another table, based on a value from this row
   Relation = 'relation',
@@ -111,8 +114,12 @@ export const DateMetaSchema = z.object({
 export type DateMeta = z.infer<typeof SelectionMetaSchema>;
 
 export const SelectionMetaSchema = z.object({
-  type: z.enum([DataTypes.Text, DataTypes.Number]),
-  options: z.array(z.string()).or(z.array(z.number())),
+  options: z.array(
+    z.object({
+      value: z.string(),
+      color: z.string().optional(),
+    }),
+  ),
 });
 export type SelectionMeta = z.infer<typeof SelectionMetaSchema>;
 

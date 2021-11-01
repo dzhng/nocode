@@ -64,6 +64,7 @@ export default function FieldPopover({
     >
       <Box
         sx={{
+          width: 200,
           padding: 2,
         }}
       >
