@@ -33,7 +33,7 @@ export default function useFields(sheetId?: number) {
   const generateFieldId = useCallback(uuid, []);
 
   const addField = useCallback(
-    async (field: FieldType & { id?: string }, index: number) => {
+    async (field: FieldType, index: number) => {
       if (!sheet || !sheetId) {
         return;
       }

@@ -1,4 +1,4 @@
-import { useState, useCallback, MouseEvent } from 'react';
+import { useState, useCallback, useEffect, MouseEvent } from 'react';
 import produce from 'immer';
 import { v1 as generateId } from 'uuid';
 import { Box, Button, InputBase } from '@mui/material';
@@ -24,6 +24,11 @@ const configByType: ConfigMap = {
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
     const [selectedColorOptionId, setSelectedColorOptionId] = useState<string | undefined>();
 
+    useEffect(() => {
+      // everytime data changes, call the onchange handler
+      onChange(data);
+    }, [data, onChange]);
+
     const handleAddOption = useCallback(() => {
       setData({
         options: [...data.options, { id: generateId(), value: '' }],
@@ -37,9 +42,8 @@ const configByType: ConfigMap = {
         });
 
         setData(newData);
-        onChange(newData);
       },
-      [onChange, data],
+      [data],
     );
 
     const handleColorSelection = useCallback((e: MouseEvent<HTMLDivElement>, id: string) => {
@@ -64,10 +68,9 @@ const configByType: ConfigMap = {
           });
 
           setData(newData);
-          onChange(newData);
         }
       },
-      [onChange, data, selectedColorOptionId],
+      [data, selectedColorOptionId],
     );
 
     return (
