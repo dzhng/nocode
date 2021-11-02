@@ -116,6 +116,7 @@ export type DateMeta = z.infer<typeof SelectionMetaSchema>;
 export const SelectionMetaSchema = z.object({
   options: z.array(
     z.object({
+      id: z.string().uuid(),
       value: z.string(),
       color: z.string().optional(),
     }),

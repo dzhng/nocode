@@ -1,8 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, MouseEvent } from 'react';
 import produce from 'immer';
+import { v1 as generateId } from 'uuid';
 import { Box, Button, InputBase } from '@mui/material';
 import { DataTypes, SelectionMeta } from 'shared/schema';
-import { DefaultOptionColor, OptionColorPalette } from '~/const';
+import { DefaultOptionColor } from '~/const';
+import OptionColorPicker from './OptionColorPicker';
 
 interface ConfigMap {
   [type: string]: React.FunctionComponent<{ onChange(meta: object): void }>;
@@ -10,19 +12,21 @@ interface ConfigMap {
 
 const DefaultMeta: SelectionMeta = {
   options: [
-    { value: 'Low', color: '#61BB45' },
-    { value: 'Medium', color: '#FDB827' },
-    { value: 'High', color: '#E1393E' },
+    { id: generateId(), value: 'Low', color: '#61BB45' },
+    { id: generateId(), value: 'Medium', color: '#FDB827' },
+    { id: generateId(), value: 'High', color: '#E1393E' },
   ],
 };
 
 const configByType: ConfigMap = {
   [DataTypes.Selection]: function Selection({ onChange }) {
     const [data, setData] = useState<SelectionMeta>(DefaultMeta);
+    const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+    const [selectedColorOptionId, setSelectedColorOptionId] = useState<string | undefined>();
 
     const handleAddOption = useCallback(() => {
       setData({
-        options: [...data.options, { value: '' }],
+        options: [...data.options, { id: generateId(), value: '' }],
       });
     }, [data]);
 
@@ -36,6 +40,34 @@ const configByType: ConfigMap = {
         onChange(newData);
       },
       [onChange, data],
+    );
+
+    const handleColorSelection = useCallback((e: MouseEvent<HTMLDivElement>, id: string) => {
+      e.preventDefault();
+      setAnchorEl(e.currentTarget);
+      setSelectedColorOptionId(id);
+    }, []);
+
+    const handleColorPickerClose = useCallback(() => {
+      setAnchorEl(null);
+    }, []);
+
+    const handleColorSelected = useCallback(
+      (value) => {
+        // close the color picker
+        setAnchorEl(null);
+
+        const index = data.options.findIndex((o) => o.id === selectedColorOptionId);
+        if (index !== -1) {
+          const newData = produce(data, (draft) => {
+            draft.options[index].color = value;
+          });
+
+          setData(newData);
+          onChange(newData);
+        }
+      },
+      [onChange, data, selectedColorOptionId],
     );
 
     return (
@@ -59,7 +91,12 @@ const configByType: ConfigMap = {
                 cursor: 'pointer',
                 border: (theme) => theme.dividerBorder,
                 backgroundColor: option.color ? option.color : DefaultOptionColor,
+
+                ':hover': {
+                  border: '1px solid #777',
+                },
               }}
+              onClick={(e) => handleColorSelection(e, option.id)}
             />
             <InputBase
               fullWidth
@@ -75,7 +112,11 @@ const configByType: ConfigMap = {
                 fontWeight: 500,
                 color: 'grey.700',
                 fontSize: '13px',
+
                 '> input': { p: 0 },
+                ':hover': {
+                  border: '1px solid #777',
+                },
               }}
               value={option.value}
               onChange={(e) => handleOptionValueChange(index, e.target.value)}
@@ -86,6 +127,13 @@ const configByType: ConfigMap = {
         <Button fullWidth size="small" variant="outlined" onClick={handleAddOption}>
           Add Option
         </Button>
+
+        <OptionColorPicker
+          anchorEl={anchorEl}
+          selectedValue={data.options.find((o) => o.id === selectedColorOptionId)?.color}
+          onSelect={handleColorSelected}
+          onClose={handleColorPickerClose}
+        />
       </Box>
     );
   },
