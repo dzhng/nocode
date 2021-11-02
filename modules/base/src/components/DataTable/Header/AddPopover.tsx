@@ -8,7 +8,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material';
-import { DataTypes } from 'shared/schema';
+import { DataTypes, SelectionMeta, RelationMeta } from 'shared/schema';
 import {
   BackIcon,
   TextTypeIcon,
@@ -33,6 +33,9 @@ export default function FieldPopover({
   const { sheet, addField, generateFieldId } = useSheetContext();
   const [name, setName] = useState('');
   const [selectedType, setSelectedType] = useState<DataTypes>(DataTypes.Text);
+  const [selectedMetadata, setSelectedMetadata] = useState<
+    SelectionMeta | RelationMeta | undefined
+  >();
 
   const shouldOpen = !!anchorEl;
 
@@ -51,6 +54,7 @@ export default function FieldPopover({
   const handleTypeChange = useCallback((_, newType: DataTypes) => {
     if (newType !== null) {
       setSelectedType(newType);
+      setSelectedMetadata(undefined);
     }
   }, []);
 
@@ -60,15 +64,16 @@ export default function FieldPopover({
         id: generateFieldId(),
         name,
         type: selectedType,
+        typeMetadata: selectedMetadata,
       },
       sheet.fields.length,
     );
 
     onClose();
-  }, [addField, name, selectedType, generateFieldId, sheet, onClose]);
+  }, [addField, name, selectedType, selectedMetadata, generateFieldId, sheet, onClose]);
 
   const handleTypeConfigurationChange = useCallback((data: object) => {
-    // TODO
+    setSelectedMetadata(data as any);
   }, []);
 
   const TypeConfiguration = TypeComponents[selectedType];
