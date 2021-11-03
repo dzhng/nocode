@@ -29,6 +29,7 @@ import {
   ViewAgendaOutlined as GroupIcon,
   InvertColorsOutlined as ColorIcon,
   Height as RowHeightIcon,
+  ArrowDropDownOutlined as SelectionDropdownIcon,
 
   // type icons
   TextFieldsOutlined as TextTypeIcon,
@@ -70,6 +71,7 @@ export {
   GroupIcon,
   ColorIcon,
   RowHeightIcon,
+  SelectionDropdownIcon,
   TextTypeIcon,
   NumberTypeIcon,
   SelectionTypeIcon,

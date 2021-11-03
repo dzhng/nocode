@@ -31,7 +31,7 @@ const Divider = styled('span')(({ theme }) => ({
 
 const FieldName = styled('div')(({ theme }) => ({
   paddingLeft: theme.spacing(1),
-  paddingRight: theme.spacing(1),
+  paddingRight: theme.spacing(0.2),
   display: 'flex',
   alignItems: 'center',
 

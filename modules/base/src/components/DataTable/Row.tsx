@@ -13,7 +13,7 @@ interface PropTypes {
   fields: FieldType[];
   index: number;
   minWidth: number;
-  defaultHeight: number;
+  height: number;
   dataForField(fieldId: string): CellType | undefined;
   editRecord(fieldId: string, data: CellType): void;
 }
@@ -38,7 +38,7 @@ export default function Row({
   fields,
   index,
   minWidth,
-  defaultHeight,
+  height,
   dataForField,
   editRecord,
 }: PropTypes) {
@@ -55,7 +55,7 @@ export default function Row({
           component="span"
           sx={{
             ml: 0.5,
-            lineHeight: `${defaultHeight}px`,
+            lineHeight: `${height}px`,
             fontWeight: 700,
             fontSize: '0.8rem',
             color: 'grey.400',
@@ -71,7 +71,7 @@ export default function Row({
         <Fragment key={field.id}>
           <TableCell
             sx={{
-              minHeight: defaultHeight,
+              height: height,
               width: field.tableMetadata?.width ?? minWidth,
               borderTopRightRadius: fieldIdx === fields.length - 1 ? 5 : 0,
               borderBottomRightRadius: fieldIdx === fields.length - 1 ? 5 : 0,
@@ -79,7 +79,7 @@ export default function Row({
           >
             <Cell
               field={field}
-              defaultHeight={defaultHeight}
+              height={height}
               data={dataForField(field.id)}
               onChange={(newData) => {
                 editRecord(field.id, newData);

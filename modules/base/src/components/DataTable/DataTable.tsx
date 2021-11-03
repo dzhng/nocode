@@ -7,14 +7,14 @@ import useSheetContext from './Context';
 import { Table, TableHead, TableBody } from './Table';
 import Header from './Header';
 import Row from './Row';
-import { SelectorCellSize, DefaultCellWidth, DefaultCellHeight } from './const';
+import { SelectorCellSize, DefaultCellWidth, CellHeightSmall } from './const';
 
 const AddNewRow = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   backgroundColor: theme.palette.grey[100],
-  height: DefaultCellHeight,
+  height: CellHeightSmall,
   fontWeight: 'bold',
   color: theme.palette.grey[700],
   borderRadius: 5,
@@ -105,7 +105,7 @@ export default function DataTable() {
                           fields={sheet.fields}
                           index={index}
                           minWidth={DefaultCellWidth}
-                          defaultHeight={DefaultCellHeight}
+                          height={CellHeightSmall}
                           dataForField={(fieldId) => cellDataForRecord(record, fieldId)}
                           editRecord={(fieldId, data) => editRecord(record.slug, fieldId, data)}
                         />

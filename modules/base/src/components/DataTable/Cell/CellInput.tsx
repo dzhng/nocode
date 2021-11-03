@@ -23,12 +23,12 @@ const useStyles = makeStyles(() =>
 
 export function TextCellInput({
   value,
-  defaultHeight,
+  height,
   onChange,
   isHeader,
 }: {
   value?: string;
-  defaultHeight: number;
+  height: number;
   onChange(input: string): void;
   isHeader?: boolean;
 }) {
@@ -61,7 +61,7 @@ export function TextCellInput({
   return (
     <input
       className={clsx(classes.input, isHeader && classes.header)}
-      style={{ minHeight: defaultHeight }}
+      style={{ height }}
       type="text"
       value={trueValue}
       onChange={onValueChange}
@@ -73,11 +73,11 @@ export function TextCellInput({
 
 export function NumberCellInput({
   value,
-  defaultHeight,
+  height,
   onChange,
 }: {
   value: number | null;
-  defaultHeight: number;
+  height: number;
   onChange(input: number | null): void;
 }) {
   const [trueValue, setTrueValue] = useState<number | null>(null);
@@ -114,7 +114,7 @@ export function NumberCellInput({
   return (
     <input
       className={classes.input}
-      style={{ minHeight: defaultHeight }}
+      style={{ height }}
       type="number"
       value={trueValue === null ? '' : trueValue}
       onChange={onValueChange}
