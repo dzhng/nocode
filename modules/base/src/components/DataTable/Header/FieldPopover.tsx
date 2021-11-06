@@ -113,10 +113,6 @@ export default function FieldPopover({
             <HideIcon sx={ButtonIconSx} />
             Hide Field
           </Button>
-          <Button color="primary">
-            <ConvertIcon sx={ButtonIconSx} />
-            Change Field Type
-          </Button>
           <Button color="error" onClick={handleDelete}>
             <DeleteIcon sx={ButtonIconSx} />
             Remove Field
